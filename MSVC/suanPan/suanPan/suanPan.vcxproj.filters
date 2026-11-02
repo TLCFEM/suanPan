@@ -1005,25 +1005,7 @@
     <ClCompile Include="..\..\..\Toolbox\utility.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestMode.cpp">
-      <Filter>UnitTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestQuaternion.cpp">
-      <Filter>UnitTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestShape.cpp">
-      <Filter>UnitTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestTensor.cpp">
-      <Filter>UnitTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestUtility.cpp">
-      <Filter>UnitTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\suanPan.cpp" />
-    <ClCompile Include="..\..\..\UnitTest\TestNURBS.cpp">
-      <Filter>UnitTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Material\Material1D\Viscosity\Kelvin.cpp">
       <Filter>Material\Material1D\Viscosity</Filter>
     </ClCompile>
@@ -1195,26 +1177,14 @@
     <ClCompile Include="..\..\..\Converger\LogicConverger.cpp">
       <Filter>Converger</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestString.cpp">
-      <Filter>UnitTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestMatrix.cpp">
-      <Filter>UnitTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Constraint\Criterion\LogicCriterion.cpp">
       <Filter>Constraint\Criterion</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestColoring.cpp">
-      <Filter>UnitTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Domain\DomainHelper.cpp">
       <Filter>Domain</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Domain\DomainState.cpp">
       <Filter>Domain</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestIntegration.cpp">
-      <Filter>UnitTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Recorder\RecorderParser.cpp">
       <Filter>Recorder</Filter>
@@ -1273,15 +1243,6 @@
     <ClCompile Include="..\..\..\Section\SectionNM\NM3D3.cpp">
       <Filter>Section\SectionNM</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestSurfaceNM.cpp">
-      <Filter>UnitTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestSolver.cpp">
-      <Filter>UnitTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestSorting.cpp">
-      <Filter>UnitTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Element\Beam\NMB21E.cpp">
       <Filter>Element\Beam</Filter>
     </ClCompile>
@@ -1300,9 +1261,6 @@
     <ClCompile Include="..\..\..\Toolbox\resampling.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestSampling.cpp">
-      <Filter>UnitTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Element\Modifier\ElementalLee.cpp">
       <Filter>Element\Modifier</Filter>
     </ClCompile>
@@ -1311,9 +1269,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Converger\AbsIncreAcc.cpp">
       <Filter>Converger</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestEigen.cpp">
-      <Filter>UnitTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material1D\Elastic\Sinh1D.cpp">
       <Filter>Material\Material1D\Elastic</Filter>
@@ -1332,9 +1287,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\command.cpp">
       <Filter>Toolbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UnitTest\TestExpression.cpp">
-      <Filter>UnitTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\Expression.cpp">
       <Filter>Toolbox</Filter>
@@ -1581,6 +1533,72 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Material\Material3D\Nonlocal\NonlocalBilinearJ2.cpp">
       <Filter>Material\Material3D\Nonlocal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestColor.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestColoring.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestContainer.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestEigen.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestExpression.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestHomotopy.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestIntegration.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestMatrix.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestMode.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestNURBS.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestQuaternion.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestRootFinding.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestSampling.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestShape.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestSolver.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestSorting.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestString.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestSurfaceNM.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestTensor.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestThreadPool.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestTree.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestUtility.cpp">
+      <Filter>UnitTest</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

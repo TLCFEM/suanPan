@@ -228,10 +228,9 @@ TEST_CASE("Rodrigues Rotation", "[Utility.Tensor]") {
 
     // rotation matrices must be orthogonal
     for(auto I = 0; I < 100; ++I) {
-        const vec axis = randn(3);
-        const auto R = transform::rodrigues(axis);
-        REQUIRE(norm(R * R.t() - eye(3, 3)) == Approx(0.).margin(1E-10));
-        REQUIRE(Approx(1.).margin(1E-9) == det(R));
+        const auto RR = transform::rodrigues(randn(3));
+        REQUIRE(norm(RR * RR.t() - eye(3, 3)) == Approx(0.).margin(1E-10));
+        REQUIRE(Approx(1.).margin(1E-9) == det(RR));
     }
 }
 

@@ -536,21 +536,27 @@
     <ClCompile Include="..\..\..\Toolbox\sort_rcm.cpp" />
     <ClCompile Include="..\..\..\Toolbox\tensor.cpp" />
     <ClCompile Include="..\..\..\Toolbox\utility.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestColor.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestColoring.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestContainer.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestEigen.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestExpression.cpp" />
-    <ClCompile Include="..\..\..\UnitTest\TestSampling.cpp" />
-    <ClCompile Include="..\..\..\UnitTest\TestSolver.cpp" />
-    <ClCompile Include="..\..\..\UnitTest\TestColoring.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestHomotopy.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestIntegration.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestMatrix.cpp" />
-    <ClCompile Include="..\..\..\UnitTest\TestNURBS.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestMode.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestNURBS.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestQuaternion.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestRootFinding.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestSampling.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestShape.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestSolver.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestSorting.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestString.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestSurfaceNM.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestTensor.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestThreadPool.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestTree.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
