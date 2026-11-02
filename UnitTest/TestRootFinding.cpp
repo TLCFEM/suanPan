@@ -57,7 +57,7 @@ TEST_CASE("Ridders Guess", "[Utility.RootFinding]") {
 TEST_CASE("Ridders Guess With Data", "[Utility.RootFinding]") {
     // exp(x) - 100 has root x = ln(100) ~ 4.605
     const auto f = [](const double x) { return std::exp(x) - 100.; };
-    double x1 = 0., x2 = 1.;
+    constexpr double x1 = 0., x2 = 1.;
     const auto root = ridders_guess(f, x1, f(x1), x2, f(x2), 1E-10);
     REQUIRE_THAT(root, Catch::Matchers::WithinAbs(std::log(100.), 1E-8));
 }

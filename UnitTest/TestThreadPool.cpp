@@ -2,15 +2,14 @@
 
 #include <Toolbox/thread_pool.hpp>
 #include <atomic>
-#include <chrono>
 #include <numeric>
 
 TEST_CASE("Thread Pool Submit Values", "[Utility.ThreadPool]") {
     thread_pool pool(4);
     REQUIRE(4 == pool.get_thread_count());
 
-    auto f1 = pool.submit([](int a, int b) { return a + b; }, 3, 4);
-    auto f2 = pool.submit([](int a) { return a * a; }, 7);
+    auto f1 = pool.submit([](const int a, const int b) { return a + b; }, 3, 4);
+    auto f2 = pool.submit([](const int a) { return a * a; }, 7);
     auto f3 = pool.submit([] { return 42; });
 
     pool.wait_for_tasks();
@@ -24,7 +23,7 @@ TEST_CASE("Thread Pool Submit On Default Thread Count", "[Utility.ThreadPool]") 
     thread_pool pool; // auto thread count
     REQUIRE(pool.get_thread_count() > 0);
 
-    auto future = pool.submit([](double x) { return x * 2.; }, 2.5);
+    auto future = pool.submit([](const double x) { return x * 2.; }, 2.5);
     pool.wait_for_tasks();
     REQUIRE(Approx(5.) == future.get());
 }
@@ -34,11 +33,11 @@ TEST_CASE("Thread Pool Vector Accumulation", "[Utility.ThreadPool]") {
     std::vector<int> data(N);
     std::iota(data.begin(), data.end(), 0);
 
-    const int expected = (N - 1) * N / 2;
+    constexpr int expected = (N - 1) * N / 2;
 
     thread_pool pool(4);
 
-    std::atomic<int> sum{0};
+    std::atomic sum{0};
 
     pool.push_loop(N, [&](const std::size_t start, const std::size_t end) {
         for(std::size_t I = start; I < end; ++I) sum += data[I];
@@ -52,7 +51,7 @@ TEST_CASE("Thread Pool Push Loop Bounds", "[Utility.ThreadPool]") {
     thread_pool pool(3);
 
     // the 3-argument push_loop passes each block's [start, end) range to the loop
-    std::atomic<int> counter{0};
+    std::atomic counter{0};
     pool.push_loop(2, 7, [&](const std::size_t start, const std::size_t end) {
         for(std::size_t i = start; i < end; ++i) counter += static_cast<int>(i);
     });
@@ -65,7 +64,7 @@ TEST_CASE("Thread Pool Reversed Push Loop Bounds", "[Utility.ThreadPool]") {
     // push_loop swaps reversed iteration bounds
     thread_pool pool(3);
 
-    std::atomic<int> counter{0};
+    std::atomic counter{0};
     pool.push_loop(7, 2, [&](const std::size_t start, const std::size_t end) {
         for(std::size_t i = start; i < end; ++i) ++counter;
     });
@@ -86,7 +85,7 @@ TEST_CASE("Thread Pool Submit Exception Propagation", "[Utility.ThreadPool]") {
 TEST_CASE("Thread Pool Void Task", "[Utility.ThreadPool]") {
     thread_pool pool(2);
 
-    std::atomic<bool> done{false};
+    std::atomic done{false};
     auto future = pool.submit([&done] { done = true; });
     pool.wait_for_tasks();
     future.get();

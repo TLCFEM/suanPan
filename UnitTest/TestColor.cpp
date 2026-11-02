@@ -2,52 +2,54 @@
 
 #include <Toolbox/sort_color.hpp>
 
-/**
- * @brief Build a graph of N nodes where every node gets a self-loop and the given
- *        inter-node edges are added symmetrically.
- *
- * Note: the coloring algorithms require every node to possess at least one
- * neighbour (the self-loop) in order to terminate, mirroring the convention used
- * by the rest of the test suite.
- */
-auto make_graph(const uword N) {
-    suanpan::graph<unsigned> g(N);
-    for(uword I = 0; I < N; ++I) g[I].insert(static_cast<unsigned>(I)); // self loop
-    return g;
-}
-
-void connect(suanpan::graph<unsigned>& g, const uword A, const uword B) {
-    g[A].insert(static_cast<unsigned>(B));
-    g[B].insert(static_cast<unsigned>(A));
-}
-
-/**
- * @brief Validate that a coloring is valid for the given graph.
- *
- * A valid proper graph coloring must:
- *  - assign every node exactly once;
- *  - never assign two adjacent (connected, distinct) nodes the same color.
- */
-void validate_coloring(const suanpan::graph<unsigned>& node_register, const std::vector<std::vector<unsigned>>& color_map) {
-    std::vector<bool> seen(node_register.size(), false);
-
-    for(const auto& color : color_map) {
-        REQUIRE_FALSE(color.empty());
-        for(const auto node : color) {
-            REQUIRE(node < node_register.size());
-            REQUIRE_FALSE(seen[node]);
-            seen[node] = true;
-        }
+namespace {
+    /**
+     * @brief Build a graph of N nodes where every node gets a self-loop and the given
+     *        inter-node edges are added symmetrically.
+     *
+     * Note: the coloring algorithms require every node to possess at least one
+     * neighbour (the self-loop) in order to terminate, mirroring the convention used
+     * by the rest of the test suite.
+     */
+    auto make_graph(const uword N) {
+        suanpan::graph<unsigned> g(N);
+        for(uword I = 0; I < N; ++I) g[I].insert(static_cast<unsigned>(I)); // self loop
+        return g;
     }
 
-    for(const auto& color : color_map)
-        for(auto I = 0u; I < color.size(); ++I)
-            for(auto J = I + 1u; J < color.size(); ++J)
-                // nodes in a color are all distinct (see `seen` above), so a self-loop is impossible
-                REQUIRE_FALSE(node_register[color[I]].contains(color[J]));
+    void connect(suanpan::graph<unsigned>& g, const uword A, const uword B) {
+        g[A].insert(static_cast<unsigned>(B));
+        g[B].insert(static_cast<unsigned>(A));
+    }
 
-    for(auto flag : seen) REQUIRE(flag);
-}
+    /**
+     * @brief Validate that a coloring is valid for the given graph.
+     *
+     * A valid proper graph coloring must:
+     *  - assign every node exactly once;
+     *  - never assign two adjacent (connected, distinct) nodes the same color.
+     */
+    void validate_coloring(const suanpan::graph<unsigned>& node_register, const std::vector<std::vector<unsigned>>& color_map) {
+        std::vector seen(node_register.size(), false);
+
+        for(const auto& color : color_map) {
+            REQUIRE_FALSE(color.empty());
+            for(const auto node : color) {
+                REQUIRE(node < node_register.size());
+                REQUIRE_FALSE(seen[node]);
+                seen[node] = true;
+            }
+        }
+
+        for(const auto& color : color_map)
+            for(auto I = 0u; I < color.size(); ++I)
+                for(auto J = I + 1u; J < color.size(); ++J)
+                    // nodes in a color are all distinct (see `seen` above), so a self-loop is impossible
+                    REQUIRE_FALSE(node_register[color[I]].contains(color[J]));
+
+        for(auto flag : seen) REQUIRE(flag);
+    }
+} // namespace
 
 TEST_CASE("Coloring Empty Graph", "[Utility.Color]") {
     const suanpan::graph<unsigned> empty{};

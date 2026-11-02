@@ -55,7 +55,7 @@ TEST_CASE("FIR Filter Normalised", "[Utility.Sampling]") {
 
 TEST_CASE("Upsampling Preserves Signal", "[Utility.Sampling]") {
     // a constant signal upsampled must remain constant (edge transients excluded)
-    vec in(32, fill::ones);
+    const vec in(32, fill::ones);
     vec out = upsampling<WindowType::Hamming>(in, 4, 8);
     REQUIRE(out.n_elem == 4 * in.n_elem);
 

@@ -1,7 +1,6 @@
 #include "CatchHeader.h"
 
 #include <Toolbox/utility.h>
-#include <numeric>
 #include <sstream>
 
 using namespace suanpan;
@@ -84,19 +83,17 @@ TEST_CASE("String Case Conversion", "[Utility.StringCase]") {
     REQUIRE('z' == suanpan::to_lower('z'));
 
     std::string s = "AbC dEf";
-    suanpan::to_upper(s);
+    to_upper(s);
     REQUIRE("ABC DEF" == s);
-    suanpan::to_lower(s);
+    to_lower(s);
     REQUIRE("abc def" == s);
 
     REQUIRE("ABC" == suanpan::to_upper(std::string("abc")));
     REQUIRE("abc" == suanpan::to_lower(std::string("ABC")));
-    REQUIRE("ABC" == suanpan::to_upper(std::move(std::string("AbC"))));
-    REQUIRE("abc" == suanpan::to_lower(std::move(std::string("AbC"))));
 }
 
 TEST_CASE("Unique Container", "[Utility.Unique]") {
-    auto v = std::vector<int>{3, 1, 2, 2, 3, 1, 4};
+    auto v = std::vector{3, 1, 2, 2, 3, 1, 4};
     const auto& r = suanpan::unique(v);
     REQUIRE(v.size() == 4);
     REQUIRE(r.size() == 4);
@@ -107,14 +104,14 @@ TEST_CASE("Unique Container", "[Utility.Unique]") {
 }
 
 TEST_CASE("Max Element", "[Utility.MaxElement]") {
-    std::vector<int> v{1, 5, 3, 9, 2};
+    std::vector v{1, 5, 3, 9, 2};
     REQUIRE(9 == *suanpan::max_element(v.begin(), v.end()));
-    std::vector<double> w{1.1, .5, 2.2};
+    std::vector w{1.1, .5, 2.2};
     REQUIRE(Approx(2.2) == *suanpan::max_element(w.begin(), w.end()));
 }
 
 TEST_CASE("Parallel All/None/Any Of", "[Utility.Parallel]") {
-    std::vector<int> v{2, 4, 6, 8};
+    std::vector v{2, 4, 6, 8};
     REQUIRE(suanpan::all_of(v, [](const int i) { return i % 2 == 0; }));
     REQUIRE(!suanpan::all_of(v, [](const int i) { return i > 4; }));
     REQUIRE(suanpan::none_of(v, [](const int i) { return i % 2 == 1; }));
@@ -124,27 +121,28 @@ TEST_CASE("Parallel All/None/Any Of", "[Utility.Parallel]") {
 }
 
 TEST_CASE("For Each", "[Utility.ForEach]") {
-    std::vector<int> v(10, 0);
-    suanpan::for_each(static_cast<uword>(v.size()), [&](const uword I) { ++v[I]; });
-    for(auto X : v) REQUIRE(1 == X);
+    std::vector v(10, 0);
+    for_each(static_cast<uword>(v.size()), [&](const uword I) { ++v[I]; });
+    for(const auto X : v) REQUIRE(1 == X);
 
-    std::vector<int> w(5, 0);
-    suanpan::for_each(1u, 5u, [&](const uword I) { ++w[I]; });
+    std::vector w(5, 0);
+    for_each(1u, 5u, [&](const uword I) { ++w[I]; });
     REQUIRE(0 == w[0]);
     for(auto I = 1u; I < 5u; ++I) REQUIRE(1 == w[I]);
 }
 
 TEST_CASE("Hacker Const Cast", "[Utility.Hacker]") {
-    // modify a mutable object through a const reference via the const_cast helper
-    int value = 42;
-    const int& cref = value;
-    suanpan::hacker(cref) = 43;
+    const auto value = 42;
+    const auto& cref = value;
+    hacker(cref) = 43;
     REQUIRE(43 == value);
 
-    const int* ptr = new int(3);
-    const int* const& cpref = ptr;
-    suanpan::hacker(cpref) = new int(5);
+    const auto ptr = new int(3);
+    const auto& cpref = ptr;
+    const auto original = ptr;
+    hacker(cpref) = new int(5);
     REQUIRE(5 == *ptr);
+    delete original;
     delete ptr;
 }
 
@@ -271,11 +269,9 @@ TEST_CASE("If Contain", "[Utility.IfContain]") {
 }
 
 TEST_CASE("Is True / Is False", "[Utility.IsTrue]") {
-    const std::vector<std::string> truthy{"On", "True", "T", "1", "Yes", "Y", "yes", "tRuE"};
-    for(const auto& s : truthy) REQUIRE(is_true(s));
+    for(const std::vector<std::string> truthy{"On", "True", "T", "1", "Yes", "Y", "yes", "tRuE"}; const auto& s : truthy) REQUIRE(is_true(s));
 
-    const std::vector<std::string> falsy{"Off", "False", "F", "0", "No", "N", "no", "fAlSe"};
-    for(const auto& s : falsy) REQUIRE(is_false(s));
+    for(const std::vector<std::string> falsy{"Off", "False", "F", "0", "No", "N", "no", "fAlSe"}; const auto& s : falsy) REQUIRE(is_false(s));
 
     REQUIRE(!is_true("Maybe"));
     REQUIRE(!is_false("Maybe"));
@@ -301,13 +297,13 @@ TEST_CASE("Perturb", "[Utility.Perturb]") {
 }
 
 TEST_CASE("Expression Split Empty / Invalid", "[Utility.ExpressionSplit]") {
-    const auto r1 = suanpan::expression::split("x|y");
+    const auto r1 = expression::split("x|y");
     REQUIRE(2 == r1.size());
     REQUIRE(1u == r1[0].second);
     REQUIRE(1u == r1[1].second);
 
     // leading integer means invalid expression
-    const auto r2 = suanpan::expression::split("5|x");
+    const auto r2 = expression::split("5|x");
     REQUIRE(r2.empty());
 }
 

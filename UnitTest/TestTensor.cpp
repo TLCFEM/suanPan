@@ -123,7 +123,7 @@ TEST_CASE("Tensor Trace", "[Utility.Tensor]") {
 TEST_CASE("Tensor Deviatoric", "[Utility.Tensor]") {
     const vec a{3., 6., 9., 2., 4., 8.};
     const auto m = tensor::mean<3>(a);
-    const auto d = tensor::dev(a);
+    const auto d = dev(a);
     REQUIRE(Approx(0.) == d(0) - (3. - m));
     REQUIRE(Approx(0.) == d(1) - (6. - m));
     REQUIRE(Approx(0.) == d(2) - (9. - m));
@@ -132,7 +132,7 @@ TEST_CASE("Tensor Deviatoric", "[Utility.Tensor]") {
 }
 
 TEST_CASE("Tensor Unit Tensors", "[Utility.Tensor]") {
-    const auto I = tensor::unit_symmetric_tensor4();
+    const auto I = unit_symmetric_tensor4();
     REQUIRE(I.n_rows == I.n_cols);
     REQUIRE(6 == I.n_rows);
     // the symmetric fourth-order identity keeps normal (Voigt 0..2) components
@@ -142,7 +142,7 @@ TEST_CASE("Tensor Unit Tensors", "[Utility.Tensor]") {
     for(auto J = 0u; J < 3u; ++J) REQUIRE(Approx(strain(J)) == out(J));
     for(auto J = 3u; J < 6u; ++J) REQUIRE(Approx(.5 * strain(J)) == out(J));
 
-    const auto id = tensor::unit_deviatoric_tensor4();
+    const auto id = unit_deviatoric_tensor4();
     // projecting a purely volumetric strain (equal normal, zero shear in Voigt) yields zero deviator
     const vec volumetric = {1., 1., 1., 0., 0., 0.};
     const auto devproj = id * volumetric;
@@ -153,31 +153,31 @@ TEST_CASE("Tensor Unit Tensors", "[Utility.Tensor]") {
     const auto devproj2 = id * deviatoric;
     REQUIRE(norm(devproj2 - deviatoric) == Approx(0.).margin(1E-12));
 
-    const auto id2 = tensor::unit_deviatoric_tensor4v2();
+    const auto id2 = unit_deviatoric_tensor4v2();
     REQUIRE(id2.n_rows == id2.n_cols);
     REQUIRE(6 == id2.n_rows);
 }
 
 TEST_CASE("Tensor Isotropic Stiffness", "[Utility.Tensor]") {
     constexpr double E = 200E3, NU = .3;
-    const auto D = tensor::isotropic_stiffness(E, NU);
+    const auto D = isotropic_stiffness(E, NU);
     REQUIRE(6 == D.n_rows);
     REQUIRE(6 == D.n_cols);
     // symmetric modulus tensor
     REQUIRE(Approx(0.).margin(1E-6) == accu(D - D.t()));
 
-    const double G = E / (2. + 2. * NU);
-    const double lambda = G * NU / (.5 - NU);
+    constexpr double G = E / (2. + 2. * NU);
+    constexpr double lambda = G * NU / (.5 - NU);
     // verify a few closed-form entries
     REQUIRE(Approx(2. * G + lambda) == D(0, 0));
     REQUIRE(Approx(lambda) == D(0, 1));
     REQUIRE(Approx(G) == D(3, 3));
 
     // extra dimension padding
-    const auto D2 = tensor::isotropic_stiffness(E, NU, 2);
+    const auto D2 = isotropic_stiffness(E, NU, 2);
     REQUIRE(8 == D2.n_rows);
     REQUIRE(8 == D2.n_cols);
-    const auto D3 = tensor::isotropic_stiffness(E, NU, 3);
+    const auto D3 = isotropic_stiffness(E, NU, 3);
     REQUIRE(9 == D3.n_rows);
     REQUIRE(9 == D3.n_cols);
 }
@@ -185,7 +185,7 @@ TEST_CASE("Tensor Isotropic Stiffness", "[Utility.Tensor]") {
 TEST_CASE("Tensor Orthotropic Stiffness", "[Utility.Tensor]") {
     const vec mod = {100., 50., 30., 20., 10., 15.};
     const vec ratio = {.2, .3, .1};
-    const auto D = tensor::orthotropic_stiffness(mod, ratio);
+    const auto D = orthotropic_stiffness(mod, ratio);
     REQUIRE(6 == D.n_rows);
     REQUIRE(6 == D.n_cols);
     // symmetric compliance inverse construction => symmetric modulus

@@ -357,7 +357,7 @@ else ()
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffp-model=precise")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffp-model=precise")
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Werror -Wno-unused-parameter -Wno-parentheses -Wno-maybe-uninitialized")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Werror -Wno-unused-parameter -Wno-parentheses -Wno-maybe-uninitialized -Wno-c2y-extensions")
     endif ()
 
     if (SP_AMD64)
