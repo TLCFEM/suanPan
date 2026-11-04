@@ -183,9 +183,13 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     const auto term_c = std::sqrt(term_a * term_a + term_b * term_b);
     ee = term_a + term_c;
     const auto incre_ee = ee - current_ee;
-    const auto peeps = (ptaps * ee + term_b * ptbps) / term_c;
-    const auto peepp = ptapp * ee / term_c;
-    const auto peepl = ptapl * ee / term_c;
+    // at a stress-free state the equivalent strain is not differentiable
+    auto peeps = 0., peepp = 0., peepl = 0.;
+    if(term_c > datum::eps) {
+        peeps = (ptaps * ee + term_b * ptbps) / term_c;
+        peepp = ptapp * ee / term_c;
+        peepl = ptapl * ee / term_c;
+    }
 
     // ep
     const auto ep = gamma * gg;
@@ -196,7 +200,7 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
 
     // xs
     auto xs = 1., pxsps = 0., pxspp = 0.;
-    if(p <= 0.) {
+    if(p <= 0. && s > datum::eps) {
         pxspp = (sqrt_six - as * sqrt_six) / s;
         xs += pxspp * p;
         pxsps = -pxspp * p / s;
@@ -256,9 +260,12 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
             dqh2dkp = hp;
         }
 
-        const auto betac = sqrtdf * qh2 / s;
-        const auto pbetacpkp = sqrtdf / s * dqh2dkp;
-        const auto pbetacps = -betac / s;
+        auto betac = 0., pbetacpkp = 0., pbetacps = 0.;
+        if(s > datum::eps) {
+            betac = sqrtdf * qh2 / s;
+            pbetacpkp = sqrtdf / s * dqh2dkp;
+            pbetacps = -betac / s;
+        }
 
         pkdc1pac = ep * betac / xs;
         const auto incre_kdc1 = pkdc1pac * ac;
@@ -334,27 +341,38 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
 
     omega = 1.; // initial guess with the maximum value to avoid convergence to the negative solution
 
+    // the damage function is monotonic on [0, 1], bracketing prevents divergence to nonphysical values
+    auto lower = 0., upper = 1.;
+
     auto counter = 0u;
     while(true) {
-        if(max_iteration == ++counter) return SUANPAN_FAIL;
-
         const auto term_a = ft * std::exp(-(kd1 + omega * kd2) / ef);
         const auto term_b = (1. - omega) * elastic_modulus;
         const auto residual = term_a - term_b * kd;
         const auto jacobian = elastic_modulus * kd - kd2 / ef * term_a;
-        const auto incre = residual / jacobian;
 
-        const auto error = std::fabs(incre);
-        suanpan_debug("Local damage iteration error: {:.5E}.\n", error);
+        if(max_iteration == ++counter || std::fabs(jacobian) < datum::eps) return SUANPAN_FAIL;
 
-        if(error < tolerance || (std::fabs(residual) < tolerance && counter > 5u)) {
+        const auto commit_damage = [&] {
             popkd = term_b / jacobian;
             popkd1 = term_a / ef / jacobian;
             popkd2 = popkd1 * omega;
             return SUANPAN_SUCCESS;
-        }
+        };
 
-        omega -= incre;
+        if(std::fabs(residual) < tolerance) return commit_damage();
+
+        if(residual > 0.) upper = omega;
+        else lower = omega;
+
+        auto trial_omega = omega - residual / jacobian;
+        if(!std::isfinite(trial_omega) || trial_omega <= lower || trial_omega >= upper) trial_omega = .5 * (lower + upper);
+
+        const auto error = std::fabs(trial_omega - omega);
+        suanpan_debug("Local damage iteration error: {:.5E}.\n", error);
+        if(error < tolerance) return commit_damage();
+
+        omega = trial_omega;
     }
 }
 
@@ -504,7 +522,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
             vec4 initial_x{0., trial_s, trial_p, current_kp};
             homotopy_config config{};
             if(SUANPAN_SUCCESS != homotopy_solve<mat44>(initial_x, system, config)) {
-                suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+                suanpan_error("Homotopy solve failed after {} iterations.\n", max_iteration);
                 return SUANPAN_FAIL;
             }
 
@@ -535,7 +553,10 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) {
+        // all residuals are measured relative to the current state, the hardening variable can be large
+        const auto scale = 1. + std::max(std::max(std::fabs(s), std::fabs(p)), std::max(std::fabs(kp), std::fabs(gamma)));
+
+        if(error < tolerance * ref_error || (counter > 5u && (error < tolerance * scale || suanpan::inf_norm(residual) < tolerance * scale))) {
             const vec unit_n = n % tensor::stress::norm_weight;
 
             plastic_strain += gamma * gs * unit_n + gamma * gp / 3. * tensor::unit_tensor2;
@@ -583,7 +604,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
     const auto aca = accu(square(principal_stress(c_pattern)));
     const auto acb = accu(square(principal_stress));
-    const auto ac = aca / acb;
+    const auto ac = acb > datum::eps ? aca / acb : 0.;
 
     if(SUANPAN_SUCCESS != compute_damage(gamma, s, p, kp, ac, data)) return SUANPAN_FAIL;
 
@@ -598,10 +619,13 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const auto& pocpac = data(10);
     const auto& pocpl = data(11);
 
-    rowvec daca = 2. * principal_stress.t();
-    daca(t_pattern).fill(0.);
-    const rowvec dac = (daca - 2. * ac * principal_stress.t()) / acb;
-    const rowvec dacde = dac * transform::compute_jacobian_nominal_to_principal(principal_direction) * trial_stiffness;
+    rowvec dacde(6, fill::zeros);
+    if(acb > datum::eps) {
+        rowvec daca = 2. * principal_stress.t();
+        daca(t_pattern).fill(0.);
+        const rowvec dac = (daca - 2. * ac * principal_stress.t()) / acb;
+        dacde = dac * transform::compute_jacobian_nominal_to_principal(principal_direction) * trial_stiffness;
+    }
 
     const rowvec potpe = pot * left + potpac * dacde + potpl * dlde;
     const rowvec pocpe = poc * left + pocpac * dacde + pocpl * dlde;
