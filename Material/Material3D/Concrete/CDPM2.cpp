@@ -554,9 +554,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
 
         // all residuals are measured relative to the current state, the hardening variable can be large
-        const auto scale = 1. + std::max(std::max(std::fabs(s), std::fabs(p)), std::max(std::fabs(kp), std::fabs(gamma)));
-
-        if(error < tolerance * ref_error || (counter > 5u && (error < tolerance * scale || suanpan::inf_norm(residual) < tolerance * scale))) {
+        if(const auto scale = 1. + std::max(std::max(std::fabs(s), std::fabs(p)), std::max(std::fabs(kp), std::fabs(gamma))); error < tolerance * ref_error || (counter > 5u && (error < tolerance * scale || suanpan::inf_norm(residual) < tolerance * scale))) {
             const vec unit_n = n % tensor::stress::norm_weight;
 
             plastic_strain += gamma * gs * unit_n + gamma * gp / 3. * tensor::unit_tensor2;
