@@ -1,6 +1,5 @@
 target_sources(${PROJECT_NAME} PRIVATE
         argument.cpp
-        arpack.cpp
         command.cpp
         Expression.cpp
         ExpressionParser.cpp
@@ -11,3 +10,9 @@ target_sources(${PROJECT_NAME} PRIVATE
         tensor.cpp
         utility.cpp
 )
+
+if (SP_ENABLE_MPI)
+    target_sources(${PROJECT_NAME} PRIVATE parpack.cpp)
+else ()
+    target_sources(${PROJECT_NAME} PRIVATE arpack.cpp)
+endif ()
