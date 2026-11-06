@@ -413,7 +413,11 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const auto hydro_stress = tensor::mean<3>(trial_stress);
     const auto trial_s = tensor::stress::norm(dev_stress);
     const auto trial_p = hydro_stress;
-    const vec n = dev_stress / trial_s;
+
+    // for a purely volumetric stress state the deviatoric direction is not unique,
+    // the model convention is to use a Lode angle of zero and an arbitrary but fixed direction
+    const auto degenerate = trial_s <= datum::eps;
+    const vec n = degenerate ? vec{2., -1., -1., 0., 0., 0.} / std::sqrt(6.) : vec(dev_stress / trial_s);
 
     static constexpr double low_limit = -.95;
     static const double low_slope = (2. * std::cos(std::acos(low_limit) / 3.) - 1.) / (low_limit + 1.);
@@ -421,7 +425,11 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     static const double high_slope = (2. * std::cos(std::acos(high_limit) / 3.) - 2.) / (high_limit - 1.);
 
     double lode, dlode;
-    if(const auto lode_a = tensor::stress::lode(dev_stress); lode_a < low_limit) {
+    if(degenerate) {
+        lode = 2.;
+        dlode = 0.;
+    }
+    else if(const auto lode_a = tensor::stress::lode(dev_stress); lode_a < low_limit) {
         // close to left boundary
         // use linear approximation
         lode = 1. + low_slope * (1. + lode_a);
@@ -440,7 +448,8 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     }
 
     const auto square_lode = lode * lode;
-    const rowvec dlde = dlode * double_shear * (tensor::stress::lode_der(dev_stress) % tensor::stress::norm_weight).t() * unit_dev_tensor;
+    rowvec dlde(6, fill::zeros);
+    if(!degenerate) dlde = dlode * double_shear * (tensor::stress::lode_der(dev_stress) % tensor::stress::norm_weight).t() * unit_dev_tensor;
 
     auto gamma = 0., s = trial_s, p = trial_p;
 
@@ -536,7 +545,13 @@ int CDPM2::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        if(1u == counter && f < 0.) break;
+        if(1u == counter && f < 0.) {
+            // elastic step, the plastic multipliers remain unchanged
+            // the derivatives of the stress invariants are still required by the damage tangent
+            if(!degenerate) left.row(1) = double_shear * (n % tensor::stress::norm_weight).t() * unit_dev_tensor;
+            left.row(2) = bulk * tensor::unit_tensor2.t();
+            break;
+        }
 
         residual = assemble_residual();
         jacobian = assemble_jacobian();
@@ -570,7 +585,9 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
             if(!solve(left, jacobian, right)) return SUANPAN_FAIL;
 
-            trial_stiffness = n * (left.row(1) - s / trial_s * right.row(1)) + s / trial_s * double_shear * unit_dev_tensor;
+            // for a purely volumetric trial state the deviatoric norm vanishes, use a safe scale
+            const auto scaled_s = s / (degenerate ? 1. : trial_s);
+            trial_stiffness = n * (left.row(1) - scaled_s * right.row(1)) + scaled_s * double_shear * unit_dev_tensor;
             trial_stiffness.row(0) += left.row(2);
             trial_stiffness.row(1) += left.row(2);
             trial_stiffness.row(2) += left.row(2);
