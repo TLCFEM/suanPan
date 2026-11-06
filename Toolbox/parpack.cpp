@@ -57,7 +57,7 @@ namespace {
             const auto remainder = N % size;
 
             local_size = base + (rank < remainder ? 1 : 0);
-            local_offset = rank * base + std::min(rank, remainder);
+            local_offset = rank * base + (rank < remainder ? rank : remainder);
 
             counts.resize(size);
             displacements.resize(size);
