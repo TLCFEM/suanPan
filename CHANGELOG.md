@@ -9,6 +9,7 @@
 1. fix the tangent stiffness matrix formulation in GCMQ element [#389](https://github.com/TLCFEM/suanPan/pull/389)
 2. bump up various dependencies
 3. bug fixes
+4. introduce [cpp-linenoise](https://github.com/yhirose/cpp-linenoise) in CLI mode
 
 ## version 4.2
 
