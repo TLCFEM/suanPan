@@ -29,10 +29,10 @@ field<vec> NURBSSurface::evaluate_point_derivative(const double u, const double 
 
     const auto point = BSplineSurface::evaluate_point_derivative(u, v, polygon, du, dv);
 
-    const auto d = du > dv ? du : dv;
-    field<vec> ders(d + 1, d + 1);
+    field<vec> ders(du + 1, dv + 1);
+    ders.for_each([&](vec& t_ders) { t_ders.zeros(dimension); });
 
-    initialize_binomial(d);
+    initialize_binomial(std::max(du, dv));
 
     for(sword k{0}; k <= du; ++k)
         for(sword l{0}; l <= dv; ++l) {
@@ -54,32 +54,30 @@ mat NURBSSurface::evaluate_shape_function(const double u, const double v, const 
     auto sum = 0.;
 
     for(uword I{0}; I < shape.n_rows; ++I)
-        for(uword J{0}; J < shape.n_cols; ++J)
-            if(!polygon(I, J).empty()) sum += shape(I, J) * polygon(I, J).back();
+        for(uword J{0}; J < shape.n_cols; ++J) {
+            if(polygon(I, J).empty()) shape(I, J) = 0.;
+            else sum += shape(I, J) *= polygon(I, J).back();
+        }
 
     return shape / sum;
 }
 
 field<mat> NURBSSurface::evaluate_shape_function_derivative(const double u, const double v, const field<vec>& polygon, sword du, sword dv) const {
-    if(du < 0) du = line_u.get_order();
-    if(dv < 0) dv = line_v.get_order();
+    const auto p = line_u.get_order();
+    const auto q = line_v.get_order();
 
     const auto uspan = line_u.evaluate_span(u);
     const auto vspan = line_v.evaluate_span(v);
 
-    auto uders = line_u.evaluate_basis_derivative(u, du);
-    uders.resize(du + 1, uders.n_cols);
-    auto vders = line_v.evaluate_basis_derivative(v, dv);
-    vders.resize(dv + 1, vders.n_cols);
+    if(du < 0) du = static_cast<sword>(p);
+    if(dv < 0) dv = static_cast<sword>(q);
 
-    const auto p = line_u.get_order();
-    const auto q = line_v.get_order();
+    const auto uders = line_u.evaluate_basis_derivative(u, du);
+    const auto vders = line_v.evaluate_basis_derivative(v, dv);
 
-    const auto d = du > dv ? du : dv;
+    initialize_binomial(std::max(du, dv));
 
-    initialize_binomial(d);
-
-    field<mat> shape(d + 1, d + 1);
+    field<mat> shape(du + 1, dv + 1);
     shape.for_each([&](mat& t_shape) { t_shape.zeros(line_u.get_knot().n_elem - line_u.get_order() - 1, line_v.get_knot().n_elem - line_v.get_order() - 1); });
 
     auto sum = 0.;

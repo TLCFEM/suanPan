@@ -18,6 +18,8 @@
 #include "BSpline.h"
 
 void IGA::convert_to_weighted(mat& polygon) {
+    if(polygon.n_rows < 2) return;
+
     for(uword I{0}; I < polygon.n_rows - 1; ++I) polygon.row(I) %= polygon.tail_rows(1);
 }
 
@@ -129,13 +131,14 @@ vec BSpline::evaluate_basis(const double u, sword p) const {
  */
 mat BSpline::evaluate_basis_derivative(const double u, sword n, sword p) const {
     p = p < 0 ? static_cast<sword>(order) : std::min(p, static_cast<sword>(order));
-    n = n < 0 ? 0 : std::min(n, p);
+    const auto target = n < 0 ? p : n;
+    n = std::min(target, p);
 
     const auto i = evaluate_span(u);
 
     const auto pp = p + 1;
 
-    mat ndu(pp, pp), ders(n + 1, pp, fill::zeros), a(2, pp);
+    mat ndu(pp, pp), ders(target + 1, pp, fill::zeros), a(2, pp);
 
     vec left(pp), right(pp);
 
@@ -251,7 +254,7 @@ vec BSpline::evaluate_shape_function(const double u, const field<vec>&) const {
 }
 
 field<vec> BSpline::evaluate_shape_function_derivative(const double u, const field<vec>&, sword du) const {
-    du = du < 0 ? order : std::min(du, static_cast<sword>(order));
+    if(du < 0) du = order;
 
     field<vec> shape(du + 1);
     shape.for_each([&](vec& t_shape) { t_shape.zeros(get_number_of_control_points()); });
