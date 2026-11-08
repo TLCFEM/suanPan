@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class ElementBase
- * @brief A ElementBase class.
+ * @brief An ElementBase class.
  * @author tlc
  * @date 10/01/2020
  * @version 0.1.0

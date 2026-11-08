@@ -16,6 +16,7 @@
  ******************************************************************************/
 /**
  * @class cuda_ptr
+ * @brief A RAII wrapper for CUDA device memory.
  * @author tlc
  * @date 17/05/2025
  * @version 0.1.0
@@ -64,9 +65,9 @@ public:
 
     template<typename T = int> [[nodiscard]] T* get(const unsigned long long offset = 0) const { return static_cast<T*>(ptr) + offset; }
 
-    auto copy_from(const void* src, const cudaStream_t s) const { cudaMemcpyAsync(ptr, src, total_size(), cudaMemcpyHostToDevice, s); }
+    auto copy_from(const void* src, cudaStream_t s) const { cudaMemcpyAsync(ptr, src, total_size(), cudaMemcpyHostToDevice, s); }
 
-    auto copy_to(void* dest, const cudaStream_t s) const {
+    auto copy_to(void* dest, cudaStream_t s) const {
         cudaMemcpyAsync(dest, ptr, total_size(), cudaMemcpyDeviceToHost, s);
         cudaStreamSynchronize(s);
     }

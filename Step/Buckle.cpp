@@ -22,7 +22,7 @@
 #include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Newton.h>
-#include <Toolbox/arpack.h>
+#include <Toolbox/eig_solver.h>
 
 Buckle::Buckle(const unsigned T)
     : Static(T, 1.) {}

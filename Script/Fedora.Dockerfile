@@ -1,3 +1,9 @@
+# Fedora.Dockerfile - Build suanPan on Fedora 44
+# 
+# Compiles suanPan with Intel oneAPI MKL and creates a Fedora RPM package.
+# Includes VTK for visualization support.
+# 
+# Build: docker build -f Fedora.Dockerfile -t tlcfem/suanpan-fedora:latest .
 FROM fedora:44 AS build
 
 RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
@@ -11,8 +17,8 @@ RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
 RUN dnf install -y libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake wget git intel-oneapi-mkl-devel
 
 RUN mkdir vtk-build && cd vtk-build && \
-    wget -q https://www.vtk.org/files/release/9.7/VTK-9.7.0.tar.gz && tar xf VTK-9.7.0.tar.gz && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.7.0 && \
+    wget -q https://www.vtk.org/files/release/9.7/VTK-9.7.1.tar.gz && tar xf VTK-9.7.1.tar.gz && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.7.1 && \
     make install -j"$(nproc)" && cd .. && rm -r vtk-build
 
 RUN git clone --recurse-submodules -b dev --depth 1 https://github.com/TLCFEM/suanPan.git && \

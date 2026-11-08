@@ -1,27 +1,16 @@
 #!/usr/bin/env bash
 # -----------------------------------------------------------------------------
-# mac-patcher.sh
+# mac-patcher.sh - macOS dylib bundler and patcher
 #
-# Usage:
-#   mac-patcher.sh [directory]
+# Bundles all required non-system dylibs for binaries and existing dylibs,
+# then patches them to use relative paths for portability.
 #
-# Description:
-#   - Bundles all required non-system dylibs for binaries and existing dylibs.
-#   - Recursively copies dependencies into the 'lib' directory.
-#   - Patches binaries in 'bin' to use bundled dylibs via @executable_path/../lib.
-#   - Patches dylibs in 'lib' to use @loader_path for their own dependencies.
-#   - Verifies all binaries and dylibs for correct linkage.
-#
-# Arguments:
-#   directory   Optional. If provided, changes to this directory before processing.
-#
-# Requirements:
-#   - otool, install_name_tool, file, grep must be installed and available in PATH.
+# Usage: ./mac-patcher.sh [directory]
+#   directory: Optional target directory (defaults to current)
 #
 # Example:
 #   ./mac-patcher.sh
 #   ./mac-patcher.sh /path/to/appdir
-#
 # -----------------------------------------------------------------------------
 
 set -e

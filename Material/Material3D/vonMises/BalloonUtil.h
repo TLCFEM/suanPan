@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file BalloonUtil.h
+ * @brief Utilities for the Balloon material model.
+ *
+ * @author tlc
+ * @date 25/04/2026
+ * @version 0.1.0
+ * @addtogroup Material-3D
+ * @{
+ */
 
 #ifndef BALLOONUTIL_H
 #define BALLOONUTIL_H
@@ -106,3 +116,5 @@ protected:
 };
 
 #endif
+
+//! @}

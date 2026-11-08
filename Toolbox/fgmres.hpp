@@ -15,6 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file fgmres.hpp
+ * @brief FGMRES iterative solver based on the MKL interface.
+ *
+ * @author tlc
+ * @date 16/05/2025
+ * @version 0.1.0
+ * @addtogroup Utility
+ * @{
+ */
 
 #ifndef FGMRES_HPP
 #define FGMRES_HPP
@@ -66,3 +76,5 @@ template<typename T> requires requires(const T& a, const mat& b) { { a * b } -> 
 }
 
 #endif
+
+//! @}

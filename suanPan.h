@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file suanPan.h
+ * @brief Global configuration, platform detection and version macros.
+ *
+ * @author tlc
+ * @date 15/05/2022
+ * @version 0.1.0
+ * @addtogroup Utility
+ * @{
+ */
 
 #ifndef SUANPAN_H
 #define SUANPAN_H
@@ -265,7 +275,7 @@ namespace suanpan {
     template<typename... T> void debug(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_VERBOSE || !SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::coral), pattern("DEBUG", file_name, format_str), fmt::make_format_args(line, args...));
+        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::sky_blue), pattern("DEBUG", file_name, format_str), fmt::make_format_args(line, args...));
         else SUANPAN_COUT << fmt::vformat(pattern("DEBUG", file_name, format_str), fmt::make_format_args(line, args...));
     }
 
@@ -273,7 +283,7 @@ namespace suanpan {
         SUANPAN_WARNING_COUNT += 1;
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_CWRN << fmt::vformat(fg(fmt::color::slate_blue), pattern("WARNING", file_name, format_str), fmt::make_format_args(line, args...));
+        if(SUANPAN_COLOR) SUANPAN_CWRN << fmt::vformat(fg(fmt::color::gold), pattern("WARNING", file_name, format_str), fmt::make_format_args(line, args...));
         else SUANPAN_CWRN << fmt::vformat(pattern("WARNING", file_name, format_str), fmt::make_format_args(line, args...));
     }
 
@@ -281,21 +291,21 @@ namespace suanpan {
         SUANPAN_ERROR_COUNT += 1;
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_CERR << fmt::vformat(fg(fmt::color::orange), pattern("ERROR", file_name, format_str), fmt::make_format_args(line, args...));
+        if(SUANPAN_COLOR) SUANPAN_CERR << fmt::vformat(fg(fmt::color::crimson), pattern("ERROR", file_name, format_str), fmt::make_format_args(line, args...));
         else SUANPAN_CERR << fmt::vformat(pattern("ERROR", file_name, format_str), fmt::make_format_args(line, args...));
     }
 
     template<typename... T> void fatal(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_CFTL << fmt::vformat(fg(fmt::color::violet), pattern("FATAL", file_name, format_str), fmt::make_format_args(line, args...));
+        if(SUANPAN_COLOR) SUANPAN_CFTL << fmt::vformat(fg(fmt::color::deep_pink), pattern("FATAL", file_name, format_str), fmt::make_format_args(line, args...));
         else SUANPAN_CFTL << fmt::vformat(pattern("FATAL", file_name, format_str), fmt::make_format_args(line, args...));
     }
 
     template<typename... T> void info(const std::string_view format_sv, const T&... args) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::green_yellow), format_sv, fmt::make_format_args(args...));
+        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::spring_green), format_sv, fmt::make_format_args(args...));
         else SUANPAN_COUT << fmt::vformat(format_sv, fmt::make_format_args(args...));
     }
 
@@ -314,7 +324,7 @@ namespace suanpan {
     template<typename T> void info(const Col<T>& in_vec) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), "{}", format(in_vec));
+        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::spring_green), "{}", format(in_vec));
         else SUANPAN_COUT << format(in_vec);
     }
 
@@ -324,14 +334,14 @@ namespace suanpan {
         if(format_sv.back() != '\t' && format_sv.back() != '\n') output += '\n';
         output += format(in_vec);
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::green_yellow), "{}", output);
+        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::format(fg(fmt::color::spring_green), "{}", output);
         else SUANPAN_COUT << output;
     }
 
     template<typename... T> void highlight(const std::string_view format_sv, const T&... args) {
         if(!SUANPAN_PRINT) return;
         const std::scoped_lock lock(print_mutex);
-        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::crimson), format_sv, fmt::make_format_args(args...));
+        if(SUANPAN_COLOR) SUANPAN_COUT << fmt::vformat(fg(fmt::color::cyan), format_sv, fmt::make_format_args(args...));
         else SUANPAN_COUT << fmt::vformat(format_sv, fmt::make_format_args(args...));
     }
 } // namespace suanpan
@@ -374,3 +384,5 @@ namespace suanpan {
 } // namespace suanpan
 
 #endif
+
+//! @}

@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file ridders.hpp
+ * @brief Ridders' root-finding method.
+ *
+ * @author tlc
+ * @date 06/11/2023
+ * @version 0.1.0
+ * @addtogroup Utility
+ * @{
+ */
 
 #ifndef RIDDERS_HPP
 #define RIDDERS_HPP

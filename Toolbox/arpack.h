@@ -20,6 +20,7 @@
  *
  * @author tlc
  * @date 05/01/2022
+ * @version 0.1.0
  * @file arpack.h
  * @addtogroup Utility
  * @{
@@ -36,10 +37,6 @@ int eig_solve(vec&, mat&, const std::shared_ptr<MetaMat<double>>&, const std::sh
 int eig_solve(cx_vec&, cx_mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "LM");
 
 int eig_solve(cx_vec&, const std::shared_ptr<MetaMat<double>>&, unsigned);
-
-#ifdef SUANPAN_DISTRIBUTED
-int eig_psolve(vec&, mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "SM");
-#endif
 
 #endif
 

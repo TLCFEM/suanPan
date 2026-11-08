@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class Embedded
- * @brief A Embedded class.
+ * @brief An Embedded class.
  *
  * The Embedded class.
  *

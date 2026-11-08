@@ -197,7 +197,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
 
     const mat iso_mapping = trans(mapping * ele_coor);
 
-    mat N(11, 12, fill::zeros), H(11, 11, fill::zeros), HT(11, 11, fill::zeros);
+    mat N(12, 12, fill::zeros), H(12, 12, fill::zeros), HT(12, 12, fill::zeros);
 
     int_pt.clear();
     int_pt.reserve(m_plan.n_rows);
@@ -209,7 +209,7 @@ int SGCMS::initialize(const shared_ptr<DomainBase>& D) {
         const auto pn = shape::quad(c_ip.coor, 1);
         const mat jacob = pn * ele_coor;
 
-        const auto poly_stress = shape::stress11(iso_mapping * vec{0., X, Y, X * Y});
+        const auto poly_stress = shape::stress12(iso_mapping * vec{0., X, Y, X * Y});
         c_ip.BM = solve(mat_stiff, poly_stress);
 
         const auto factor = det(jacob) * m_plan(I, 2) * thickness;

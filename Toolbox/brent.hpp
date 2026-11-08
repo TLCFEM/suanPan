@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file brent.hpp
+ * @brief Brent's root-finding method.
+ *
+ * @author tlc
+ * @date 16/05/2025
+ * @version 0.1.0
+ * @addtogroup Utility
+ * @{
+ */
 
 #ifndef BRENT_HPP
 #define BRENT_HPP

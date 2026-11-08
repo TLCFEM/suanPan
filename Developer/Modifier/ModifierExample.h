@@ -18,7 +18,7 @@
  * @class ModifierExample
  * @brief A ModifierExample damping class.
  * @author tlc
- * @date 20/2/2019
+ * @date 20/02/2019
  * @version 0.1.0
  * @file ModifierExample.h
  * @addtogroup Modifier

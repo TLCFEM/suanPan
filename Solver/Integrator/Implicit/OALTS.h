@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class OALTS
- * @brief A OALTS class defines a solver using OALTS algorithm.
+ * @brief An OALTS class defines a solver using OALTS algorithm.
  *
  * doi:10.1002/nme.6188
  *

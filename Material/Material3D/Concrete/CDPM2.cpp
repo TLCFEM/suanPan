@@ -19,8 +19,8 @@
 #include "CDPM2.h"
 
 #include <Recorder/OutputType.h>
+#include <Toolbox/homotopy.hpp>
 #include <Toolbox/tensor.h>
-#include <Toolbox/utility.h>
 
 const double CDPM2::sqrt_six = std::sqrt(6.);
 const double CDPM2::sqrt_three_two = std::sqrt(1.5);
@@ -100,7 +100,7 @@ void CDPM2::compute_plasticity(const double lode, const double s, const double p
 
     pfpp = 2. * g1 * pg1pp + m0 * qh1 * qh1 * qh2 * pg4pp;
     pfps = 2. * g1 * pg1ps + m0 * qh1 * qh1 * qh2 * pg4ps;
-    pfpkp = 2. * g1 * pg1pkp + 2. * qh1 * qh2 * (m0 * g4 * dqh1dkp - qh1 * dqh2dkp - qh2 * dqh1dkp) + m0 * qh1 * qh1 * g4 * dqh2dkp;
+    pfpkp = std::min(0., 2. * g1 * pg1pkp + 2. * qh1 * qh2 * (m0 * g4 * dqh1dkp - qh1 * dqh2dkp - qh2 * dqh1dkp) + m0 * qh1 * qh1 * g4 * dqh2dkp); // pfpkp is strictly negative
     pfpl = m0 * qh1 * qh1 * qh2 * pg4pl;
 
     gp = 2. * g1 * pg1pp + qh1 * qh1 * pg2pp;
@@ -123,6 +123,11 @@ void CDPM2::compute_plasticity(const double lode, const double s, const double p
     pgspp /= sqrt_six * fc;
     pgsps /= sqrt_six * fc;
     pgspkp /= sqrt_six * fc;
+
+    if(kp > 1.) {
+        if(pgppkp < 0.) pgppkp = 0.;
+        if(pgspkp < 0.) pgspkp = 0.;
+    }
 
     if(const auto rh = -p / fc - 1. / 3.; rh >= 0.) {
         xh = (bh - ah) * std::exp(-rh / ch);
@@ -178,9 +183,13 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     const auto term_c = std::sqrt(term_a * term_a + term_b * term_b);
     ee = term_a + term_c;
     const auto incre_ee = ee - current_ee;
-    const auto peeps = (ptaps * ee + term_b * ptbps) / term_c;
-    const auto peepp = ptapp * ee / term_c;
-    const auto peepl = ptapl * ee / term_c;
+    // at a stress-free state the equivalent strain is not differentiable
+    auto peeps = 0., peepp = 0., peepl = 0.;
+    if(term_c > datum::eps) {
+        peeps = (ptaps * ee + term_b * ptbps) / term_c;
+        peepp = ptapp * ee / term_c;
+        peepl = ptapl * ee / term_c;
+    }
 
     // ep
     const auto ep = gamma * gg;
@@ -191,7 +200,7 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
 
     // xs
     auto xs = 1., pxsps = 0., pxspp = 0.;
-    if(p <= 0.) {
+    if(p <= 0. && s > datum::eps) {
         pxspp = (sqrt_six - as * sqrt_six) / s;
         xs += pxspp * p;
         pxsps = -pxspp * p / s;
@@ -251,9 +260,12 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
             dqh2dkp = hp;
         }
 
-        const auto betac = sqrtdf * qh2 / s;
-        const auto pbetacpkp = sqrtdf / s * dqh2dkp;
-        const auto pbetacps = -betac / s;
+        auto betac = 0., pbetacpkp = 0., pbetacps = 0.;
+        if(s > datum::eps) {
+            betac = sqrtdf * qh2 / s;
+            pbetacpkp = sqrtdf / s * dqh2dkp;
+            pbetacps = -betac / s;
+        }
 
         pkdc1pac = ep * betac / xs;
         const auto incre_kdc1 = pkdc1pac * ac;
@@ -329,27 +341,38 @@ int CDPM2::compute_damage_factor(const double kd, const double kd1, const double
 
     omega = 1.; // initial guess with the maximum value to avoid convergence to the negative solution
 
+    // the damage function is monotonic on [0, 1], bracketing prevents divergence to nonphysical values
+    auto lower = 0., upper = 1.;
+
     auto counter = 0u;
     while(true) {
-        if(max_iteration == ++counter) return SUANPAN_FAIL;
-
         const auto term_a = ft * std::exp(-(kd1 + omega * kd2) / ef);
         const auto term_b = (1. - omega) * elastic_modulus;
         const auto residual = term_a - term_b * kd;
         const auto jacobian = elastic_modulus * kd - kd2 / ef * term_a;
-        const auto incre = residual / jacobian;
 
-        const auto error = std::fabs(incre);
-        suanpan_debug("Local damage iteration error: {:.5E}.\n", error);
+        if(max_iteration == ++counter || std::fabs(jacobian) < datum::eps) return SUANPAN_FAIL;
 
-        if(error < tolerance || (std::fabs(residual) < tolerance && counter > 5u)) {
+        const auto commit_damage = [&] {
             popkd = term_b / jacobian;
             popkd1 = term_a / ef / jacobian;
             popkd2 = popkd1 * omega;
             return SUANPAN_SUCCESS;
-        }
+        };
 
-        omega -= incre;
+        if(std::fabs(residual) < tolerance) return commit_damage();
+
+        if(residual > 0.) upper = omega;
+        else lower = omega;
+
+        auto trial_omega = omega - residual / jacobian;
+        if(!std::isfinite(trial_omega) || trial_omega <= lower || trial_omega >= upper) trial_omega = .5 * (lower + upper);
+
+        const auto error = std::fabs(trial_omega - omega);
+        suanpan_debug("Local damage iteration error: {:.5E}.\n", error);
+        if(error < tolerance) return commit_damage();
+
+        omega = trial_omega;
     }
 }
 
@@ -390,7 +413,11 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const auto hydro_stress = tensor::mean<3>(trial_stress);
     const auto trial_s = tensor::stress::norm(dev_stress);
     const auto trial_p = hydro_stress;
-    const vec n = dev_stress / trial_s;
+
+    // for a purely volumetric stress state the deviatoric direction is not unique,
+    // the model convention is to use a Lode angle of zero and an arbitrary but fixed direction
+    const auto degenerate = trial_s <= datum::eps;
+    const vec n = degenerate ? vec{2., -1., -1., 0., 0., 0.} / std::sqrt(6.) : vec(dev_stress / trial_s);
 
     static constexpr double low_limit = -.95;
     static const double low_slope = (2. * std::cos(std::acos(low_limit) / 3.) - 1.) / (low_limit + 1.);
@@ -398,7 +425,11 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     static const double high_slope = (2. * std::cos(std::acos(high_limit) / 3.) - 2.) / (high_limit - 1.);
 
     double lode, dlode;
-    if(const auto lode_a = tensor::stress::lode(dev_stress); lode_a < low_limit) {
+    if(degenerate) {
+        lode = 2.;
+        dlode = 0.;
+    }
+    else if(const auto lode_a = tensor::stress::lode(dev_stress); lode_a < low_limit) {
         // close to left boundary
         // use linear approximation
         lode = 1. + low_slope * (1. + lode_a);
@@ -417,7 +448,8 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     }
 
     const auto square_lode = lode * lode;
-    const rowvec dlde = dlode * double_shear * (tensor::stress::lode_der(dev_stress) % tensor::stress::norm_weight).t() * unit_dev_tensor;
+    rowvec dlde(6, fill::zeros);
+    if(!degenerate) dlde = dlode * double_shear * (tensor::stress::lode_der(dev_stress) % tensor::stress::norm_weight).t() * unit_dev_tensor;
 
     auto gamma = 0., s = trial_s, p = trial_p;
 
@@ -448,18 +480,61 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     // const auto& r = data(16);
     // const auto& drdl = data(17);
 
+    const auto assemble_residual = [&] {
+        vec4 out_residual(fill::none);
+
+        out_residual(0) = f;
+        out_residual(1) = s + double_shear * gamma * gs - trial_s;
+        out_residual(2) = p + bulk * gamma * gp - trial_p;
+        out_residual(3) = xh * (current_kp - kp) + gamma * gg * square_lode;
+
+        return out_residual;
+    };
+    const auto assemble_jacobian = [&] {
+        mat44 out_jacobian(fill::none);
+
+        out_jacobian(0, 0) = 0.;
+        out_jacobian(0, 1) = pfps;
+        out_jacobian(0, 2) = pfpp;
+        out_jacobian(0, 3) = pfpkp;
+
+        out_jacobian(1, 0) = double_shear * gs;
+        out_jacobian(1, 1) = double_shear * gamma * pgsps + 1.;
+        out_jacobian(1, 2) = double_shear * gamma * pgspp;
+        out_jacobian(1, 3) = double_shear * gamma * pgspkp;
+
+        out_jacobian(2, 0) = bulk * gp;
+        out_jacobian(2, 1) = bulk * gamma * pgpps;
+        out_jacobian(2, 2) = bulk * gamma * pgppp + 1.;
+        out_jacobian(2, 3) = bulk * gamma * pgppkp;
+
+        out_jacobian(3, 0) = gg * square_lode;
+        out_jacobian(3, 1) = gamma * square_lode / gg * (gs * pgsps + gp / 3. * pgpps);
+        out_jacobian(3, 2) = gamma * square_lode / gg * (gs * pgspp + gp / 3. * pgppp) + (current_kp - kp) * dxhdp;
+        out_jacobian(3, 3) = gamma * square_lode / gg * (gs * pgspkp + gp / 3. * pgppkp) - xh;
+
+        return out_jacobian;
+    };
+
     auto counter{0u};
     auto ref_error{1.};
-    auto try_unit_kp{false};
     while(true) {
-        if(max_iteration == ++counter) {
-            if(try_unit_kp || current_kp > 1.) {
-                suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+        if(max_iteration <= ++counter) {
+            const auto system = [&](const vec4& in_x) {
+                gamma = in_x(0);
+
+                compute_plasticity(lode, s = in_x(1), p = in_x(2), kp = in_x(3), data);
+
+                return std::pair{assemble_residual(), assemble_jacobian()};
+            };
+
+            vec4 initial_x{0., trial_s, trial_p, current_kp};
+            homotopy_config config{};
+            if(SUANPAN_SUCCESS != homotopy_solve<mat44>(initial_x, system, config)) {
+                suanpan_error("Homotopy solve failed after {} iterations.\n", max_iteration);
                 return SUANPAN_FAIL;
             }
 
-            try_unit_kp = true;
-            kp = 1.;      // start from unity
             counter = 2u; // bypass elasticity check
         }
 
@@ -470,31 +545,16 @@ int CDPM2::update_trial_status(const vec& t_strain) {
             return SUANPAN_FAIL;
         }
 
-        if(1u == counter && f < 0.) break;
+        if(1u == counter && f < 0.) {
+            // elastic step, the plastic multipliers remain unchanged
+            // the derivatives of the stress invariants are still required by the damage tangent
+            if(!degenerate) left.row(1) = double_shear * (n % tensor::stress::norm_weight).t() * unit_dev_tensor;
+            left.row(2) = bulk * tensor::unit_tensor2.t();
+            break;
+        }
 
-        residual(0) = f;
-        residual(1) = s + double_shear * gamma * gs - trial_s;
-        residual(2) = p + bulk * gamma * gp - trial_p;
-        residual(3) = xh * (current_kp - kp) + gamma * gg * square_lode;
-
-        jacobian(0, 1) = pfps;
-        jacobian(0, 2) = pfpp;
-        jacobian(0, 3) = pfpkp;
-
-        jacobian(1, 0) = double_shear * gs;
-        jacobian(1, 1) = double_shear * gamma * pgsps + 1.;
-        jacobian(1, 2) = double_shear * gamma * pgspp;
-        jacobian(1, 3) = double_shear * gamma * pgspkp;
-
-        jacobian(2, 0) = bulk * gp;
-        jacobian(2, 1) = bulk * gamma * pgpps;
-        jacobian(2, 2) = bulk * gamma * pgppp + 1.;
-        jacobian(2, 3) = bulk * gamma * pgppkp;
-
-        jacobian(3, 0) = gg * square_lode;
-        jacobian(3, 1) = gamma * square_lode / gg * (gs * pgsps + gp / 3. * pgpps);
-        jacobian(3, 2) = gamma * square_lode / gg * (gs * pgspp + gp / 3. * pgppp) + (current_kp - kp) * dxhdp;
-        jacobian(3, 3) = gamma * square_lode / gg * (gs * pgspkp + gp / 3. * pgppkp) - xh;
+        residual = assemble_residual();
+        jacobian = assemble_jacobian();
 
         if(rcond(jacobian) < datum::eps) {
             // short-circuit and directly fail
@@ -502,13 +562,14 @@ int CDPM2::update_trial_status(const vec& t_strain) {
             continue;
         }
 
-        if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
+        if(!solve(incre, jacobian, residual, solve_opts::equilibrate + solve_opts::no_approx)) return SUANPAN_FAIL;
 
         const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
 
-        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) {
+        // all residuals are measured relative to the current state, the hardening variable can be large
+        if(const auto scale = 1. + std::max(std::max(std::fabs(s), std::fabs(p)), std::max(std::fabs(kp), std::fabs(gamma))); error < tolerance * ref_error || (counter > 5u && (error < tolerance * scale || suanpan::inf_norm(residual) < tolerance * scale))) {
             const vec unit_n = n % tensor::stress::norm_weight;
 
             plastic_strain += gamma * gs * unit_n + gamma * gp / 3. * tensor::unit_tensor2;
@@ -524,7 +585,9 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
             if(!solve(left, jacobian, right)) return SUANPAN_FAIL;
 
-            trial_stiffness = n * (left.row(1) - s / trial_s * right.row(1)) + s / trial_s * double_shear * unit_dev_tensor;
+            // for a purely volumetric trial state the deviatoric norm vanishes, use a safe scale
+            const auto scaled_s = s / (degenerate ? 1. : trial_s);
+            trial_stiffness = n * (left.row(1) - scaled_s * right.row(1)) + scaled_s * double_shear * unit_dev_tensor;
             trial_stiffness.row(0) += left.row(2);
             trial_stiffness.row(1) += left.row(2);
             trial_stiffness.row(2) += left.row(2);
@@ -556,7 +619,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
     const auto aca = accu(square(principal_stress(c_pattern)));
     const auto acb = accu(square(principal_stress));
-    const auto ac = aca / acb;
+    const auto ac = acb > datum::eps ? aca / acb : 0.;
 
     if(SUANPAN_SUCCESS != compute_damage(gamma, s, p, kp, ac, data)) return SUANPAN_FAIL;
 
@@ -571,10 +634,13 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const auto& pocpac = data(10);
     const auto& pocpl = data(11);
 
-    rowvec daca = 2. * principal_stress.t();
-    daca(t_pattern).fill(0.);
-    const rowvec dac = (daca - 2. * ac * principal_stress.t()) / acb;
-    const rowvec dacde = dac * transform::compute_jacobian_nominal_to_principal(principal_direction) * trial_stiffness;
+    rowvec dacde(6, fill::zeros);
+    if(acb > datum::eps) {
+        rowvec daca = 2. * principal_stress.t();
+        daca(t_pattern).fill(0.);
+        const rowvec dac = (daca - 2. * ac * principal_stress.t()) / acb;
+        dacde = dac * transform::compute_jacobian_nominal_to_principal(principal_direction) * trial_stiffness;
+    }
 
     const rowvec potpe = pot * left + potpac * dacde + potpl * dlde;
     const rowvec pocpe = poc * left + pocpac * dacde + pocpl * dlde;
@@ -591,7 +657,7 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     else if(DamageType::ANISOTROPIC == damage_type) {
         const auto [tension_projector, tension_derivative] = transform::stress::eigen_to_tensile_derivative(principal_stress, principal_direction);
 
-        const vec tension_stress = tension_projector * trial_stress;
+        const vec6 tension_stress = tension_projector * trial_stress;
 
         trial_stiffness = damage_c * trial_stiffness - trial_stress * pocpe + (omegac - omegat) * tension_derivative * trial_stiffness + tension_stress * (pocpe - potpe);
 

@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class ExternalMaterialData
- * @brief A ExternalMaterialData class.
+ * @brief An ExternalMaterialData class.
  *
  * @author tlc
  * @date 21/05/2022

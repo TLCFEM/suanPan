@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class Viscosity01
- * @brief A 1D Elastic class.
+ * @brief A nonlinear viscous material with a damping coefficient.
  * @author tlc
  * @date 01/03/2019
  * @version 0.3.0

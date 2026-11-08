@@ -24,6 +24,7 @@ $RECYCLE.BIN/
 *.spec
 *.u2d
 build
+build-*
 Checker/.idea
 Checker/*.exe
 Checker/updater
@@ -37,6 +38,7 @@ MSVC/suanPan/.vs
 MSVC/suanPan/*/x64
 MSVC/suanPan/PredictedInputCache*.dat
 venv
+opencode.json
 
 # Windows shortcuts
 *.lnk

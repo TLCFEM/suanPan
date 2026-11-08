@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file ExpressionParser.h
+ * @brief Parses expression commands.
+ *
+ * @author tlc
+ * @date 20/01/2023
+ * @version 0.1.0
+ * @addtogroup Utility
+ * @{
+ */
 
 #ifndef EXPRESSIONPARSER_H
 #define EXPRESSIONPARSER_H
@@ -25,3 +35,5 @@ class DomainBase;
 int create_new_expression(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif
+
+//! @}

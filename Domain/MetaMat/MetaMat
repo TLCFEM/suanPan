@@ -32,7 +32,9 @@
 #include "Dense.Cluster/FullMatCluster.hpp"
 #include "Sparse.Cluster/SparseMatClusterLIS.hpp"
 #include "Sparse.Cluster/SparseMatClusterMUMPS.hpp"
+#ifdef SUANPAN_MKL
 #include "Sparse.Cluster/SparseMatClusterPARDISO.hpp"
+#endif
 #endif
 
 // misc operation

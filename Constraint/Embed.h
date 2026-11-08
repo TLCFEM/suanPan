@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class Embed
- * @brief A Embed class.
+ * @brief An Embed class.
  *
  * @author tlc
  * @date 12/08/2020

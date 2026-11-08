@@ -53,9 +53,10 @@ public:
         mat&&,            // compression damage table
         double,           // g_t
         double,           // g_c
-        double = .2,      // dilatancy parameter
-        double = 1.16,    // biaxial compression strength ratio
-        double = .5,      // stiffness recovery
+        double,           // dilatancy parameter
+        double,           // biaxial compression strength ratio
+        double,           // meridian ratio
+        double,           // stiffness recovery
         double = 2400E-12 // density
     );
 

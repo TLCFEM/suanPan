@@ -37,7 +37,7 @@ vec NURBS::evaluate_point(const double u, const field<vec>& polygon) const {
 }
 
 field<vec> NURBS::evaluate_point_derivative(const double u, const field<vec>& polygon, sword d) const {
-    if(d < 0) d = order;
+    if(d < 0) d = static_cast<sword>(order);
 
     const auto point = BSpline::evaluate_point_derivative(u, polygon, d);
 
@@ -60,18 +60,19 @@ vec NURBS::evaluate_shape_function(const double u, const field<vec>& polygon) co
 
     auto sum = 0.;
 
-    for(uword I{0}; I < shape.n_rows; ++I)
-        for(uword J{0}; J < shape.n_cols; ++J) sum += shape(I, J) * polygon(I, J).back();
+    for(uword I{0}; I < shape.n_elem; ++I) {
+        if(polygon(I).empty()) shape(I) = 0.;
+        else sum += shape(I) *= polygon(I).back();
+    }
 
     return shape / sum;
 }
 
 field<vec> NURBS::evaluate_shape_function_derivative(const double u, const field<vec>& polygon, sword d) const {
-    if(d < 0) d = order;
+    if(d < 0) d = static_cast<sword>(order);
 
     const auto span = evaluate_span(u);
-    auto ders = evaluate_basis_derivative(u, d);
-    ders.resize(d + 1, ders.n_cols);
+    const auto ders = evaluate_basis_derivative(u, d);
 
     initialize_binomial(d);
 

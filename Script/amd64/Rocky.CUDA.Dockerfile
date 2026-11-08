@@ -1,3 +1,9 @@
+# amd64/Rocky.CUDA.Dockerfile - Build CUDA-enabled suanPan binary
+# 
+# Uses tlcfem/suanpan-env:cuda as base, compiles suanPan with CUDA and MKL
+# support, and creates a minimal runtime RPM package for GPU deployment.
+# 
+# Build: docker build -f amd64/Rocky.CUDA.Dockerfile -t tlcfem/suanpan-cuda:latest .
 FROM tlcfem/suanpan-env:cuda AS build
 
 RUN git clone --recurse-submodules --branch dev --depth 1 https://github.com/TLCFEM/suanPan.git && cd suanPan && mkdir build && cd build && \

@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
-
+# -----------------------------------------------------------------------------
+# Coverage.sh - Run examples and collect timing data
+#
+# Executes example files with the compiled suanPan binary, records execution
+# times, and generates a summary report. Creates a Results.tar.gz archive.
+#
+# Usage: ./Coverage.sh <build_folder>
+#   build_folder: Directory containing the compiled suanPan binary
+#
+# Example: ./Coverage.sh ./build
+# -----------------------------------------------------------------------------
 set -e
 
 if [ $# -eq 0 ]; then

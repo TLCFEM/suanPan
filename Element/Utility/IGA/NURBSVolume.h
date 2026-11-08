@@ -36,12 +36,16 @@
 class NURBSVolume : public BSplineVolume, public NURBSBase {
 public:
     using BSplineVolume::BSplineVolume;
+    using BSplineVolume::evaluate_point;
+    using BSplineVolume::evaluate_point_derivative;
+    using BSplineVolume::evaluate_shape_function;
+    using BSplineVolume::evaluate_shape_function_derivative;
 
     [[nodiscard]] vec evaluate_point(double, double, double, const field<vec>&) const override;
-    [[nodiscard]] field<vec> evaluate_point_derivative(double, double, double, const field<vec>&, sword = -1) const override;
+    [[nodiscard]] field<vec> evaluate_point_derivative(double, double, double, const field<vec>&, sword) const override;
 
     [[nodiscard]] cube evaluate_shape_function(double, double, double, const field<vec>&) const override;
-    [[nodiscard]] field<cube> evaluate_shape_function_derivative(double, double, double, const field<vec>&, sword = -1, sword = -1, sword = -1) const override;
+    [[nodiscard]] field<cube> evaluate_shape_function_derivative(double, double, double, const field<vec>&, sword, sword, sword) const override;
 };
 
 class NURBSVolume3D final : public NURBSVolume {

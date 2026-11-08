@@ -71,8 +71,8 @@ field<vec> BSplineSurface::evaluate_point_derivative(const double u, const doubl
     const auto p = line_u.get_order();
     const auto q = line_v.get_order();
 
-    if(du < 0) du = p;
-    if(dv < 0) dv = q;
+    if(du < 0) du = static_cast<sword>(p);
+    if(dv < 0) dv = static_cast<sword>(q);
 
     field<vec> point(du + 1, dv + 1);
 
@@ -125,11 +125,11 @@ field<mat> BSplineSurface::evaluate_shape_function_derivative(const double u, co
     const auto p = line_u.get_order();
     const auto q = line_v.get_order();
 
+    if(du < 0) du = static_cast<sword>(p);
+    if(dv < 0) dv = static_cast<sword>(q);
+
     const auto uspan = line_u.evaluate_span(u);
     const auto vspan = line_v.evaluate_span(v);
-
-    du = du < 0 ? p : std::min(du, static_cast<sword>(p));
-    dv = dv < 0 ? q : std::min(dv, static_cast<sword>(q));
 
     const auto nu = line_u.evaluate_basis_derivative(u, du);
     const auto nv = line_v.evaluate_basis_derivative(v, dv);

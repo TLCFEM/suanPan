@@ -36,12 +36,16 @@
 class NURBSSurface : public BSplineSurface, public NURBSBase {
 public:
     using BSplineSurface::BSplineSurface;
+    using BSplineSurface::evaluate_point;
+    using BSplineSurface::evaluate_point_derivative;
+    using BSplineSurface::evaluate_shape_function;
+    using BSplineSurface::evaluate_shape_function_derivative;
 
     [[nodiscard]] vec evaluate_point(double, double, const field<vec>&) const override;
-    [[nodiscard]] field<vec> evaluate_point_derivative(double, double, const field<vec>&, sword = -1, sword = -1) const override;
+    [[nodiscard]] field<vec> evaluate_point_derivative(double, double, const field<vec>&, sword, sword) const override;
 
     [[nodiscard]] mat evaluate_shape_function(double, double, const field<vec>&) const override;
-    [[nodiscard]] field<mat> evaluate_shape_function_derivative(double, double, const field<vec>&, sword = -1, sword = -1) const override;
+    [[nodiscard]] field<mat> evaluate_shape_function_derivative(double, double, const field<vec>&, sword, sword) const override;
 };
 
 class NURBSSurface2D final : public NURBSSurface {

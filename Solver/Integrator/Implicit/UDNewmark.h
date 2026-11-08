@@ -16,6 +16,7 @@
  ******************************************************************************/
 /**
  * @class UDNewmark
+ * @brief A base class for Newmark integrators with uniform damping.
  *
  * @author tlc
  * @date 10/05/2026

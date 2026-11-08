@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class ArcLength
- * @brief A ArcLength class.
+ * @brief An ArcLength class.
  *
  * This class corresponds to the Static, Riks step in Abaqus, which handles a
  * static problem using arc-length solvers.

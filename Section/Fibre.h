@@ -21,7 +21,7 @@
  * @date 14/09/2023
  * @version 0.1.0
  * @file Fibre.h
- * @ingroup Section
+ * @addtogroup Section
  * @{
  */
 

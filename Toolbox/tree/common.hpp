@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file common.hpp
+ * @brief Common geometric primitives for tree data structures.
+ *
+ * @author tlc
+ * @date 25/04/2026
+ * @version 0.1.0
+ * @addtogroup Utility
+ * @{
+ */
 
 #ifndef TREE_COMMON_HPP
 #define TREE_COMMON_HPP
@@ -37,3 +47,5 @@ template<std::floating_point T = double> struct BoundingBox {
 };
 
 #endif
+
+//! @}

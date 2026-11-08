@@ -19,6 +19,7 @@
  * @brief A Damper02 class.
  * @author tlc
  * @date 19/10/2017
+ * @version 0.1.0
  * @file Damper02.h
  * @addtogroup Special
  * @ingroup Element

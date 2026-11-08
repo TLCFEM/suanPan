@@ -71,17 +71,17 @@ namespace shape {
     template<typename T> Mat<T> stress5(const Col<T>& C);
     template<typename T> Mat<T> stress7(const Col<T>& C);
     template<typename T> Mat<T> stress9(const Col<T>& C);
-    template<typename T> Mat<T> stress11(const Col<T>& C);
+    template<typename T> Mat<T> stress12(const Col<T>& C);
 
     template<typename T> Mat<T> stress5(T X, T Y);
     template<typename T> Mat<T> stress7(T X, T Y);
     template<typename T> Mat<T> stress9(T X, T Y);
-    template<typename T> Mat<T> stress11(T X, T Y);
+    template<typename T> Mat<T> stress12(T X, T Y);
 
     inline mat stress5(const vec& C);
     inline mat stress7(const vec& C);
     inline mat stress9(const vec& C);
-    inline mat stress11(const vec& C);
+    inline mat stress12(const vec& C);
 
     template<typename T> Mat<T> strain(T X, T Y, T V, unsigned S);
 
@@ -490,10 +490,12 @@ template<typename T> Mat<T> shape::stress(const T X, const T Y, const unsigned S
                 N(1, 7) = N(0, 8) = 2. * XY;
                 N(2, 7) = -X2;
                 N(2, 8) = -Y2;
-                if(S == 11) {
+                if(S == 12) {
                     N(1, 9) = 2. * X2 + (N(1, 10) = -Y2);
                     N(0, 10) = 2. * Y2 + (N(0, 9) = -X2);
                     N(2, 10) = N(2, 9) = 2. * XY;
+                    N(0, 11) = Y2;
+                    N(1, 11) = X2;
                 }
             }
         }
@@ -510,7 +512,7 @@ template<typename T> Mat<T> shape::stress7(const Col<T>& C) { return stress(C, 7
 
 template<typename T> Mat<T> shape::stress9(const Col<T>& C) { return stress(C, 9); }
 
-template<typename T> Mat<T> shape::stress11(const Col<T>& C) { return stress(C, 11); }
+template<typename T> Mat<T> shape::stress12(const Col<T>& C) { return stress(C, 12); }
 
 template<typename T> Mat<T> shape::stress5(const T X, const T Y) { return stress(X, Y, 5); }
 
@@ -518,7 +520,7 @@ template<typename T> Mat<T> shape::stress7(const T X, const T Y) { return stress
 
 template<typename T> Mat<T> shape::stress9(const T X, const T Y) { return stress(X, Y, 9); }
 
-template<typename T> Mat<T> shape::stress11(const T X, const T Y) { return stress(X, Y, 11); }
+template<typename T> Mat<T> shape::stress12(const T X, const T Y) { return stress(X, Y, 12); }
 
 template<typename T> Mat<T> shape::strain(const T X, const T Y, const T V, const unsigned S) {
     Mat<T> N(3, S, fill::zeros);
@@ -690,7 +692,7 @@ mat shape::stress7(const vec& C) { return stress(C, 7); }
 
 mat shape::stress9(const vec& C) { return stress(C, 9); }
 
-mat shape::stress11(const vec& C) { return stress(C, 11); }
+mat shape::stress12(const vec& C) { return stress(C, 12); }
 
 mat shape::strain5(const vec& C, const double V) { return strain(C, V, 5); }
 

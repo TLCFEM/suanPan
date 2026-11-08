@@ -150,3 +150,5 @@ template<sp_d T> Mat<T> sdof_response(const T damping_ratio, const T interval, c
 }
 
 #endif
+
+//! @}

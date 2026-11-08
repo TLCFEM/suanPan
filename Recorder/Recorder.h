@@ -21,6 +21,7 @@
  * @date 27/07/2017
  * @version 0.1.0
  * @file Recorder.h
+ * @addtogroup Recorder
  * @{
  */
 

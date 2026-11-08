@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class ElementalLee
- * @brief A ElementalLee damping class.
+ * @brief An ElementalLee damping class.
  * @author tlc
  * @date 20/10/2022
  * @version 0.1.0

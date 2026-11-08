@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class ISection3D
- * @brief A ISection3D class.
+ * @brief An ISection3D class.
  * @author tlc
  * @date 13/03/2019
  * @version 0.1.0

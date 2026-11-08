@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file MaterialParser.h
+ * @brief Parses material commands.
+ *
+ * @author tlc
+ * @date 15/05/2022
+ * @version 0.1.0
+ * @addtogroup Material
+ * @{
+ */
 
 #ifndef MATERIALPARSER_H
 #define MATERIALPARSER_H
@@ -25,3 +35,5 @@ class DomainBase;
 int create_new_material(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif
+
+//! @}

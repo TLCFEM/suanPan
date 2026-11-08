@@ -1,3 +1,9 @@
+# arm64/Rocky.Dockerfile - Build ARM64 suanPan binary
+# 
+# Uses tlcfem/suanpan-env:latest as base, compiles suanPan with ARM64 support
+# and creates a minimal runtime image for deployment on ARM64 systems.
+# 
+# Build: docker build -f arm64/Rocky.Dockerfile -t tlcfem/suanpan-arm64:latest .
 FROM tlcfem/suanpan-env:latest AS build
 
 # part 3: suanpan

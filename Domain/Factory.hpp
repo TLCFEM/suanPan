@@ -660,7 +660,7 @@ public:
 
     /*************************ASSEMBLER*************************/
 
-    void assemble_vector(const Mat<T>&, const uvec&, vec&);
+    static void assemble_vector(const Mat<T>&, const uvec&, vec&);
 
     void assemble_resistance(const Mat<T>&, const uvec&);
     void assemble_damping_force(const Mat<T>&, const uvec&);

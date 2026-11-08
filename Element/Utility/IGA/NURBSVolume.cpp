@@ -23,11 +23,12 @@ vec NURBSVolume::evaluate_point(const double u, const double v, const double w, 
     return point.head(point.n_elem - 1) / point.back();
 }
 
-field<vec> NURBSVolume::evaluate_point_derivative(const double u, const double v, const double w, const field<vec>& polygon, const sword d) const {
+field<vec> NURBSVolume::evaluate_point_derivative(const double u, const double v, const double w, const field<vec>& polygon, sword d) const {
+    if(d < 0) d = static_cast<sword>(std::max(line_u.get_order(), std::max(line_v.get_order(), line_w.get_order())));
+
     const auto point = BSplineVolume::evaluate_point_derivative(u, v, w, polygon, d);
 
     field<vec> ders(d + 1, d + 1, d + 1);
-    // ders.for_each([&](vec& t_ders) { t_ders.zeros(dimension); });
 
     initialize_binomial(d);
 
@@ -56,39 +57,34 @@ cube NURBSVolume::evaluate_shape_function(const double u, const double v, const 
 
     for(uword I{0}; I < shape.n_rows; ++I)
         for(uword J{0}; J < shape.n_cols; ++J)
-            for(uword K{0}; K < shape.n_slices; ++K)
-                if(!polygon(I, J, K).empty()) sum += shape(I, J, K) * polygon(I, J, K).back();
+            for(uword K{0}; K < shape.n_slices; ++K) {
+                if(polygon(I, J, K).empty()) shape(I, J, K) = 0.;
+                else sum += shape(I, J, K) *= polygon(I, J, K).back();
+            }
 
     return shape / sum;
 }
 
 field<cube> NURBSVolume::evaluate_shape_function_derivative(const double u, const double v, const double w, const field<vec>& polygon, sword du, sword dv, sword dw) const {
-    if(du < 0) du = line_u.get_order();
-    if(dv < 0) dv = line_v.get_order();
-    if(dw < 0) dw = line_w.get_order();
+    const auto p = line_u.get_order();
+    const auto q = line_v.get_order();
+    const auto r = line_w.get_order();
 
     const auto uspan = line_u.evaluate_span(u);
     const auto vspan = line_v.evaluate_span(v);
     const auto wspan = line_w.evaluate_span(w);
 
-    auto uders = line_u.evaluate_basis_derivative(u, du);
-    uders.resize(du + 1, uders.n_cols);
-    auto vders = line_v.evaluate_basis_derivative(v, dv);
-    vders.resize(dv + 1, vders.n_cols);
-    auto wders = line_w.evaluate_basis_derivative(w, dw);
-    wders.resize(dw + 1, wders.n_cols);
+    if(du < 0) du = static_cast<sword>(p);
+    if(dv < 0) dv = static_cast<sword>(q);
+    if(dw < 0) dw = static_cast<sword>(r);
 
-    const auto p = line_u.get_order();
-    const auto q = line_v.get_order();
-    const auto r = line_w.get_order();
+    const auto uders = line_u.evaluate_basis_derivative(u, du);
+    const auto vders = line_v.evaluate_basis_derivative(v, dv);
+    const auto wders = line_w.evaluate_basis_derivative(w, dw);
 
-    auto d = du;
-    if(dv > d) d = dv;
-    if(dw > d) d = dw;
+    initialize_binomial(std::max(std::max(du, dv), dw));
 
-    initialize_binomial(d);
-
-    field<cube> shape(d + 1, d + 1, d + 1);
+    field<cube> shape(du + 1, dv + 1, dw + 1);
     shape.for_each([&](cube& t_shape) { t_shape.zeros(line_u.get_knot().n_elem - line_u.get_order() - 1, line_v.get_knot().n_elem - line_v.get_order() - 1, line_w.get_knot().n_elem - line_w.get_order() - 1); });
 
     auto sum = 0.;
@@ -102,7 +98,7 @@ field<cube> NURBSVolume::evaluate_shape_function_derivative(const double u, cons
                     sum += uders(0, i) * vders(0, j) * wders(0, k) * polygon(uind, vind, wind).back();
                     for(sword l{0}; l <= du; ++l)
                         for(sword m{0}; m <= dv; ++m)
-                            for(auto n = 0; n <= dw; ++n) shape(l, m, n)(uind, vind, wind) = uders(l, i) * vders(m, j) * wders(n, k) * polygon(uind, vind, wind).back();
+                            for(sword n{0}; n <= dw; ++n) shape(l, m, n)(uind, vind, wind) = uders(l, i) * vders(m, j) * wders(n, k) * polygon(uind, vind, wind).back();
                 }
         }
     }
@@ -121,8 +117,7 @@ field<cube> NURBSVolume::evaluate_shape_function_derivative(const double u, cons
                                     for(uword y{0}; y <= q; ++y) {
                                         const auto vind = vspan + y - q;
                                         for(uword z{0}; z <= r; ++z) {
-                                            const auto wind = wspan + z - r;
-                                            if(!polygon(uind, vind, wind).empty()) weight_sum += polygon(uind, vind, wind).back() * uders(l, x) * vders(m, y) * wders(n, z);
+                                            if(const auto wind = wspan + z - r; !polygon(uind, vind, wind).empty()) weight_sum += polygon(uind, vind, wind).back() * uders(l, x) * vders(m, y) * wders(n, z);
                                         }
                                     }
                                 }

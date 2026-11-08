@@ -499,6 +499,134 @@ TEST_CASE("Triplet/CSR/CSC Conversion", "[Matrix.Sparse]") {
     }
 }
 
+namespace {
+    template<typename T> void check_compressed_ptr(const T* ptr, const uword n, const uword n_elem, const uword shift) {
+        REQUIRE(static_cast<uword>(ptr[0]) == shift);
+        for(uword I = 1; I <= n; ++I) REQUIRE(ptr[I] >= ptr[I - 1]);
+        REQUIRE(static_cast<uword>(ptr[n]) == n_elem + shift);
+    }
+
+    template<typename F> mat csr_to_dense(const F& in_mat, const uword shift) {
+        mat out_mat(static_cast<uword>(in_mat.n_rows), static_cast<uword>(in_mat.n_cols), fill::zeros);
+        for(uword I = 0; I < out_mat.n_rows; ++I)
+            for(auto J = static_cast<uword>(in_mat.row_mem()[I]) - shift; J < static_cast<uword>(in_mat.row_mem()[I + 1]) - shift; ++J) out_mat(I, static_cast<uword>(in_mat.col_mem()[J]) - shift) += in_mat.val_mem()[J];
+        return out_mat;
+    }
+
+    template<typename F> mat csc_to_dense(const F& in_mat, const uword shift) {
+        mat out_mat(static_cast<uword>(in_mat.n_rows), static_cast<uword>(in_mat.n_cols), fill::zeros);
+        for(uword I = 0; I < out_mat.n_cols; ++I)
+            for(auto J = static_cast<uword>(in_mat.col_mem()[I]) - shift; J < static_cast<uword>(in_mat.col_mem()[I + 1]) - shift; ++J) out_mat(static_cast<uword>(in_mat.row_mem()[J]) - shift, I) += in_mat.val_mem()[J];
+        return out_mat;
+    }
+
+    template<typename T> void check_conversion(const mat& A) {
+        const auto R = A.n_rows, C = A.n_cols;
+
+        triplet_form<double, uword> B(R, C);
+
+        // insert every entry twice to exercise condensation
+        for(uword I = 0; I < R; ++I)
+            for(uword J = 0; J < C; ++J)
+                if(A(I, J) != 0.) {
+                    B.at(I, J) = .5 * A(I, J);
+                    B.at(I, J) = .5 * A(I, J);
+                }
+
+        const vec X(C, fill::randn);
+
+        for(const auto base : {SparseBase::ZERO, SparseBase::ONE})
+            for(const auto full : {false, true}) {
+                const auto shift = static_cast<uword>(base);
+
+                auto BB = B;
+                csr_form<double, T> D(BB, base, full);
+                BB = B;
+                csc_form<double, T> E(BB, base, full);
+
+                REQUIRE(static_cast<uword>(D.n_rows) == R);
+                REQUIRE(static_cast<uword>(D.n_cols) == C);
+                REQUIRE(static_cast<uword>(E.n_rows) == R);
+                REQUIRE(static_cast<uword>(E.n_cols) == C);
+
+                check_compressed_ptr(D.row_mem(), R, static_cast<uword>(D.n_elem), shift);
+                check_compressed_ptr(E.col_mem(), C, static_cast<uword>(E.n_elem), shift);
+
+                REQUIRE(norm(A - csr_to_dense(D, shift), "inf") == 0.);
+                REQUIRE(norm(A - csc_to_dense(E, shift), "inf") == 0.);
+
+                if(SparseBase::ZERO == base) {
+                    REQUIRE(norm(A - to_mat(D), "inf") == 0.);
+                    REQUIRE(norm(A - to_mat(E), "inf") == 0.);
+                    for(uword I = 0; I < R; ++I)
+                        for(uword J = 0; J < C; ++J) {
+                            REQUIRE(D(static_cast<T>(I), static_cast<T>(J)) == A(I, J));
+                            REQUIRE(E(static_cast<T>(I), static_cast<T>(J)) == A(I, J));
+                        }
+                    if(R == C) {
+                        REQUIRE(norm(A * X - D * X, "inf") <= 1E-13);
+                        REQUIRE(norm(A * X - E * X, "inf") <= 1E-13);
+                    }
+                }
+            }
+
+        // assignment operator path
+        auto BB = B;
+        csr_form<double, T> D;
+        D = BB;
+        BB = B;
+        csc_form<double, T> E;
+        E = BB;
+
+        check_compressed_ptr(D.row_mem(), R, static_cast<uword>(D.n_elem), 0);
+        check_compressed_ptr(E.col_mem(), C, static_cast<uword>(E.n_elem), 0);
+
+        REQUIRE(norm(A - to_mat(D), "inf") == 0.);
+        REQUIRE(norm(A - to_mat(E), "inf") == 0.);
+    }
+} // namespace
+
+TEST_CASE("Triplet/CSR/CSC Conversion Empty Rows/Columns", "[Matrix.Sparse]") {
+    // leading, trailing and interior empty rows/columns in a rectangular matrix
+    mat A(7, 5, fill::zeros);
+    A(1, 1) = 1.;
+    A(1, 3) = 2.;
+    A(3, 1) = 3.;
+    A(4, 3) = 4.;
+
+    check_conversion<uword>(A);
+    check_conversion<int>(A);
+
+    // transposed shape so columns outnumber rows
+    check_conversion<uword>(mat(A.t()));
+    check_conversion<int>(mat(A.t()));
+
+    // only the first entry is populated
+    mat F(4, 6, fill::zeros);
+    F(0, 0) = 1.;
+
+    check_conversion<uword>(F);
+    check_conversion<int>(F);
+
+    // only the last entry is populated
+    mat L(6, 4, fill::zeros);
+    L(5, 3) = 1.;
+
+    check_conversion<uword>(L);
+    check_conversion<int>(L);
+
+    // fully empty matrix
+    check_conversion<uword>(mat(5, 3, fill::zeros));
+    check_conversion<int>(mat(3, 5, fill::zeros));
+
+    // random sparse matrices with many empty rows/columns
+    for(auto I = 0; I < 50; ++I) {
+        check_conversion<uword>(mat(sprandu<sp_mat>(50, 50, .02)));
+        check_conversion<int>(mat(sprandu<sp_mat>(40, 60, .02)));
+        check_conversion<uword>(mat(sprandu<sp_mat>(60, 40, .02)));
+    }
+}
+
 TEST_CASE("Benchmark Triplet Measure", "[Matrix.Sparse]") {
     constexpr unsigned long long N = 1024;
     constexpr unsigned long long REPEAT = 8;

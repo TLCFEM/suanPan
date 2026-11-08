@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file misc.h
+ * @brief Miscellaneous result saving helpers.
+ *
+ * @author tlc
+ * @date 01/09/2023
+ * @version 0.1.0
+ * @addtogroup Utility
+ * @{
+ */
 
 #ifndef MISC_H
 #define MISC_H
@@ -24,3 +34,5 @@ void save_result(const mat&);
 void save_gnuplot();
 
 #endif
+
+//! @}

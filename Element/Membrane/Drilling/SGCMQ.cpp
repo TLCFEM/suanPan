@@ -183,7 +183,9 @@ int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
 
     const mat iso_mapping = trans(mapping * ele_coor);
 
-    mat N(11, 12, fill::zeros), H(11, 11, fill::zeros), HT(11, 11, fill::zeros);
+    constexpr auto l_size = 12u;
+
+    mat N(l_size, m_size, fill::zeros), H(l_size, l_size, fill::zeros), HT(l_size, l_size, fill::zeros);
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
@@ -195,7 +197,7 @@ int SGCMQ::initialize(const shared_ptr<DomainBase>& D) {
         const mat jacob = pn * ele_coor;
         auto& c_pt = int_pt.emplace_back(std::move(t_vec), det(jacob) * plan(I, 2) * thickness, mat_proto->unique_copy());
 
-        const auto poly_stress = shape::stress11(iso_mapping * form_stress_mode(X, Y));
+        const auto poly_stress = shape::stress12(iso_mapping * form_stress_mode(X, Y));
         c_pt.poly_strain = solve(mat_stiff, poly_stress);
 
         N += c_pt.factor * poly_stress.t() * form_displacement_dn(solve(jacob, pn), solve(jacob, form_drilling_dn(c_pt.coor, diff_coor)));
@@ -285,20 +287,20 @@ mat SGCMQ::GetData(const OutputType P) {
 
     if(P == OutputType::S) {
         mat B(3u * static_cast<unsigned>(int_pt.size()), 1);
-        mat A(3u * static_cast<unsigned>(int_pt.size()), 11);
+        mat A(3u * static_cast<unsigned>(int_pt.size()), 12);
         for(unsigned I{0}, J{0}; I < static_cast<unsigned>(int_pt.size()); ++I, J += 3u) {
             B.rows(J, J + 2u) = int_pt[I].m_material->get_current_stress();
-            A.rows(J, J + 2u) = shape::stress11(int_pt[I].coor);
+            A.rows(J, J + 2u) = shape::stress12(int_pt[I].coor);
         }
         mat X;
         if(!solve(X, A, B)) return {};
 
         mat t_stress(6, m_node, fill::zeros);
 
-        t_stress(uvec{0, 1, 3}, uvec{0}) = shape::stress11(-1., -1.) * X;
-        t_stress(uvec{0, 1, 3}, uvec{1}) = shape::stress11(1., -1.) * X;
-        t_stress(uvec{0, 1, 3}, uvec{2}) = shape::stress11(1., 1.) * X;
-        t_stress(uvec{0, 1, 3}, uvec{3}) = shape::stress11(-1., 1.) * X;
+        t_stress(uvec{0, 1, 3}, uvec{0}) = shape::stress12(-1., -1.) * X;
+        t_stress(uvec{0, 1, 3}, uvec{1}) = shape::stress12(1., -1.) * X;
+        t_stress(uvec{0, 1, 3}, uvec{2}) = shape::stress12(1., 1.) * X;
+        t_stress(uvec{0, 1, 3}, uvec{3}) = shape::stress12(-1., 1.) * X;
 
         return t_stress;
     }

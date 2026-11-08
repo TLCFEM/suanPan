@@ -3244,18 +3244,20 @@ namespace {
         return_obj = std::make_unique<Rotation3D>(tag, full_tag, a, b, c);
     }
 
-    void new_tablecdp(unique_ptr<Material>& return_obj, std::istringstream& command) {
+    void new_tablecdp(unique_ptr<Material>& return_obj, std::istringstream& command, const bool abaqus) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
             return;
         }
 
-        vec para_pool{3E4, .2, .2, 1.16, .5, 2400E-12};
+        vec para_pool;
+        if(abaqus) para_pool = {3E4, .2, .6, 1.16, 2. / 3., 0., 2400E-12};
+        else para_pool = {3E4, .2, .2, 1.16, .5, 2400E-12};
 
-        auto idx = 0;
+        auto idx{0};
         double para;
-        while(!command.eof() && idx < 2)
+        while(!command.eof() && std::cmp_less(idx, 2))
             if(get_input(command, para)) para_pool(idx++) = para;
 
         const auto check_file = [&](mat& table) {
@@ -3278,7 +3280,7 @@ namespace {
         mat t_table, c_table, dt_table, dc_table;
         if(!check_file(t_table) || !check_file(c_table) || !check_file(dt_table) || !check_file(dc_table)) return;
 
-        while(!command.eof() && idx < 6)
+        while(!command.eof() && std::cmp_less(idx, para_pool.n_elem))
             if(get_input(command, para)) para_pool(idx++) = para;
 
         const auto convert = [](mat& backbone, mat& damage) {
@@ -3318,7 +3320,8 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<TableCDP>(tag, para_pool(0), para_pool(1), std::move(t_table), std::move(c_table), std::move(dt_table), std::move(dc_table), g_t, g_c, para_pool(2), para_pool(3), para_pool(4), para_pool(5));
+        if(abaqus) return_obj = std::make_unique<TableCDP>(tag, para_pool(0), para_pool(1), std::move(t_table), std::move(c_table), std::move(dt_table), std::move(dc_table), g_t, g_c, para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6));
+        else return_obj = std::make_unique<TableCDP>(tag, para_pool(0), para_pool(1), std::move(t_table), std::move(c_table), std::move(dt_table), std::move(dc_table), g_t, g_c, para_pool(2), para_pool(3), 1., para_pool(4), para_pool(5));
     }
 
     void new_tablegurson(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -3679,7 +3682,8 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
 
     unique_ptr<Material> new_material = nullptr;
 
-    if(is_equal_any(material_id, "AFC", "AFC01")) new_afc01(new_material, command);
+    if(is_equal(material_id, "AbaqusCDP")) new_tablecdp(new_material, command, true);
+    else if(is_equal_any(material_id, "AFC", "AFC01")) new_afc01(new_material, command);
     else if(is_equal_any(material_id, "AFC02", "AFCS")) new_afc02(new_material, command);
     else if(is_equal_any(material_id, "AFC03", "AFCN")) new_afc03(new_material, command);
     else if(is_equal(material_id, "AFCO1D")) new_armstrongfrederick1d(new_material, command, true);
@@ -3799,7 +3803,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
         else if(is_equal(material_id, "SubloadingViscous1D")) new_subloadingviscous1d(new_material, command);
     }
     else if(is_equal(material_id, "Substepping")) new_substepping(new_material, command);
-    else if(is_equal(material_id, "TableCDP")) new_tablecdp(new_material, command);
+    else if(is_equal(material_id, "TableCDP")) new_tablecdp(new_material, command, false);
     else if(is_equal(material_id, "TableGurson")) new_tablegurson(new_material, command);
     else if(is_equal(material_id, "Tanh1D")) new_tanh1d(new_material, command);
     else if(is_equal(material_id, "TimberPD")) new_timberpd(new_material, command);

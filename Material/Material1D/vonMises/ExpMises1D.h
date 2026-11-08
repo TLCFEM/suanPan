@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class ExpMises1D
- * @brief A ExpMises1D material class.
+ * @brief An ExpMises1D material class.
  * @author tlc
  * @date 21/01/2019
  * @version 0.1.0

@@ -22,8 +22,7 @@
  * @date 28/07/2018
  * @version 0.1.3
  * @file vtkBase.h
- * @addtogroup Membrane
- * @ingroup Element
+ * @addtogroup Visualisation
  * @{
  */
 

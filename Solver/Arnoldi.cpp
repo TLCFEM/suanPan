@@ -20,7 +20,7 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
-#include <Toolbox/arpack.h>
+#include <Toolbox/eig_solver.h>
 
 Arnoldi::Arnoldi(const unsigned T, const unsigned N, const char TP)
     : Solver(T)
@@ -63,11 +63,7 @@ int Arnoldi::analyze() {
     for(uword I{0}; I < t_mass->n_rows; ++I) t_mass->at(I, I) += factor;
     D->update<Statistics::AssembleMatrix>(t_clock);
 
-#ifdef SUANPAN_DISTRIBUTED
-    return eig_psolve(W->modify_eigenvalue(), W->modify_eigenvector(), W->get_stiffness(), t_mass, eigen_num, 'L' == eigen_type ? "LM" : "SM");
-#else
     return eig_solve(W->modify_eigenvalue(), W->modify_eigenvector(), W->get_stiffness(), t_mass, eigen_num, 'L' == eigen_type ? "LM" : "SM");
-#endif
 }
 
 void Arnoldi::print() {

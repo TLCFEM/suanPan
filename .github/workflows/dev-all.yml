@@ -11,6 +11,14 @@ jobs:
     needs: linux-dev
     secrets: inherit
     uses: ./.github/workflows/compare.yml
+  cookbook:
+    needs: flatpak
+    runs-on: ubuntu-slim
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.ALL }}
+        name: Cookbook
+        run: gh workflow run pdf.yml --repo TLCFEM/constitutive-modelling-cookbook --ref master
   delete:
     if: github.event_name == 'push'
     needs: linux-dev
@@ -27,9 +35,16 @@ jobs:
     uses: ./.github/workflows/flatpak.yml
   guard:
     if: github.repository == 'TLCFEM/suanPan'
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-24.04
     steps:
-      - run: echo "Hello, World!"
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Formatting
+        run: |
+          wget -q -O /usr/local/bin/cf https://github.com/cpp-linter/clang-tools-static-binaries/releases/download/2026.09.01-5fb8802d/clang-format-23_linux-amd64
+          chmod +x /usr/local/bin/cf
+          bash Script/Format.sh
+          git diff --exit-code
   linux-dev:
     if: ${{ !contains(github.event.head_commit.message, '[skip.linux]') && !contains(github.event.head_commit.message, '[skip.all]') }}
     needs: guard
@@ -204,7 +219,6 @@ jobs:
           - ubuntu-24.04
           - ubuntu-24.04-arm
         vtk:
-          - 'ON'
           - 'OFF'
     timeout-minutes: 120
   linux-dev-mpi:
@@ -222,8 +236,8 @@ jobs:
           cache: false
       - name: Dependency
         run: |
-          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.0-${{ matrix.os }}.tar.gz
-          tar xf VTK-9.7.0-${{ matrix.os }}.tar.gz
+          wget -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.1-${{ matrix.os }}.tar.gz
+          tar xf VTK-9.7.1-${{ matrix.os }}.tar.gz
           wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
           sudo apt-get update && sudo apt-get install intel-oneapi-mkl-devel intel-oneapi-mpi-devel libglvnd-dev dpkg-dev xz-utils lcov patchelf
@@ -348,15 +362,11 @@ jobs:
         build:
           - RelWithDebInfo
         compiler:
-          - gcc
           - clang
         exclude:
           - compiler: gcc
             vtk: 'ON'
         os:
-          - macos-15-large
-          - macos-15-xlarge
-          - macos-26-large
           - macos-26-xlarge
         vtk:
           - 'ON'
@@ -377,16 +387,16 @@ jobs:
       - if: matrix.mkl == 'ON'
         name: MKL
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/838e2a31-c5db-429e-93d8-509c08d71ceb/intel-onemkl-2026.1.0.238_offline.exe
-          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/a43777b7-be5a-4fb6-97f9-bf4ae49eeb33/intel-fortran-compiler-2026.1.1.20_offline.exe
-          intel-onemkl-2026.1.0.238_offline.exe -s -a --silent --eula accept
-          intel-fortran-compiler-2026.1.1.20_offline.exe -s -a --silent --eula accept
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/e1efd9db-a5ef-4fb7-a66d-19fd33d2a263/intel-onemkl-2026.2.0.886_offline.exe
+          C:/msys64/usr/bin/wget.exe -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/3b453507-718a-4d49-8ec3-55ae43b44de4/intel-fortran-compiler-2026.2.0.605_offline.exe
+          intel-onemkl-2026.2.0.886_offline.exe -s -a --silent --eula accept
+          intel-fortran-compiler-2026.2.0.605_offline.exe -s -a --silent --eula accept
         shell: cmd
       - if: matrix.vtk == 'ON'
         name: VTK
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.0-win.7z
-          7z x VTK-9.7.0-win.7z
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.1-win.7z
+          7z x VTK-9.7.1-win.7z
       - name: Compile
         run: |
           go build Checker/updater.go
@@ -457,8 +467,8 @@ jobs:
       - if: matrix.vtk == 'ON'
         name: VTK
         run: |
-          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.0-win-gcc.7z
-          7z x VTK-9.7.0-win-gcc.7z -oVTK
+          C:/msys64/usr/bin/wget.exe -q https://github.com/TLCFEM/prebuilds/releases/download/latest/VTK-9.7.1-win-gcc.7z
+          7z x VTK-9.7.1-win-gcc.7z -oVTK
       - name: Compile
         run: |
           go build Checker/updater.go

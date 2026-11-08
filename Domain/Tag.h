@@ -19,6 +19,8 @@
  * @date 01/04/2018
  * @version 0.2.0
  * @file Tag.h
+ * @addtogroup Domain
+ * @{
  */
 
 #ifndef TAG_H
@@ -97,3 +99,5 @@ public:
 };
 
 #endif
+
+//! @}

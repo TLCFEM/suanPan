@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class ISection2D
- * @brief A ISection2D class.
+ * @brief An ISection2D class.
  * @author tlc
  * @date 30/10/2017
  * @version 0.1.0

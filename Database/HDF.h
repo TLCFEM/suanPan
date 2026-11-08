@@ -14,6 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @class HDF
+ * @brief An HDF5-based database writer.
+ *
+ * @author tlc
+ * @date 15/05/2022
+ * @version 0.1.0
+ * @file HDF.h
+ * @addtogroup Database
+ * @{
+ */
 
 #ifndef HDF_H
 #define HDF_H
@@ -35,3 +46,5 @@ public:
 #endif
 
 #endif
+
+//! @}

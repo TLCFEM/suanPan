@@ -684,18 +684,26 @@ static vec3 tensile_fraction(const vec& eig_val) {
     return {compute(0, 1), compute(1, 2), compute(2, 0)};
 }
 
-std::pair<mat, mat> transform::stress::eigen_to_tensile_derivative(const vec& principal_stress, const mat& principal_direction) {
-    const mat pnn = eigen_to_tensor_base(principal_direction);
+std::pair<mat66, mat66> transform::stress::eigen_to_tensile_derivative(const vec& principal_stress, const mat& principal_direction) {
+    const auto pnn = eigen_to_tensor_base(principal_direction);
 
     const uvec pattern = find(principal_stress > 0.);
 
-    mat eigen_projector = pnn.cols(pattern) * pnn.cols(pattern).t();
-    mat eigen_derivative = eigen_projector + pnn.tail_cols(3) * diagmat(tensile_fraction(principal_stress)) * pnn.tail_cols(3).t();
+    mat66 eigen_projector = pnn.cols(pattern) * pnn.cols(pattern).t();
+    mat66 eigen_derivative = eigen_projector + pnn.tail_cols(3) * diagmat(tensile_fraction(principal_stress)) * pnn.tail_cols(3).t();
 
     eigen_projector.tail_cols(3) *= 2.;
     eigen_derivative.tail_cols(3) *= 2.;
 
     return {std::move(eigen_projector), std::move(eigen_derivative)};
+}
+
+std::pair<mat66, mat66> transform::stress::eigen_to_transformed_derivative(const vec& principal_stress, const mat& principal_direction, const mat66& transformation_t, const mat66& transformation_c) {
+    const auto [projector_t, derivative_t] = eigen_to_tensile_derivative(principal_stress, principal_direction);
+
+    const mat66 transformation_diff = transformation_t - transformation_c;
+
+    return {transformation_diff * projector_t + transformation_c, transformation_diff * derivative_t};
 }
 
 mat transform::beam::global_to_local(const double cos, const double sin, const double length) {

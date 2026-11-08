@@ -1,3 +1,9 @@
+# amd64/Rocky.Pre.Dockerfile - Build dependencies for AMD64 architecture
+# 
+# Creates a base image with Intel oneAPI MKL, VTK, and other dependencies
+# for compiling suanPan on x86_64 Rocky Linux.
+# 
+# Build: docker build -f amd64/Rocky.Pre.Dockerfile -t tlcfem/suanpan-env:latest .
 # This Dockerfile is creating a base image for compiling suanPan.
 # It preinstalls the MKL library, which is required as a fast linear algebra driver that does the heavy lifting.
 # It installs the VTK library, which is required to generate VTK files for visualization.
@@ -15,8 +21,8 @@ RUN echo "[oneAPI]" > /etc/yum.repos.d/oneAPI.repo && \
 RUN dnf install -y libglvnd-devel gcc g++ gfortran rpm-build rpm-devel rpmdevtools cmake git intel-oneapi-mkl-devel intel-oneapi-mpi-devel procps-ng wget && dnf clean all
 
 RUN mkdir vtk-build && cd vtk-build && \
-    wget -q https://www.vtk.org/files/release/9.7/VTK-9.7.0.tar.gz && tar xf VTK-9.7.0.tar.gz && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.7.0 && \
+    wget -q https://www.vtk.org/files/release/9.7/VTK-9.7.1.tar.gz && tar xf VTK-9.7.1.tar.gz && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.7.1 && \
     make install -j"$(nproc)" && cd .. && rm -r vtk-build
 
 # ARG USERNAME=nonroot

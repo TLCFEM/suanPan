@@ -79,10 +79,10 @@ public:
     [[nodiscard]] field<vec> evaluate_shape_function_derivative(double, sword = -1) const;
 
     [[nodiscard]] virtual vec evaluate_point(double, const field<vec>&) const;
-    [[nodiscard]] virtual field<vec> evaluate_point_derivative(double, const field<vec>&, sword = -1) const;
+    [[nodiscard]] virtual field<vec> evaluate_point_derivative(double, const field<vec>&, sword) const;
 
     [[nodiscard]] virtual vec evaluate_shape_function(double, const field<vec>&) const;
-    [[nodiscard]] virtual field<vec> evaluate_shape_function_derivative(double, const field<vec>&, sword = -1) const;
+    [[nodiscard]] virtual field<vec> evaluate_shape_function_derivative(double, const field<vec>&, sword) const;
 };
 
 class BSplineCurve2D final : public BSpline {

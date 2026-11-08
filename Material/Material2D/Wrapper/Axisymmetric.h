@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class Axisymmetric
- * @brief A Axisymmetric class.
+ * @brief An Axisymmetric class.
  * @author tlc
  * @date 04/10/2017
  * @version 0.1.0

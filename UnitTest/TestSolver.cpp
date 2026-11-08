@@ -4,12 +4,14 @@
 #include <Toolbox/brent.hpp>
 #include <Toolbox/ridders.hpp>
 
-class Quadratic {
-public:
-    [[nodiscard]] static vec evaluate_residual(const vec& x) { return square(x) - 1.; }
+namespace {
+    class Quadratic {
+    public:
+        [[nodiscard]] static vec evaluate_residual(const vec& x) { return square(x) - 1.; }
 
-    [[nodiscard]] static mat evaluate_jacobian(const vec& x) { return diagmat(2. * x); }
-};
+        [[nodiscard]] static mat evaluate_jacobian(const vec& x) { return diagmat(2. * x); }
+    };
+} // namespace
 
 TEST_CASE("LBFGS Solver", "[Utility.Solver]") {
     Quadratic function;

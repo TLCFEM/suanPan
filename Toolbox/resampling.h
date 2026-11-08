@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file resampling.h
+ * @brief Signal resampling and FIR filter design helpers.
+ *
+ * @author tlc
+ * @date 05/11/2022
+ * @version 0.1.0
+ * @addtogroup Utility
+ * @{
+ */
 
 #ifndef RESAMPLING_H
 #define RESAMPLING_H
@@ -139,3 +149,5 @@ template<WindowType T> mat upsampling(const std::string& file_name, const uword 
 mat upsampling(const std::string&, const std::string&, uword, uword = 8u);
 
 #endif
+
+//! @}

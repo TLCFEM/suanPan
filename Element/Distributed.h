@@ -14,6 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @class Distributed
+ * @brief Base class providing distributed-memory communication for elements.
+ *
+ * @author tlc
+ * @date 12/04/2025
+ * @version 0.1.0
+ * @file Distributed.h
+ * @addtogroup Element
+ * @{
+ */
 
 #ifndef DISTRIBUTED_H
 #define DISTRIBUTED_H
@@ -61,3 +72,5 @@ public:
 };
 
 #endif // DISTRIBUTED_H
+
+//! @}

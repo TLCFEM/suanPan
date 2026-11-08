@@ -24,7 +24,7 @@
 #ifdef SUANPAN_MKL
 extern "C" void mkl_free_buffers();
 #else
-void mkl_free_buffers() {}
+static void mkl_free_buffers() {}
 #endif
 
 #ifdef SUANPAN_DISTRIBUTED
@@ -39,6 +39,10 @@ int main(int argc, char** argv) {
 #endif
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
+#endif
+
+#ifndef SUANPAN_MT
+    suanpan_highlight("This build lacks parallelization support.\n");
 #endif
 
 #ifdef SUANPAN_DISTRIBUTED

@@ -56,8 +56,9 @@ int CSMQ8::initialize(const shared_ptr<DomainBase>& D) {
 
     const auto& t_size = t_dof.n_elem;
     const auto& r_size = r_dof.n_elem;
+    constexpr auto s_size = 12u;
 
-    mat E1(t_size, t_size, fill::zeros), E2(11, 11, fill::zeros), H1(t_size, t_size, fill::zeros), H2(t_size, 11, fill::zeros), H3(r_size, t_size, fill::zeros), H4(t_size, t_size, fill::zeros), H5(11, 11, fill::zeros);
+    mat E1(t_size, t_size, fill::zeros), E2(s_size, s_size, fill::zeros), H1(t_size, t_size, fill::zeros), H2(t_size, s_size, fill::zeros), H3(r_size, t_size, fill::zeros), H4(t_size, t_size, fill::zeros), H5(s_size, s_size, fill::zeros);
 
     int_pt.clear();
     int_pt.reserve(plan.n_rows);
@@ -87,9 +88,9 @@ int CSMQ8::initialize(const shared_ptr<DomainBase>& D) {
         j_p *= .5;
         j_q *= .5;
 
-        const auto location = (n * ele_coor).eval();
+        const mat location = n * ele_coor;
 
-        const mat phi_a = shape::stress11(location(0), location(1));
+        const mat phi_a = shape::stress12(location(0), location(1));
         const mat phi_b = solve(c_pt.m_material->get_initial_stiffness(), phi_a);
 
         E1 += c_pt.weight * phi_r.t() * c_pt.m_couple->get_initial_stiffness() * phi_r;

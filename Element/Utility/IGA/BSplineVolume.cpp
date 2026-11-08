@@ -75,10 +75,12 @@ vec BSplineVolume::evaluate_point(const double u, const double v, const double w
     return point;
 }
 
-field<vec> BSplineVolume::evaluate_point_derivative(const double u, const double v, const double w, const field<vec>& polygon, const sword d) const {
+field<vec> BSplineVolume::evaluate_point_derivative(const double u, const double v, const double w, const field<vec>& polygon, sword d) const {
     const auto p = line_u.get_order();
     const auto q = line_v.get_order();
     const auto r = line_w.get_order();
+
+    if(d < 0) d = static_cast<sword>(std::max(p, std::max(q, r)));
 
     field<vec> point(d + 1, d + 1, d + 1);
 
@@ -104,8 +106,7 @@ field<vec> BSplineVolume::evaluate_point_derivative(const double u, const double
                     for(uword b{0}; b <= q; ++b) {
                         const auto vind = vspan - q + b;
                         for(uword c{0}; c <= r; ++c) {
-                            const auto wind = wspan - r + c;
-                            if(!polygon(uind, vind, wind).empty()) point(k, l, m) += nw(m, c) * nv(l, b) * nu(k, a) * polygon(uind, vind, wind);
+                            if(const auto wind = wspan - r + c; !polygon(uind, vind, wind).empty()) point(k, l, m) += nw(m, c) * nv(l, b) * nu(k, a) * polygon(uind, vind, wind);
                         }
                     }
                 }
@@ -147,9 +148,9 @@ field<cube> BSplineVolume::evaluate_shape_function_derivative(const double u, co
     const auto q = line_v.get_order();
     const auto r = line_w.get_order();
 
-    du = std::min(du, static_cast<sword>(p));
-    dv = std::min(dv, static_cast<sword>(q));
-    dw = std::min(dw, static_cast<sword>(r));
+    if(du < 0) du = static_cast<sword>(p);
+    if(dv < 0) dv = static_cast<sword>(q);
+    if(dw < 0) dw = static_cast<sword>(r);
 
     const auto uspan = line_u.evaluate_span(u);
     const auto vspan = line_v.evaluate_span(v);

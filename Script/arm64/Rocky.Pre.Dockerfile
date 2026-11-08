@@ -1,3 +1,9 @@
+# arm64/Rocky.Pre.Dockerfile - Build dependencies for ARM64 architecture
+# 
+# Creates a base image with ARM64-specific dependencies (OpenBLAS, TBB, VTK)
+# compiled for Rocky Linux 10 on ARM64.
+# 
+# Build: docker build -f arm64/Rocky.Pre.Dockerfile -t tlcfem/suanpan-env:latest .
 FROM almalinux:10
 
 RUN dnf install -y epel-release && crb enable
@@ -16,7 +22,7 @@ RUN mkdir tbb-build && cd tbb-build && \
 
 # part 3: vtk
 RUN mkdir vtk-build && cd vtk-build && \
-    wget -q https://www.vtk.org/files/release/9.7/VTK-9.7.0.tar.gz && tar xf VTK-9.7.0.tar.gz && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.7.0 && \
+    wget -q https://www.vtk.org/files/release/9.7/VTK-9.7.1.tar.gz && tar xf VTK-9.7.1.tar.gz && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.7.1 && \
     cmake --build . --target install --config Release --parallel "$(nproc)" && \
     cd .. && rm -r vtk-build

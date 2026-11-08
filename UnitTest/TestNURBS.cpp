@@ -161,6 +161,9 @@ TEST_CASE("NURBS Compute Location of A Point", "[IGA.NURBS]") {
     P(3) = {4, 1, 1};
     P(4) = {5, -1, 1};
 
+    // the points must be reconstructed from the unweighted control points
+    const auto PP = P;
+
     IGA::convert_to_weighted(P);
 
     const auto B = A.evaluate_point(1, P);
@@ -171,7 +174,7 @@ TEST_CASE("NURBS Compute Location of A Point", "[IGA.NURBS]") {
     const auto C = A.evaluate_shape_function(1., P);
 
     vec BB(3, fill::zeros);
-    for(uword I{0}; I < P.n_rows; ++I) BB += P(I) * C(I);
+    for(uword I{0}; I < P.n_rows; ++I) BB += PP(I) * C(I);
 
     REQUIRE(B(0) == Approx(BB(0)));
     REQUIRE(B(1) == Approx(BB(1)));
@@ -295,7 +298,7 @@ TEST_CASE("NURBSVolume Compute Location of A Point", "[IGA.NURBSVolume]") {
 
     for(uword I{0}; I < B.n_rows; ++I)
         for(uword J{0}; J < B.n_cols; ++J)
-            for(uword K{0}; K < B.n_slices; ++K) C += B(I, J, K) * P(I, J, K);
+            for(uword K{0}; K < B.n_slices; ++K) C += B(I, J, K) * PP(I, J, K);
 
     REQUIRE(norm(A) == Approx(norm(C.head(3))));
 

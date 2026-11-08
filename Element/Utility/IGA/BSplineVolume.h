@@ -61,10 +61,10 @@ public:
     [[nodiscard]] field<cube> evaluate_shape_function_derivative(double, double, double, sword = -1, sword = -1, sword = -1) const;
 
     [[nodiscard]] virtual vec evaluate_point(double, double, double, const field<vec>&) const;
-    [[nodiscard]] virtual field<vec> evaluate_point_derivative(double, double, double, const field<vec>&, sword = -1) const;
+    [[nodiscard]] virtual field<vec> evaluate_point_derivative(double, double, double, const field<vec>&, sword) const;
 
     [[nodiscard]] virtual cube evaluate_shape_function(double, double, double, const field<vec>&) const;
-    [[nodiscard]] virtual field<cube> evaluate_shape_function_derivative(double, double, double, const field<vec>&, sword = -1, sword = -1, sword = -1) const;
+    [[nodiscard]] virtual field<cube> evaluate_shape_function_derivative(double, double, double, const field<vec>&, sword, sword, sword) const;
 };
 
 class BSplineVolume3D final : public BSplineVolume {

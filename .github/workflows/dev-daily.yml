@@ -152,7 +152,7 @@ jobs:
           path: build/dist/bin/*.exe
       - if: false
         name: Sign
-        uses: signpath/github-action-submit-signing-request@v2
+        uses: signpath/github-action-submit-signing-request@v3
         with:
           api-token: ${{ secrets.SIGNPATH }}
           artifact-configuration-slug: test

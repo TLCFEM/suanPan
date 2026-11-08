@@ -42,12 +42,16 @@ protected:
 class NURBS : public BSpline, public NURBSBase {
 public:
     using BSpline::BSpline;
+    using BSpline::evaluate_point;
+    using BSpline::evaluate_point_derivative;
+    using BSpline::evaluate_shape_function;
+    using BSpline::evaluate_shape_function_derivative;
 
     [[nodiscard]] vec evaluate_point(double, const field<vec>&) const override;
-    [[nodiscard]] field<vec> evaluate_point_derivative(double, const field<vec>&, sword = -1) const override;
+    [[nodiscard]] field<vec> evaluate_point_derivative(double, const field<vec>&, sword) const override;
 
     [[nodiscard]] vec evaluate_shape_function(double, const field<vec>&) const override;
-    [[nodiscard]] field<vec> evaluate_shape_function_derivative(double, const field<vec>&, sword = -1) const override;
+    [[nodiscard]] field<vec> evaluate_shape_function_derivative(double, const field<vec>&, sword) const override;
 };
 
 class NURBSCurve2D final : public NURBS {

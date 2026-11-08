@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class EnergyEvolution
- * @brief A EnergyEvolution class.
+ * @brief An EnergyEvolution class.
  *
  * The EnergyEvolution class.
  *

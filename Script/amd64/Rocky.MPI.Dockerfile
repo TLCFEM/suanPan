@@ -1,3 +1,9 @@
+# amd64/Rocky.MPI.Dockerfile - Build MPI-enabled suanPan package
+# 
+# Creates an RPM package with MPI support for distributed computing.
+# Sets up SSH keys for MPI job management and provides a test environment.
+# 
+# Build: docker build -f amd64/Rocky.MPI.Dockerfile -t tlcfem/suanpan-mpi:latest .
 FROM tlcfem/suanpan-env:latest AS build
 
 RUN source /opt/intel/oneapi/setvars.sh && \

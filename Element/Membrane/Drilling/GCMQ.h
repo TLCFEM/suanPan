@@ -39,23 +39,23 @@
 class IntegrationPlan;
 
 class GCMQ final : public SGCMQ {
-    static constexpr int enhanced_mode = 2;
+    static constexpr unsigned enhanced_mode{3u};
+    static constexpr unsigned local_size{12u};
 
     const mat mat_stiffness, iso_mapping;
 
     mat HT, NT, MT, N, M; // constant matrices
 
-    mat initial_viwt, trial_viwt, current_viwt;
+    mat initial_viz, trial_viz, current_viz;
     vec trial_vif, current_vif;
     vec trial_zeta, current_zeta;   // enhanced strain
     vec trial_beta, current_beta;   // strain
     vec trial_alpha, current_alpha; // stress
-    vec trial_q, current_q;
 
     vec pre_disp;
 
     static mat form_transformation(const mat&);
-    static mat form_enhanced_strain(const vec&, int);
+    static mat form_enhanced_strain(const vec&);
 
 public:
     using SGCMQ::SGCMQ;

@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class ExternalModule
- * @brief A ExternalModule class handles communication between the main program
+ * @brief An ExternalModule class handles communication between the main program
  * and external library.
  *
  * @author tlc
@@ -98,3 +98,5 @@ namespace external_module {
 } // namespace external_module
 
 #endif
+
+//! @}

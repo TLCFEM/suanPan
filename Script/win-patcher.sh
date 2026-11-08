@@ -1,18 +1,11 @@
 #!/usr/bin/env bash
 # -----------------------------------------------------------------------------
-# win-patcher.sh
+# win-patcher.sh - Windows DLL cleanup utility
 #
-# Purpose:
-#   Prune unneeded DLLs beside a Windows executable.
+# Prunes unnecessary DLLs from a Windows executable's directory by analyzing
+# its import table and removing any DLLs not actually needed.
 #
-# Synopsis:
-#   win-patcher.sh <path/to/app.exe>
-#
-# Description:
-#   - Reads the EXE's import table using objdump (MinGW/binutils) or dumpbin
-#     (Visual Studio) to obtain the list of dependent DLL names.
-#   - Scans the EXE's directory and deletes any *.dll files whose names are not
-#     in the dependency list (case-insensitive).
+# Usage: ./win-patcher.sh <path/to/app.exe>
 #
 # Example:
 #   ./win-patcher.sh "C:/path/to/app/bin/suanPan.exe"

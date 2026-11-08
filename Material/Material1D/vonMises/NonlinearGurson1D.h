@@ -22,7 +22,7 @@
  * @date 05/01/2020
  * @version 1.0.0
  * @file NonlinearGurson1D.h
- * @addtogroup Material-3D
+ * @addtogroup Material-1D
  * @{
  */
 

@@ -1,7 +1,9 @@
-# This Dockerfile is creating a base image for compiling suanPan.
-# It is based on the official NVIDIA CUDA image.
-# Compared to the Rocky.Pre.Dockerfile, it adds the CUDA toolkit.
-# If you need the GPU related solvers, you should use this Dockerfile.
+# amd64/Rocky.Pre.CUDA.Dockerfile - Build dependencies for CUDA-enabled suanPan
+# 
+# Extends Rocky.Pre.Dockerfile with NVIDIA CUDA toolkit and cuDNN support
+# for GPU-accelerated computations. Required for CUDA-based solvers.
+# 
+# Build: docker build -f amd64/Rocky.Pre.CUDA.Dockerfile -t tlcfem/suanpan-env:cuda .
 
 FROM nvidia/cuda:13.3.1-devel-rockylinux9
 
@@ -21,8 +23,8 @@ RUN mkdir magma-build && cd magma-build && \
     make install -j"$(nproc)" && cd .. && rm -r magma-build
 
 RUN mkdir vtk-build && cd vtk-build && \
-    wget -q https://www.vtk.org/files/release/9.7/VTK-9.7.0.tar.gz && tar xf VTK-9.7.0.tar.gz && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.7.0 && \
+    wget -q https://www.vtk.org/files/release/9.7/VTK-9.7.1.tar.gz && tar xf VTK-9.7.1.tar.gz && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.7.1 && \
     make install -j"$(nproc)" && cd .. && rm -r vtk-build
 
 ARG USERNAME=nonroot

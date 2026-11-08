@@ -1294,6 +1294,7 @@ namespace {
         suanpan_info(format, "section", "define truss/beam/plate/shell sections");
         suanpan_info(format, "sectiontest*", "test sections without creating a finite element model");
         suanpan_info(format, "set", "set properties of the analysis/model");
+        suanpan_info(format, "sleep", "sleep (pause) for a given duration in milliseconds");
         suanpan_info(format, "solver", "define solvers");
         suanpan_info(format, "step", "define analysis steps");
         suanpan_info(format, "summary", "print summary for the current problem domain");
@@ -1301,6 +1302,7 @@ namespace {
         suanpan_info(format, "t/terminal", "execute commands in terminal");
         suanpan_info(format, "upsampling", "upsample the given ground motion with various filters");
         suanpan_info(format, "use", "use the specific object in the current step");
+        suanpan_info(format, "var/variable", "define variables for substitution in later commands");
         suanpan_info(format, "version", "print version information");
 
         return SUANPAN_SUCCESS;

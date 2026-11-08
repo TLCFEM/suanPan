@@ -2,51 +2,53 @@
 
 #include <Toolbox/sort_color.hpp>
 
-auto tiny_graph() {
-    suanpan::graph<unsigned> graph;
-    graph.emplace_back(std::initializer_list<unsigned>{4, 2, 1, 0});
-    graph.emplace_back(std::initializer_list<unsigned>{0, 2, 3, 1});
-    graph.emplace_back(std::initializer_list<unsigned>{4, 3, 1, 0, 2});
-    graph.emplace_back(std::initializer_list<unsigned>{1, 2, 5, 6, 3});
-    graph.emplace_back(std::initializer_list<unsigned>{0, 2, 5, 4});
-    graph.emplace_back(std::initializer_list<unsigned>{4, 3, 6, 5});
-    graph.emplace_back(std::initializer_list<unsigned>{5, 3, 6});
+namespace {
+    auto tiny_graph() {
+        suanpan::graph<unsigned> graph;
+        graph.emplace_back(std::initializer_list<unsigned>{4, 2, 1, 0});
+        graph.emplace_back(std::initializer_list<unsigned>{0, 2, 3, 1});
+        graph.emplace_back(std::initializer_list<unsigned>{4, 3, 1, 0, 2});
+        graph.emplace_back(std::initializer_list<unsigned>{1, 2, 5, 6, 3});
+        graph.emplace_back(std::initializer_list<unsigned>{0, 2, 5, 4});
+        graph.emplace_back(std::initializer_list<unsigned>{4, 3, 6, 5});
+        graph.emplace_back(std::initializer_list<unsigned>{5, 3, 6});
 
-    return graph;
-}
-
-auto small_graph(const unsigned N, const double D) {
-    suanpan::graph<unsigned> graph(N);
-
-    for(auto I = 0u; I < N; ++I) graph[I].insert(I);
-
-    sp_mat A = sprandu(N, N, D);
-
-    for(auto I = A.begin(); I != A.end(); ++I) {
-        graph[I.col()].insert(static_cast<unsigned>(I.row()));
-        graph[I.row()].insert(static_cast<unsigned>(I.col()));
+        return graph;
     }
 
-    return graph;
-}
+    auto small_graph(const unsigned N, const double D) {
+        suanpan::graph<unsigned> graph(N);
 
-auto color_graph(const unsigned N, const double D, std::vector<std::vector<unsigned>> (&algorithm)(const suanpan::graph<unsigned>&)) {
-    const auto graph = small_graph(N, D);
+        for(auto I = 0u; I < N; ++I) graph[I].insert(I);
 
-    const auto color_map = algorithm(graph);
+        sp_mat A = sprandu(N, N, D);
 
-    auto number_element = 0llu;
-    for(auto& color : color_map) {
-        number_element += color.size();
-        for(auto I = 0llu; I < color.size(); ++I) {
-            const auto& target_list = graph[color[I]];
-            for(auto J = I + 1u; J < color.size(); ++J)
-                REQUIRE((target_list.find(color[J]) == target_list.end()));
+        for(auto I = A.begin(); I != A.end(); ++I) {
+            graph[I.col()].insert(static_cast<unsigned>(I.row()));
+            graph[I.row()].insert(static_cast<unsigned>(I.col()));
         }
+
+        return graph;
     }
 
-    REQUIRE(number_element == graph.size());
-}
+    auto color_graph(const unsigned N, const double D, std::vector<std::vector<unsigned>> (&algorithm)(const suanpan::graph<unsigned>&)) {
+        const auto graph = small_graph(N, D);
+
+        const auto color_map = algorithm(graph);
+
+        auto number_element = 0llu;
+        for(auto& color : color_map) {
+            number_element += color.size();
+            for(auto I = 0llu; I < color.size(); ++I) {
+                const auto& target_list = graph[color[I]];
+                for(auto J = I + 1u; J < color.size(); ++J)
+                    REQUIRE((target_list.find(color[J]) == target_list.end()));
+            }
+        }
+
+        REQUIRE(number_element == graph.size());
+    }
+} // namespace
 
 TEST_CASE("Coloring Basic", "[Utility.Coloring]") {
     const auto graph = tiny_graph();

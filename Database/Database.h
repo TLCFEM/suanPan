@@ -21,6 +21,8 @@
  * @date 27/08/2017
  * @version 0.2.1
  * @file Database.h
+ * @addtogroup Database
+ * @{
  */
 
 #ifndef DATABASE_H
@@ -43,3 +45,5 @@ public:
 };
 
 #endif
+
+//! @}

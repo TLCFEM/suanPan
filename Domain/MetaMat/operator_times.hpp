@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file operator_times.hpp
+ * @brief Arithmetic operators for MetaMat objects.
+ *
+ * @author tlc
+ * @date 15/05/2022
+ * @version 0.1.0
+ * @addtogroup MetaMat
+ * @{
+ */
 
 #ifndef OPERATOR_TIMES_HPP
 #define OPERATOR_TIMES_HPP
@@ -95,3 +105,5 @@ template<sp_d DT, sp_i IT> const unique_ptr<MetaMat<DT>>& operator+=(const uniqu
 }
 
 #endif // OPERATOR_TIMES_HPP
+
+//! @}

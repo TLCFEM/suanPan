@@ -46,8 +46,8 @@ int TimberPD::update_trial_status(const vec& t_strain) {
     mat principal_direction; // 3x3
     if(!eig_sym(principal_stress, principal_direction, tensor::stress::to_tensor(trial_stress), "std")) return SUANPAN_FAIL;
 
-    mat stiffness_t = transform::stress::eigen_to_tensile_derivative(principal_stress, principal_direction).second;
-    mat stiffness_c = eye(6, 6) - stiffness_t;
+    auto stiffness_t = transform::stress::eigen_to_tensile_derivative(principal_stress, principal_direction).second;
+    decltype(stiffness_t) stiffness_c = eye(6, 6) - stiffness_t;
 
     const vec sigma_t = transform::stress::eigen_to_tensile_stress(principal_stress, principal_direction);
     const vec sigma_c = trial_stress - sigma_t;
@@ -61,7 +61,7 @@ int TimberPD::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-double TimberPD::update_damage_t(const vec& sigma_t, mat& stiffness_t) {
+double TimberPD::update_damage_t(const vec& sigma_t, mat66& stiffness_t) {
     auto& r_t = trial_history(7);
 
     bool new_damage_t = false;
@@ -80,7 +80,7 @@ double TimberPD::update_damage_t(const vec& sigma_t, mat& stiffness_t) {
     return omega_t;
 }
 
-double TimberPD::update_damage_c(const vec& sigma_c, mat& stiffness_c) {
+double TimberPD::update_damage_c(const vec& sigma_c, mat66& stiffness_c) {
     auto& r_c = trial_history(8);
 
     bool new_damage_c = false;

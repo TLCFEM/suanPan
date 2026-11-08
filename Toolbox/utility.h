@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file utility.h
+ * @brief General-purpose utility functions used across the project.
+ *
+ * @author tlc
+ * @date 15/05/2022
+ * @version 0.1.0
+ * @addtogroup Utility
+ * @{
+ */
 
 #ifndef UTILITY_H
 #define UTILITY_H
@@ -91,6 +101,12 @@ namespace suanpan {
     template<std::floating_point T> constexpr T clamp(const T c, T a, T b) {
         if(a > b) std::swap(a, b);
         return std::max(a, std::min(b, c));
+    }
+
+    template<std::floating_point T> constexpr T clamp(const T value, const T low_test, const T high_test, const T low_bound, const T high_bound) {
+        if(value > high_test) return high_bound;
+        if(value < low_test) return low_bound;
+        return value;
     }
 
     template<std::floating_point T> constexpr T clamp_unit(const T c) { return clamp(c, T(0), T(1)); }
@@ -195,3 +211,5 @@ bool is_integer(const std::string&);
 double perturb(double, double = 1E-5);
 
 #endif
+
+//! @}

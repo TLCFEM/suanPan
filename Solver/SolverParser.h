@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file SolverParser.h
+ * @brief Parses integrator and solver commands.
+ *
+ * @author tlc
+ * @date 17/06/2022
+ * @version 0.1.0
+ * @addtogroup Solver
+ * @{
+ */
 
 #ifndef SOLVERPARSER_H
 #define SOLVERPARSER_H
@@ -26,3 +36,5 @@ int create_new_integrator(const std::shared_ptr<DomainBase>&, std::istringstream
 int create_new_solver(const std::shared_ptr<DomainBase>&, std::istringstream&);
 
 #endif
+
+//! @}

@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+/**
+ * @file OutputType.h
+ * @brief Output type enumeration used by recorders.
+ *
+ * @author tlc
+ * @date 15/05/2022
+ * @version 0.1.0
+ * @addtogroup Recorder
+ * @{
+ */
 
 #ifndef OUTPUTTYPE_H
 #define OUTPUTTYPE_H
@@ -282,3 +292,5 @@ std::string to_category(OutputType);
 int to_index(OutputType);
 
 #endif
+
+//! @}

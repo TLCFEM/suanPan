@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class Optimization
- * @brief A Optimization class.
+ * @brief An Optimization class.
  *
  * @author tlc
  * @date 12/09/2020

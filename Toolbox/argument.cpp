@@ -28,6 +28,14 @@
 #ifdef SUANPAN_WIN
 #include <Windows.h>
 #endif
+#ifdef SUANPAN_MSVC
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+#include <linenoise/linenoise.hpp>
+#ifdef SUANPAN_MSVC
+#pragma warning(pop)
+#endif
 
 #ifdef SUANPAN_MSVC
 #pragma warning(push)
@@ -341,11 +349,17 @@ void print_version() {
 }
 
 void cli_mode(const shared_ptr<Bead>& model) {
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(comm_size > 1) {
+        suanpan_error("CLI mode is not available on distributed platforms.\n");
+        return;
+    }
+
     const auto history_path = get_history_path();
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
     // ReSharper disable once CppRedundantBooleanExpressionArgument
-    if(!exists(history_path) and 0 == comm_rank) {
+    if(!exists(history_path)) {
         suanpan_info("To go through a brief introduction, use '");
         suanpan_highlight("overview");
         suanpan_info("'.\nTo check the build info, use '");
@@ -357,19 +371,370 @@ void cli_mode(const shared_ptr<Bead>& model) {
         suanpan_info("'.\n\n");
     }
 
-    ofstream output_file(history_path, std::ios_base::app | std::ios_base::out);
+    static constexpr std::array TOP_LEVEL_COMMANDS{
+        "amplitude",
+        "analyse",
+        "analyze",
+        "benchmark",
+        "clear",
+        "command",
+        "constraint",
+        "converger",
+        "criterion",
+        "delete",
+        "disable",
+        "domain",
+        "element",
+        "enable",
+        "erase",
+        "example",
+        "exit",
+        "expression",
+        "file",
+        "fullname",
+        "group",
+        "import",
+        "initial",
+        "integrator",
+        "interaction",
+        "license",
+        "list",
+        "load",
+        "material",
+        "modifier",
+        "mute",
+        "node",
+        "orientation",
+        "overview",
+        "peek",
+        "plot",
+        "precheck",
+        "protect",
+        "pwd",
+        "qrcode",
+        "quit",
+        "recorder",
+        "remove",
+        "reset",
+        "response_spectrum",
+        "save",
+        "sdof_response",
+        "section",
+        "set",
+        "sleep",
+        "solver",
+        "step",
+        "summary",
+        "suspend",
+        "t",
+        "terminal",
+        "upsampling",
+        "use",
+        "var",
+        "variable",
+        "version",
+    };
+
+    static constexpr std::array ELEMENT_TYPES{
+        "Allman",
+        "B21",
+        "B21EH",
+        "B21EL",
+        "B21H",
+        "B31",
+        "B31OS",
+        "C3D20",
+        "C3D4",
+        "C3D8",
+        "C3D8I",
+        "C3D8R",
+        "CAX3",
+        "CAX4",
+        "CAX8",
+        "CIN3D8",
+        "CINP4",
+        "CP3",
+        "CP4",
+        "CP4I",
+        "CP4R",
+        "CP5",
+        "CP6",
+        "CP7",
+        "CP8",
+        "CPE8",
+        "CPE8R",
+        "CPS8",
+        "CSMQ4",
+        "CSMQ5",
+        "CSMQ6",
+        "CSMQ7",
+        "CSMQ8",
+        "CSMT3",
+        "CSMT6",
+        "Contact2D",
+        "Contact3D",
+        "DC3D4",
+        "DC3D4M",
+        "DC3D8",
+        "DC3D8M",
+        "DCP3",
+        "DCP3M",
+        "DCP4",
+        "DCP4M",
+        "DKT3",
+        "DKT4",
+        "DKTS3",
+        "Damper01",
+        "Damper02",
+        "Damper03",
+        "Damper04",
+        "Damper05",
+        "Damper06",
+        "EB21",
+        "EB31OS",
+        "Embedded2D",
+        "Embedded3D",
+        "F21",
+        "F21H",
+        "F31",
+        "GCMQ",
+        "GCMQG",
+        "GCMQI",
+        "GCMQL",
+        "GQ12",
+        "Joint",
+        "MVLEM",
+        "Mass",
+        "Mass2D",
+        "Mass3D",
+        "MassPoint2D",
+        "MassPoint3D",
+        "Mindlin",
+        "NMB21",
+        "NMB21EH",
+        "NMB21EL",
+        "NMB31",
+        "NonlocalC3D8",
+        "NonlocalCP4",
+        "PCPE4DC",
+        "PCPE4UC",
+        "PCPE8DC",
+        "PCPE8UC",
+        "PS",
+        "PatchCube",
+        "PatchQuad",
+        "QE2",
+        "S4",
+        "SGCMQG",
+        "SGCMQI",
+        "SGCMQL",
+        "SGCMS",
+        "SingleSection2D",
+        "SingleSection3D",
+        "SphericalParticle2D",
+        "SphericalParticle3D",
+        "Spring01",
+        "Spring02",
+        "T2D2",
+        "T2D2S",
+        "T3D2",
+        "T3D2S",
+        "Tie",
+        "TranslationConnector2D",
+        "TranslationConnector3D",
+    };
+
+    static constexpr std::array MATERIAL_TYPES{
+        "AFCO1D",
+        "AFC",
+        "AFC01",
+        "AFC02",
+        "AFCS",
+        "AFC03",
+        "AFCN",
+        "AbaqusCDP",
+        "ArmstrongFrederick",
+        "ArmstrongFrederick1D",
+        "AsymmElastic1D",
+        "Axisymmetric",
+        "AxisymmetricElastic",
+        "BWBN",
+        "Balloon",
+        "Balloon1D",
+        "Bilinear1D",
+        "BilinearCC",
+        "BilinearDP",
+        "BilinearElastic1D",
+        "BilinearHoffman",
+        "BilinearJ2",
+        "BilinearMises1D",
+        "BilinearOO",
+        "BilinearPO",
+        "BilinearPeric",
+        "BilinearTsaiWu",
+        "BilinearViscosity",
+        "BlatzKo",
+        "BoucWen",
+        "CDP",
+        "CDPM2",
+        "CDPM2ISO",
+        "CDPM2ANISO",
+        "CDPM2NO",
+        "Concrete21",
+        "Concrete22",
+        "ConcreteCM",
+        "ConcreteExp",
+        "ConcreteK4",
+        "ConcreteTable",
+        "ConcreteTsai",
+        "CoulombFriction",
+        "CustomCC",
+        "CustomCDP",
+        "CustomDP",
+        "CustomElastic1D",
+        "CustomGurson",
+        "CustomGurson1D",
+        "CustomHoffman",
+        "CustomJ2",
+        "CustomMises1D",
+        "CustomStrainDegradation",
+        "CustomStressDegradation",
+        "CustomTsaiWu",
+        "CustomViscosity",
+        "DafaliasManzari",
+        "Dhakal",
+        "DuncanSelig",
+        "Elastic1D",
+        "Elastic2D",
+        "Elastic3D",
+        "IsotropicElastic3D",
+        "NonlocalElastic3D",
+        "NonlocalIsotropicElastic3D",
+        "ElasticOS",
+        "ExpCC",
+        "ExpDP",
+        "ExpGurson",
+        "ExpGurson1D",
+        "ExpHoffman",
+        "ExpJ2",
+        "ExpMises1D",
+        "ExpTsaiWu",
+        "Flag01",
+        "Flag02",
+        "Fluid",
+        "Gap01",
+        "Kelvin",
+        "Laminated",
+        "LinearDamage",
+        "MPF",
+        "Maxwell",
+        "MooneyRivlin",
+        "MultiSubloading1D",
+        "MultilinearElastic1D",
+        "MultilinearJ2",
+        "MultilinearMises1D",
+        "MultilinearOO",
+        "MultilinearPO",
+        "NLE1D01",
+        "NLE3D01",
+        "NonlocalBilinearJ2",
+        "Nonviscous01",
+        "OS146",
+        "OS146S",
+        "OrthotropicElastic3D",
+        "ParabolicCC",
+        "Parallel",
+        "PlaneStrain",
+        "PlaneStress",
+        "PlaneSymmetric13",
+        "PlaneSymmetric23",
+        "PolyElastic1D",
+        "PolyJ2",
+        "Prestrain",
+        "RambergOsgood",
+        "Rebar2D",
+        "Rebar3D",
+        "Rotation2D",
+        "Rotation3D",
+        "Sequential",
+        "SimpleSand",
+        "Sinh1D",
+        "SlipLock",
+        "Stacked",
+        "SteelBRB",
+        "Subloading",
+        "Subloading1D",
+        "SubloadingViscous1D",
+        "Substepping",
+        "TableCDP",
+        "TableGurson",
+        "Tanh1D",
+        "TimberPD",
+        "TrilinearStrainDegradation",
+        "Trivial",
+        "Uniaxial",
+        "VAFCRP",
+        "VAFCRP1D",
+        "Viscosity01",
+        "Viscosity02",
+        "YLD0418P",
+        "YLD0418PISO",
+        "Yeoh",
+    };
+
+    const auto suggest_types = [](const std::string& first_word, const std::string& line, const size_t pos, std::vector<linenoise::Completion>& completions) {
+        if(!is_equal(first_word, "element") && !is_equal(first_word, "material")) return;
+
+        const auto first_word_end = line.find(' ');
+        if(first_word_end == std::string::npos) return;
+        const auto found = line.find_first_not_of(' ', first_word_end);
+        const auto second_start = found == std::string::npos ? line.length() : found;
+        if(pos < second_start) return;
+
+        const auto second_end = line.find(' ', second_start);
+        const auto boundary = second_end == std::string::npos ? line.length() : second_end;
+        if(pos > boundary) return;
+
+        const auto prefix = line.substr(second_start, pos - second_start);
+        if(is_equal(first_word, "element")) {
+            for(const auto& type : ELEMENT_TYPES)
+                if(if_startswith(type, prefix)) completions.push_back({.text = std::string{type}, .start = second_start, .end = boundary});
+        }
+        else if(is_equal(first_word, "material")) {
+            for(const auto& type : MATERIAL_TYPES)
+                if(if_startswith(type, prefix)) completions.push_back({.text = std::string{type}, .start = second_start, .end = boundary});
+        }
+    };
+
+    linenoise::SetCompletionCallback(
+        [&](const char* buf, const size_t pos, std::vector<linenoise::Completion>& completions) {
+            const std::string line{buf};
+
+            const auto first_word_end = line.find(' ');
+
+            if(const auto boundary = first_word_end == std::string::npos ? line.length() : first_word_end; pos <= boundary) {
+                const auto prefix = line.substr(0, pos);
+                for(const auto& command : TOP_LEVEL_COMMANDS)
+                    if(if_startswith(command, prefix)) completions.push_back({.text = std::string{command}, .start = 0, .end = boundary});
+            }
+            else if(boundary < line.length()) suggest_types(line.substr(0, first_word_end), line, pos, completions);
+        }
+    );
+
+    linenoise::SetHistoryMaxLen(4096);
+    linenoise::LoadHistory(history_path.generic_string().c_str());
+
+    std::string prompt{"suanPan ~<> "};
+    if(SUANPAN_COLOR) prompt = fmt::format(fmt::emphasis::bold | fg(fmt::color::deep_sky_blue), "{}", prompt);
 
     std::string all_line;
     while(true) {
         std::string command_line;
-        // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-        if(0 == comm_rank)
-            suanpan_info("suanPan ~<> ");
-        getline(std::cin, command_line);
+        if(linenoise::Readline(prompt.c_str(), command_line)) break;
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
-        if(output_file.is_open()) output_file << all_line << '\n';
         if(process_command(model, all_line) == SUANPAN_EXIT) return;
+        linenoise::AddHistory(all_line.c_str());
         all_line.clear();
     }
 }

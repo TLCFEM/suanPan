@@ -16,7 +16,7 @@
  ******************************************************************************/
 /**
  * @class ElementalModal
- * @brief A ElementalModal damping class.
+ * @brief An ElementalModal damping class.
  * @author tlc
  * @date 20/12/2018
  * @version 0.2.0
