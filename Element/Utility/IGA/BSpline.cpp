@@ -31,6 +31,10 @@ void IGA::convert_to_weighted(field<vec>& polygon) {
 }
 
 uword IGA::compute_order(const vec& knot) {
+    if(knot.n_elem < 2) throw std::invalid_argument("knot vector is too short");
+    if(!knot.is_finite()) throw std::invalid_argument("knot vector contains non-finite values");
+    if(knot.min() == knot.max()) throw std::invalid_argument("knot vector does not define a non-empty interval");
+
     const auto b_order = find(knot.min() == knot).eval().n_elem - 1;
 
     if(const auto e_order = find(knot.max() == knot).eval().n_elem - 1; b_order == e_order) return b_order;
@@ -77,7 +81,8 @@ uvec BSpline::get_all_element_span() const { return IGA::compute_all_element_spa
 uword BSpline::evaluate_span(const double u) const {
     const auto n = knot.n_elem - order - uword{2};
 
-    if(std::fabs(u - knot(n + 1)) <= 1E-14) return n;
+    if(u <= knot(order)) return order;
+    if(u >= knot(n + 1)) return n;
 
     auto low = order, high = n + 1;
 
@@ -225,7 +230,7 @@ vec BSpline::evaluate_point(const double u, const field<vec>& polygon) const {
  *
  */
 field<vec> BSpline::evaluate_point_derivative(const double u, const field<vec>& polygon, sword du) const {
-    if(du < 0) du = order;
+    if(du < 0) du = static_cast<sword>(order);
 
     field<vec> point(du + 1);
     point.for_each([&](vec& t_point) { t_point.zeros(dimension); });
@@ -254,7 +259,7 @@ vec BSpline::evaluate_shape_function(const double u, const field<vec>&) const {
 }
 
 field<vec> BSpline::evaluate_shape_function_derivative(const double u, const field<vec>&, sword du) const {
-    if(du < 0) du = order;
+    if(du < 0) du = static_cast<sword>(order);
 
     field<vec> shape(du + 1);
     shape.for_each([&](vec& t_shape) { t_shape.zeros(get_number_of_control_points()); });

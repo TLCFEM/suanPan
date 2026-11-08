@@ -117,8 +117,7 @@ field<cube> NURBSVolume::evaluate_shape_function_derivative(const double u, cons
                                     for(uword y{0}; y <= q; ++y) {
                                         const auto vind = vspan + y - q;
                                         for(uword z{0}; z <= r; ++z) {
-                                            const auto wind = wspan + z - r;
-                                            if(!polygon(uind, vind, wind).empty()) weight_sum += polygon(uind, vind, wind).back() * uders(l, x) * vders(m, y) * wders(n, z);
+                                            if(const auto wind = wspan + z - r; !polygon(uind, vind, wind).empty()) weight_sum += polygon(uind, vind, wind).back() * uders(l, x) * vders(m, y) * wders(n, z);
                                         }
                                     }
                                 }

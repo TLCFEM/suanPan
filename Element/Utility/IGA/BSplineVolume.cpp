@@ -106,8 +106,7 @@ field<vec> BSplineVolume::evaluate_point_derivative(const double u, const double
                     for(uword b{0}; b <= q; ++b) {
                         const auto vind = vspan - q + b;
                         for(uword c{0}; c <= r; ++c) {
-                            const auto wind = wspan - r + c;
-                            if(!polygon(uind, vind, wind).empty()) point(k, l, m) += nw(m, c) * nv(l, b) * nu(k, a) * polygon(uind, vind, wind);
+                            if(const auto wind = wspan - r + c; !polygon(uind, vind, wind).empty()) point(k, l, m) += nw(m, c) * nv(l, b) * nu(k, a) * polygon(uind, vind, wind);
                         }
                     }
                 }

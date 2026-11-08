@@ -24,8 +24,8 @@ vec NURBSSurface::evaluate_point(const double u, const double v, const field<vec
 }
 
 field<vec> NURBSSurface::evaluate_point_derivative(const double u, const double v, const field<vec>& polygon, sword du, sword dv) const {
-    if(du < 0) du = line_u.get_order();
-    if(dv < 0) dv = line_v.get_order();
+    if(du < 0) du = static_cast<sword>(line_u.get_order());
+    if(dv < 0) dv = static_cast<sword>(line_v.get_order());
 
     const auto point = BSplineSurface::evaluate_point_derivative(u, v, polygon, du, dv);
 

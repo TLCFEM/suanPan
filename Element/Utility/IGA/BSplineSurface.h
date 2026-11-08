@@ -61,10 +61,10 @@ public:
     [[nodiscard]] field<mat> evaluate_shape_function_derivative(double, double, sword = -1, sword = -1) const;
 
     [[nodiscard]] virtual vec evaluate_point(double, double, const field<vec>&) const;
-    [[nodiscard]] virtual field<vec> evaluate_point_derivative(double, double, const field<vec>&, sword = -1, sword = -1) const;
+    [[nodiscard]] virtual field<vec> evaluate_point_derivative(double, double, const field<vec>&, sword, sword) const;
 
     [[nodiscard]] virtual mat evaluate_shape_function(double, double, const field<vec>&) const;
-    [[nodiscard]] virtual field<mat> evaluate_shape_function_derivative(double, double, const field<vec>&, sword = -1, sword = -1) const;
+    [[nodiscard]] virtual field<mat> evaluate_shape_function_derivative(double, double, const field<vec>&, sword, sword) const;
 };
 
 class BSplineSurface2D final : public BSplineSurface {

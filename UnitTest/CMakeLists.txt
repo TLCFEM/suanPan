@@ -6,6 +6,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         TestEigen.cpp
         TestExpression.cpp
         TestHomotopy.cpp
+        TestIGAValidation.cpp
         TestIntegration.cpp
         TestMatrix.cpp
         TestMode.cpp
