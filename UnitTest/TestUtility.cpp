@@ -132,12 +132,12 @@ TEST_CASE("For Each", "[Utility.ForEach]") {
 }
 
 TEST_CASE("Hacker Const Cast", "[Utility.Hacker]") {
-    const auto value = 42;
+    auto value = 42;
     const auto& cref = value;
     hacker(cref) = 43;
     REQUIRE(43 == value);
 
-    const auto ptr = new int(3);
+    auto ptr = new int(3);
     const auto& cpref = ptr;
     const auto original = ptr;
     hacker(cpref) = new int(5);
