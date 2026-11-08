@@ -2538,7 +2538,7 @@ namespace {
     constexpr double absolute_margin = 1E-10;
 
     vec to_vec(const std::vector<double>& data) {
-        vec result(data.size());
+        vec result(static_cast<uword>(data.size()));
         for(uword I{0}; I < result.n_elem; ++I) result(I) = data[I];
         return result;
     }
@@ -2546,11 +2546,11 @@ namespace {
     vec to_point(const IGAValidationData::Case& C, const uword index, const bool weighted) {
         const auto& source = C.control[index];
 
-        vec point(source.size() + (weighted ? 1 : 0));
+        vec point(static_cast<uword>(source.size()) + (weighted ? 1 : 0));
 
-        for(uword I{0}; I < source.size(); ++I) point(I) = source[I];
+        for(uword I{0}; I < static_cast<uword>(source.size()); ++I) point(I) = source[I];
 
-        if(weighted) point(source.size()) = C.weights[index];
+        if(weighted) point(static_cast<uword>(source.size())) = C.weights[index];
 
         return point;
     }
