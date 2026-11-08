@@ -39,7 +39,7 @@
 class IntegrationPlan;
 
 class GCMQ final : public SGCMQ {
-    static constexpr unsigned enhanced_mode{2u};
+    static constexpr unsigned enhanced_mode{3u};
     static constexpr unsigned local_size{12u};
 
     const mat mat_stiffness, iso_mapping;

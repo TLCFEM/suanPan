@@ -50,11 +50,17 @@ mat GCMQ::form_enhanced_strain(const vec& coor) {
 
     auto &X = coor(0), &Y = coor(1);
 
+    // Mode 1: quadratic normal (dilatational) mode.
     if constexpr(1u <= enhanced_mode) {
         poly(0, 0) = 3. * X * X - 1.;
         poly(1, 0) = 3. * Y * Y - 1.;
     }
+    // Mode 2: quadratic shear mode.
     if constexpr(2u <= enhanced_mode) poly(2, 1) = (X + Y) * (X - Y);
+    // Mode 3: quadratic shear mode complementary to mode 2, so that the two
+    // modes span both x- and y-quadratic shear terms, keeping the element
+    // frame invariant. It is zero mean over the parent element.
+    if constexpr(3u <= enhanced_mode) poly(2, 2) = X * X + Y * Y - 2. / 3.;
 
     return poly;
 }
