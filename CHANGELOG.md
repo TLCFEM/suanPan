@@ -7,6 +7,8 @@
 ## version 4.2.1
 
 1. fix the tangent stiffness matrix formulation in GCMQ element [#389](https://github.com/TLCFEM/suanPan/pull/389)
+2. bump up various dependencies
+3. bug fixes
 
 ## version 4.2
 
