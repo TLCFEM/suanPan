@@ -4,7 +4,9 @@
 
 1. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
 
-## version 4.2.1
+## version 4.3.1
+
+## version 4.3
 
 1. fix the tangent stiffness matrix formulation in GCMQ element [#389](https://github.com/TLCFEM/suanPan/pull/389)
 2. bump up various dependencies
