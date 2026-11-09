@@ -11,8 +11,8 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends wget gnupg c
 RUN wget -q https://registrationcenter-download.intel.com/akdlm/IRC_NAS/97415287-271a-4d14-967f-72e2d9ceeb1e/intel-onemkl-2026.2.0.890_offline.sh && sh ./intel-onemkl-2026.2.0.890_offline.sh -a --silent --eula accept && rm ./intel-onemkl-2026.2.0.890_offline.sh
 
 RUN mkdir vtk-build && cd vtk-build && \
-    wget -q https://www.vtk.org/files/release/9.7/VTK-9.7.1.tar.gz && tar xf VTK-9.7.1.tar.gz && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.7.1 && \
+    wget -q https://www.vtk.org/files/release/9.7/VTK-9.7.2.tar.gz && tar xf VTK-9.7.2.tar.gz && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ./VTK-9.7.2 && \
     make install -j"$(nproc)" && cd .. && rm -r vtk-build
 
 RUN git clone --recurse-submodules -b dev --depth 1 https://github.com/TLCFEM/suanPan.git && cd suanPan && \
