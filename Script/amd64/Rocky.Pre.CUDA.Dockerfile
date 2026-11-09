@@ -5,7 +5,7 @@
 # 
 # Build: docker build -f amd64/Rocky.Pre.CUDA.Dockerfile -t tlcfem/suanpan-env:cuda .
 
-FROM nvidia/cuda:13.3.1-devel-rockylinux9
+FROM nvidia/cuda:13.5.0-devel-rockylinux9
 
 RUN dnf install -y dnf-plugins-core && \
     dnf config-manager --enable crb && \
