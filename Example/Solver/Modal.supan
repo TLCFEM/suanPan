@@ -36,6 +36,8 @@ analyze
 # 0.1056
 peek eigenvalue
 
+peek recorder 1
+
 save recorder 1
 
 exit
