@@ -54,8 +54,10 @@ void ModalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     const auto n_dof = eigenvector.n_rows;
     if(0 == n_mode || 0 == n_dof) return;
 
+    const auto components = static_cast<uword>(directions.size());
+
     // unit influence vectors in all requested directions
-    mat influence(n_dof, directions.size(), fill::zeros);
+    mat influence(n_dof, components, fill::zeros);
 
     for(auto& I : D->get_node_pool()) {
         if(!I->is_active()) continue;
@@ -65,7 +67,7 @@ void ModalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
 
         node_dof.emplace_back(I->get_tag(), dof);
 
-        for(auto J{0u}; J < directions.size(); ++J)
+        for(auto J{0u}; J < components; ++J)
             for(const auto K : I->get_dof({directions[J]})) influence(K, J) = 1.;
     }
 
@@ -74,8 +76,8 @@ void ModalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     const mat mass_influence = *mass * influence;
 
     frequency.zeros(n_mode);
-    participation_factor.zeros(n_mode, directions.size());
-    effective_mass.zeros(n_mode, directions.size());
+    participation_factor.zeros(n_mode, components);
+    effective_mass.zeros(n_mode, components);
 
     const auto mass_threshold = 1E-12 * std::max(1., mass->max());
 
@@ -90,7 +92,7 @@ void ModalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
         // normalize the mode shape with respect to the mass matrix to make the participation factor unique
         mode_shape.col(I) /= std::sqrt(modal_mass);
 
-        for(auto J{0u}; J < directions.size(); ++J) {
+        for(auto J{0u}; J < components; ++J) {
             const auto gamma = dot(mode_shape.col(I), mass_influence.col(J));
             participation_factor(I, J) = gamma;
             effective_mass(I, J) = gamma * gamma;
@@ -119,7 +121,7 @@ void ModalRecorder::save() {
     hsize_t dimension[2]{frequency.n_elem, 1};
     H5LTmake_dataset(file_id, "Frequency", 2, dimension, H5T_NATIVE_DOUBLE, frequency.mem);
 
-    for(auto I{0u}; I < directions.size(); ++I) {
+    for(std::size_t I{0}; I < directions.size(); ++I) {
         const auto group_name = std::string(magic_enum::enum_name(directions[I]));
         const auto group_id = H5Gcreate(file_id, group_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
