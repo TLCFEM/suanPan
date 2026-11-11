@@ -2539,6 +2539,12 @@
       "contents": "recorder ${1:(1)} hdf5 Modal ${2:(2...)}\n# (1) int, unique recorder tag\n# (2...) string, DoF identifiers that define the influence directions"
     },
     {
+      "trigger": "modalforce",
+      "details": "recorder of modal elastic forces",
+      "kind": "keyword",
+      "contents": "recorder ${1:(1)} hdf5 ModalForce\n# (1) int, unique recorder tag"
+    },
+    {
       "trigger": "node",
       "details": "define node",
       "kind": "keyword",

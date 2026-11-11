@@ -28,9 +28,7 @@
  * 1. natural frequency f = sqrt(lambda) / (2 * pi),
  * 2. modal participation factor gamma = phi' * M * r / (phi' * M * phi),
  * 3. effective modal mass m_eff = gamma^2 * (phi' * M * phi),
- * 4. mode shape phi,
- * 5. modal elastic force f = K * phi, assembled from the element stiffness
- *    matrices so that restrained DoFs receive the corresponding reaction.
+ * 4. mode shape phi.
  *
  * The mode shapes are normalised with respect to the mass matrix, i.e.
  * phi' * M * phi = 1. The influence vector r is a unit vector in each of the
@@ -38,12 +36,9 @@
  * specified. Participation factors and effective masses are stored as matrices
  * with one row per mode and one column per direction.
  *
- * The elastic force is assembled element by element rather than by using the
- * global stiffness matrix, because the global stiffness matrix is modified
- * when boundary conditions and constraints are processed. Consequently, the
- * force vector contains the reaction components at restrained DoFs, which are
- * generally nonzero. The free-DoF components are the usual elastic restoring
- * forces.
+ * The modal elastic force K * phi is not recorded by this recorder. It is
+ * available from ModalForceRecorder, which also stores the element force
+ * vectors.
  *
  * @author tlc
  * @date 10/11/2026
@@ -65,10 +60,8 @@ class ModalRecorder final : public Recorder {
     vec frequency;            // natural frequencies
     mat participation_factor; // modal participation factors
     mat effective_mass;       // effective modal masses
-    mat mode_shape;           // mass normalized mode shapes
-    mat force_response;       // modal elastic force, assembled from element stiffness
 
-    std::vector<std::pair<unsigned, uvec>> node_dof; // node tag and corresponding DoF indices
+    std::vector<std::pair<unsigned, mat>> node_shape; // node tag and nodal mode shapes
 
     void record_impl(const shared_ptr<DomainBase>&) override;
 

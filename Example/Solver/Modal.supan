@@ -16,6 +16,7 @@ fix 1 E 1
 fix 2 U2 1 2 3
 
 recorder 1 hdf5 Modal U1 U2 U3 UR1 UR2 UR3
+recorder 2 hdf5 ModalForce
 
 step frequency 1 2
 set band_mat 0
@@ -34,12 +35,15 @@ analyze
 # Effective modal masses in the U1 direction:
 # 1.8944
 # 0.1056
-# The F datasets contain the modal elastic force K * phi; the value at node 1
-# is the base reaction.
+# The N datasets in the Nodes groups of the ModalForce recorder contain the
+# nodal modal elastic force K * phi and the E datasets in the Elements groups
+# contain the element forces. The value at node 1 is the base reaction.
 peek eigenvalue
 
 peek recorder 1
+peek recorder 2
 
 save recorder 1
+save recorder 2
 
 exit
