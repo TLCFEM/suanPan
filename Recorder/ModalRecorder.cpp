@@ -121,7 +121,7 @@ void ModalRecorder::save() {
     hsize_t dimension[2]{frequency.n_elem, 1};
     H5LTmake_dataset(file_id, "Frequency", 2, dimension, H5T_NATIVE_DOUBLE, frequency.mem);
 
-    for(std::size_t I{0}; I < directions.size(); ++I) {
+    for(uword I{0}; I < static_cast<uword>(directions.size()); ++I) {
         const auto group_name = std::string(magic_enum::enum_name(directions[I]));
         const auto group_id = H5Gcreate(file_id, group_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
