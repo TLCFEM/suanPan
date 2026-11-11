@@ -28,7 +28,8 @@
  * 1. natural frequency f = sqrt(lambda) / (2 * pi),
  * 2. modal participation factor gamma = phi' * M * r / (phi' * M * phi),
  * 3. effective modal mass m_eff = gamma^2 * (phi' * M * phi),
- * 4. mode shape phi.
+ * 4. mode shape phi,
+ * 5. force response f = lambda * M * phi, equivalent to K * phi.
  *
  * The mode shapes are normalised with respect to the mass matrix, i.e.
  * phi' * M * phi = 1. The influence vector r is a unit vector in each of the
@@ -57,6 +58,7 @@ class ModalRecorder final : public Recorder {
     mat participation_factor; // modal participation factors
     mat effective_mass;       // effective modal masses
     mat mode_shape;           // mass normalized mode shapes
+    mat force_response;       // modal force response
 
     std::vector<std::pair<unsigned, uvec>> node_dof; // node tag and corresponding DoF indices
 
@@ -68,6 +70,12 @@ public:
     void save() override;
 
     void print() override;
+
+    [[nodiscard]] const vec& get_frequency() const;
+    [[nodiscard]] const mat& get_participation_factor() const;
+    [[nodiscard]] const mat& get_effective_mass() const;
+    [[nodiscard]] const mat& get_mode_shape() const;
+    [[nodiscard]] const mat& get_force_response() const;
 };
 
 #endif
