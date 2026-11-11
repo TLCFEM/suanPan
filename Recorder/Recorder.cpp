@@ -102,7 +102,7 @@ std::vector<vec> Recorder::normalise_size(std::vector<vec>&& container) {
 
 const uvec& Recorder::update_tag(const shared_ptr<DomainBase>&) { return object_tag = reference_tag; }
 
-void Recorder::combine(std::string&& recorder_name) const {
+void Recorder::combine(std::string recorder_name) const {
     if(!is_distributed() || comm_size == 1) return;
 
     barrier();
@@ -249,7 +249,8 @@ void Recorder::save(const shared_ptr<DomainBase>& D) {
         H5Gclose(group_id);
         H5Fclose(file_id);
 
-        D->insert(std::async(std::launch::async, &Recorder::combine, (recorder_name << ".h5").str()));
+        recorder_name << ".h5";
+        D->insert(std::async(std::launch::async, &Recorder::combine, this, recorder_name.str()));
     }
     else
 #endif
