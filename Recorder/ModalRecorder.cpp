@@ -91,8 +91,7 @@ void ModalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
 
     // store only the nodal quantities that are actually written to disk
     node_shape.reserve(D->get_node_pool().size());
-    for(auto& I : D->get_node_pool())
-        if(I->is_active()) node_shape.emplace_back(I->get_tag(), mode_shape.rows(I->get_reordered_dof()));
+    for(auto& I : D->get_node_pool()) node_shape.emplace_back(I->get_tag(), mode_shape.rows(I->get_reordered_dof()));
 }
 
 ModalRecorder::ModalRecorder(const unsigned T, std::vector<Node::DOF>&& D, const bool H)

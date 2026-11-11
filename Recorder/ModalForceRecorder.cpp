@@ -62,6 +62,7 @@ void ModalForceRecorder::record_impl(const shared_ptr<DomainBase>& D) {
 
     mat force_response(n_dof, n_mode, fill::zeros);
 
+    element_force.reserve(D->get_element_pool().size() / comm_size + 1);
     for(const auto& t_ele : D->get_element_pool()) {
         if(!t_ele->is_local) continue;
 
@@ -80,11 +81,7 @@ void ModalForceRecorder::record_impl(const shared_ptr<DomainBase>& D) {
 
     // store only the nodal quantities that are actually written to disk
     node_force.reserve(D->get_node_pool().size());
-    for(auto& I : D->get_node_pool()) {
-        if(!I->is_active()) continue;
-
-        node_force.emplace_back(I->get_tag(), force_response.rows(I->get_reordered_dof()));
-    }
+    for(auto& I : D->get_node_pool()) node_force.emplace_back(I->get_tag(), force_response.rows(I->get_reordered_dof()));
 
     mode_count = n_mode;
 }
