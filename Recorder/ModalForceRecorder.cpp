@@ -22,8 +22,7 @@
 #include <Domain/Node.h>
 #include <Element/Element.h>
 #ifdef SUANPAN_HDF5
-#include <hdf5.h>
-#include <hdf5_hl.h>
+#include <Toolbox/HDF5Wrapper.h>
 #endif
 
 extern fs::path SUANPAN_OUTPUT;
@@ -98,33 +97,19 @@ void ModalForceRecorder::save(const shared_ptr<DomainBase>&) {
     if(comm_size > 1) file_name << 'P' << comm_rank << '-';
     file_name << 'R' << get_tag() << "-ModalForce.h5";
 
-    const auto file_id = H5Fcreate((SUANPAN_OUTPUT / file_name.str()).generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-
-    hsize_t dimension[2]{1, 1};
+    hdf5::File file(SUANPAN_OUTPUT / file_name.str(), hdf5::File::Mode::Truncate);
 
     for(uword I{0}; I < mode_count; ++I) {
-        const auto mode_id = H5Gcreate(file_id, ("Mode " + std::to_string(I + 1)).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        auto mode_group = file.create_group("Mode " + std::to_string(I + 1));
 
-        const auto nodes_id = H5Gcreate(mode_id, "Nodes", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        for(const auto& [tag, nodal_force] : node_force) {
-            dimension[0] = nodal_force.n_rows;
+        auto nodes = mode_group.create_group("Nodes");
+        for(const auto& [tag, nodal_force] : node_force)
+            nodes.create_dataset("N" + std::to_string(tag), nodal_force.colptr(I), {static_cast<hsize_t>(nodal_force.n_rows), 1});
 
-            H5LTmake_dataset(nodes_id, ("N" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, nodal_force.colptr(I));
-        }
-        H5Gclose(nodes_id);
-
-        const auto elements_id = H5Gcreate(mode_id, "Elements", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        for(const auto& [tag, elemental_force] : element_force) {
-            dimension[0] = elemental_force.n_rows;
-
-            H5LTmake_dataset(elements_id, ("E" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, elemental_force.colptr(I));
-        }
-        H5Gclose(elements_id);
-
-        H5Gclose(mode_id);
+        auto elements = mode_group.create_group("Elements");
+        for(const auto& [tag, elemental_force] : element_force)
+            elements.create_dataset("E" + std::to_string(tag), elemental_force.colptr(I), {static_cast<hsize_t>(elemental_force.n_rows), 1});
     }
-
-    H5Fclose(file_id);
 #endif
 }
 

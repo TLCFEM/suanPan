@@ -22,8 +22,7 @@
 #include <Domain/Node.h>
 
 #ifdef SUANPAN_HDF5
-#include <hdf5.h>
-#include <hdf5_hl.h>
+#include <Toolbox/HDF5Wrapper.h>
 #endif
 
 extern fs::path SUANPAN_OUTPUT;
@@ -59,25 +58,18 @@ void EigenRecorder::save(const shared_ptr<DomainBase>&) {
     if(comm_size > 1) file_name << 'P' << comm_rank << '-';
     file_name << "Eigenvalue.h5";
 
-    const auto file_id = H5Fcreate((SUANPAN_OUTPUT / file_name.str()).generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    hdf5::File file(SUANPAN_OUTPUT / file_name.str(), hdf5::File::Mode::Truncate);
 
-    hsize_t dimension[2]{eigen_value.n_elem, 1};
-    H5LTmake_dataset(file_id, "Eigenvalue", 2, dimension, H5T_NATIVE_DOUBLE, eigen_value.mem);
+    file.create_dataset("Eigenvalue", eigen_value.mem, {static_cast<hsize_t>(eigen_value.n_elem), 1});
 
     for(uword I{0}, J{1}; I < eigen_value.n_elem; ++I, ++J) {
-        const auto group_id = H5Gcreate(file_id, ("Eigenvalue " + std::to_string(J)).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        auto group = file.create_group("Eigenvalue " + std::to_string(J));
 
         for(const auto& [e_val, e_vec] : eigen_pool[I]) {
             const auto dataset_name = "N" + std::to_string(e_val);
-            dimension[0] = e_vec.n_cols;
-            dimension[1] = e_vec.n_rows;
-            H5LTmake_dataset(group_id, dataset_name.c_str(), 2, dimension, H5T_NATIVE_DOUBLE, e_vec.mem);
+            group.create_dataset(dataset_name, e_vec.mem, {static_cast<hsize_t>(e_vec.n_cols), static_cast<hsize_t>(e_vec.n_rows)});
         }
-
-        H5Gclose(group_id);
     }
-
-    H5Fclose(file_id);
 #endif
 }
 

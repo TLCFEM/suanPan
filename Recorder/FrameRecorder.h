@@ -31,9 +31,13 @@
 
 #include <Recorder/Recorder.h>
 
+#ifdef SUANPAN_HDF5
+#include <Toolbox/HDF5Wrapper.h>
+#endif
+
 class FrameRecorder final : public Recorder {
 #ifdef SUANPAN_HDF5
-    hid_t file_id = 0;
+    hdf5::File file;
 #endif
 
     void record_impl(const shared_ptr<DomainBase>&) override;

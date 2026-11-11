@@ -32,9 +32,10 @@
 #ifdef SUANPAN_HDF5
 
 #include <Database/Database.h>
+#include <Toolbox/HDF5Wrapper.h>
 
 class HDF final : public Database {
-    hid_t file_id;
+    hdf5::File file;
 
 public:
     explicit HDF(const char*);

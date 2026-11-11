@@ -22,8 +22,7 @@
 #include <Element/Element.h>
 
 #ifdef SUANPAN_HDF5
-#include <hdf5.h>
-#include <hdf5_hl.h>
+#include <Toolbox/HDF5Wrapper.h>
 #endif
 
 extern fs::path SUANPAN_OUTPUT;
@@ -33,7 +32,7 @@ void FrameRecorder::record_impl([[maybe_unused]] const shared_ptr<DomainBase>& D
     std::ostringstream group_name;
     group_name << "/" << D->get_factory()->get_current_time();
 
-    const auto group_id = H5Gcreate(file_id, group_name.str().c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    auto group = file.create_group(group_name.str());
 
     for(auto& I : D->get_element_pool()) {
         if(const auto data = normalise_size(I->record(variable_type)); !data.empty()) {
@@ -42,13 +41,9 @@ void FrameRecorder::record_impl([[maybe_unused]] const shared_ptr<DomainBase>& D
             uword idx = 0;
             for(const auto& J : data) data_to_write.col(idx++) = J;
 
-            const hsize_t dimension[2]{data_to_write.n_cols, data_to_write.n_rows};
-
-            H5LTmake_dataset(group_id, ("Element " + std::to_string(I->get_tag())).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, data_to_write.mem);
+            group.create_dataset("Element " + std::to_string(I->get_tag()), data_to_write.mem, {static_cast<hsize_t>(data_to_write.n_cols), static_cast<hsize_t>(data_to_write.n_rows)});
         }
     }
-
-    H5Gclose(group_id);
 #endif
 }
 
@@ -57,15 +52,11 @@ FrameRecorder::FrameRecorder(const unsigned T, const OutputType L, const unsigne
 #ifdef SUANPAN_HDF5
     std::ostringstream file_name;
     file_name << 'R' << get_tag() << '-' << to_name(original_type) << ".h5";
-    file_id = H5Fcreate((SUANPAN_OUTPUT / file_name.str()).generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    file = hdf5::File(SUANPAN_OUTPUT / file_name.str(), hdf5::File::Mode::Truncate);
 #endif
 }
 
-FrameRecorder::~FrameRecorder() {
-#ifdef SUANPAN_HDF5
-    H5Fclose(file_id);
-#endif
-}
+FrameRecorder::~FrameRecorder() = default;
 
 void FrameRecorder::save(const shared_ptr<DomainBase>&) {}
 

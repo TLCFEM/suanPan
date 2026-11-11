@@ -127,9 +127,9 @@ namespace hdf5 {
         [[nodiscard]] Group create_group(const std::string&) const;
         [[nodiscard]] Group open_group(const std::string&) const;
 
-        [[nodiscard]] Dataset create_dataset(const std::string&, const double*, std::initializer_list<hsize_t>) const;
-        [[nodiscard]] Dataset create_dataset(const std::string&, const double*, const std::vector<hsize_t>&) const;
-        [[nodiscard]] Dataset create_dataset(const std::string&, const std::vector<double>&) const;
+        Dataset create_dataset(const std::string&, const double*, std::initializer_list<hsize_t>) const;
+        Dataset create_dataset(const std::string&, const double*, const std::vector<hsize_t>&) const;
+        Dataset create_dataset(const std::string&, const std::vector<double>&) const;
         [[nodiscard]] Dataset open_dataset(const std::string&) const;
 
         [[nodiscard]] bool exists(const std::string&) const;
@@ -180,9 +180,9 @@ namespace hdf5 {
         [[nodiscard]] Group create_group(const std::string&) const;
         [[nodiscard]] Group open_group(const std::string&) const;
 
-        [[nodiscard]] Dataset create_dataset(const std::string&, const double*, std::initializer_list<hsize_t>) const;
-        [[nodiscard]] Dataset create_dataset(const std::string&, const double*, const std::vector<hsize_t>&) const;
-        [[nodiscard]] Dataset create_dataset(const std::string&, const std::vector<double>&) const;
+        Dataset create_dataset(const std::string&, const double*, std::initializer_list<hsize_t>) const;
+        Dataset create_dataset(const std::string&, const double*, const std::vector<hsize_t>&) const;
+        Dataset create_dataset(const std::string&, const std::vector<double>&) const;
         [[nodiscard]] Dataset open_dataset(const std::string&) const;
 
         [[nodiscard]] bool exists(const std::string&) const;
