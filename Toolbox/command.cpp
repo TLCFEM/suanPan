@@ -809,7 +809,7 @@ namespace {
         if(is_equal(object_id, "Recorder")) {
             unsigned tag;
             while(get_input(command, tag))
-                if(domain->find_recorder(tag)) domain->get_recorder(tag)->save();
+                if(domain->find_recorder(tag)) domain->get_recorder(tag)->save(domain);
         }
         else if(is_equal(object_id, "Stiffness")) {
             std::string name = "K";

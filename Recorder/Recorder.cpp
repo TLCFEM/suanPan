@@ -17,11 +17,61 @@
 
 #include "Recorder.h"
 
+#include <Domain/DomainBase.h>
+
 extern fs::path SUANPAN_OUTPUT;
 
 #ifdef SUANPAN_HDF5
 #include <hdf5.h>
 #include <hdf5_hl.h>
+
+namespace {
+    std::string join_hdf5_path(const std::string& parent, const std::string& name) {
+        if(parent.empty() || "/" == parent) return "/" + name;
+        return parent + "/" + name;
+    }
+
+    std::vector<std::string> list_hdf5_links(const hid_t file_id, const std::string& group_path) {
+        std::vector<std::string> names;
+
+        const auto group_id = H5Gopen2(file_id, group_path.c_str(), H5P_DEFAULT);
+        if(group_id < 0) return names;
+
+        H5G_info_t info;
+        if(H5Gget_info(group_id, &info) >= 0)
+            for(hsize_t I{0}; I < info.nlinks; ++I) {
+                const auto length = H5Lget_name_by_idx(group_id, ".", H5_INDEX_NAME, H5_ITER_INC, I, nullptr, 0, H5P_DEFAULT);
+                if(length < 0) continue;
+
+                std::vector<char> buffer(static_cast<size_t>(length) + 1, '\0');
+                if(H5Lget_name_by_idx(group_id, ".", H5_INDEX_NAME, H5_ITER_INC, I, buffer.data(), buffer.size(), H5P_DEFAULT) >= 0)
+                    names.emplace_back(buffer.data(), static_cast<size_t>(length));
+            }
+
+        H5Gclose(group_id);
+
+        return names;
+    }
+
+    void merge_hdf5_group(const hid_t source_id, const std::string& source_path, const hid_t target_id, const std::string& target_path) {
+        for(const auto& name : list_hdf5_links(source_id, source_path)) {
+            const auto source_child = join_hdf5_path(source_path, name);
+            const auto target_child = join_hdf5_path(target_path, name);
+
+            if(H5Lexists(target_id, target_child.c_str(), H5P_DEFAULT) <= 0) {
+                H5Ocopy(source_id, source_child.c_str(), target_id, target_child.c_str(), H5P_DEFAULT, H5P_DEFAULT);
+                continue;
+            }
+
+            // both objects exist, merge groups recursively and keep the existing dataset otherwise
+            const auto target_group = H5Gopen2(target_id, target_child.c_str(), H5P_DEFAULT);
+            if(target_group < 0) continue;
+
+            H5Gclose(target_group);
+            merge_hdf5_group(source_id, source_child, target_id, target_child);
+        }
+    }
+} // namespace
 #endif
 
 auto Recorder::normalise_size(std::vector<std::vector<vec>>& container) {
@@ -51,6 +101,66 @@ std::vector<vec> Recorder::normalise_size(std::vector<vec>&& container) {
 }
 
 const uvec& Recorder::update_tag(const shared_ptr<DomainBase>&) { return object_tag = reference_tag; }
+
+void Recorder::combine(const std::string_view recorder_name) const {
+    if(!is_distributed() || comm_size == 1) return;
+
+    barrier();
+
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_rank) return;
+
+#ifdef SUANPAN_HDF5
+    std::vector<fs::path> file_paths;
+    file_paths.reserve(comm_size);
+
+    for(auto I{0}; I < comm_size; ++I) {
+        std::ostringstream distributed_name;
+        distributed_name << 'P' << I << '-' << recorder_name;
+        file_paths.emplace_back(SUANPAN_OUTPUT / distributed_name.str());
+    }
+
+    std::erase_if(file_paths, [](const fs::path& file_path) { return !fs::exists(file_path); });
+    if(file_paths.empty()) return;
+
+    const auto target_path = SUANPAN_OUTPUT / recorder_name;
+
+    const auto target_id = H5Fcreate(target_path.generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    if(target_id < 0) {
+        suanpan_warning("Failed to create combined HDF5 file {}.\n", recorder_name);
+        return;
+    }
+
+    bool success = true;
+
+    for(const auto& file_path : file_paths) {
+        const auto source_id = H5Fopen(file_path.generic_string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+        if(source_id < 0) {
+            suanpan_warning("Failed to open HDF5 file {} for combination.\n", file_path.generic_string());
+            success = false;
+            continue;
+        }
+
+        merge_hdf5_group(source_id, "/", target_id, "/");
+
+        H5Fclose(source_id);
+    }
+
+    H5Fclose(target_id);
+
+    if(!success) {
+        std::error_code error;
+        fs::remove(target_path, error);
+        return;
+    }
+
+    for(const auto& file_path : file_paths) {
+        std::error_code error;
+        fs::remove(file_path, error);
+        if(error) suanpan_warning("Failed to remove distributed HDF5 file {}: {}.\n", file_path.generic_string(), error.message());
+    }
+#endif
+}
 
 /**
  * \brief ctor
@@ -92,12 +202,13 @@ void Recorder::clear_status() {
     data_pool.clear();
 }
 
-void Recorder::save() {
-    std::ostringstream file_name;
+void Recorder::save(const shared_ptr<DomainBase>& D) {
+    std::ostringstream file_name, recorder_name;
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
     // ReSharper disable once CppDFAUnreachableCode
     if(comm_size > 1) file_name << 'P' << comm_rank << '-';
-    file_name << 'R' << get_tag() << '-' << to_name(original_type);
+    recorder_name << 'R' << get_tag() << '-' << to_name(original_type);
+    file_name << recorder_name.str();
     const auto origin_name = file_name.str();
 
 #ifdef SUANPAN_HDF5
@@ -137,6 +248,9 @@ void Recorder::save() {
 
         H5Gclose(group_id);
         H5Fclose(file_id);
+
+        recorder_name << ".h5";
+        D->insert(std::async(std::launch::async, &Recorder::combine, this, recorder_name.str()));
     }
     else
 #endif

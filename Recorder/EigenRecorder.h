@@ -40,7 +40,7 @@ class EigenRecorder final : public Recorder {
 public:
     explicit EigenRecorder(unsigned = 0, bool = true);
 
-    void save() override;
+    void save(const shared_ptr<DomainBase>&) override;
 
     void print() override;
 };

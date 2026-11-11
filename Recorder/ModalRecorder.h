@@ -68,7 +68,7 @@ class ModalRecorder final : public Recorder {
 public:
     explicit ModalRecorder(unsigned = 0, std::vector<Node::DOF>&& = {}, bool = true);
 
-    void save() override;
+    void save(const shared_ptr<DomainBase>&) override;
 
     void print() override;
 };

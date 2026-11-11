@@ -49,7 +49,7 @@ void EigenRecorder::record_impl(const shared_ptr<DomainBase>& D) {
 EigenRecorder::EigenRecorder(const unsigned T, const bool H)
     : Recorder(T, {}, OutputType::NL, 1, H) {}
 
-void EigenRecorder::save() {
+void EigenRecorder::save(const shared_ptr<DomainBase>&) {
     if(eigen_value.is_empty()) return;
 
 #ifdef SUANPAN_HDF5

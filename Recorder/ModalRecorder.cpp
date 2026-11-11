@@ -101,7 +101,7 @@ ModalRecorder::ModalRecorder(const unsigned T, std::vector<Node::DOF>&& D, const
     directions.erase(first, last);
 }
 
-void ModalRecorder::save() {
+void ModalRecorder::save(const shared_ptr<DomainBase>&) {
     if(frequency.is_empty()) return;
 
 #ifdef SUANPAN_HDF5

@@ -71,7 +71,7 @@ class ModalForceRecorder final : public Recorder {
 public:
     explicit ModalForceRecorder(unsigned = 0, bool = true);
 
-    void save() override;
+    void save(const shared_ptr<DomainBase>&) override;
 
     void print() override;
 };
