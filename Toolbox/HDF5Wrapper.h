@@ -191,7 +191,7 @@ namespace hdf5 {
         /**
          * @brief Copy one object (dataset or group) from this file into another file.
          */
-        bool copy(const std::string&, const File&, const std::string&) const;
+        [[nodiscard]] bool copy(const std::string&, const File&, const std::string&) const;
 
         /**
          * @brief Recursively merge all objects of a source file into this file.
