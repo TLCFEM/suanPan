@@ -55,7 +55,7 @@ protected:
     virtual const uvec& update_tag(const shared_ptr<DomainBase>&);
 
     virtual void record_impl(const shared_ptr<DomainBase>&) = 0;
-    
+
     /**
      * \brief Combine distributed HDF5 output files into a single file.
      *
@@ -63,7 +63,7 @@ protected:
      * from the first file name. All source files are removed after a successful
      * combination.
      */
-    static void combine(std::vector<fs::path>, const fs::path&);
+    static void combine(std::string&&);
 
     /**
      * \brief Whether the recorder output is distributed across ranks.

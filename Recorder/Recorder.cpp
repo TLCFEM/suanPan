@@ -102,25 +102,36 @@ std::vector<vec> Recorder::normalise_size(std::vector<vec>&& container) {
 
 const uvec& Recorder::update_tag(const shared_ptr<DomainBase>&) { return object_tag = reference_tag; }
 
-void Recorder::combine(std::vector<fs::path> file_names, const fs::path& target_name) {
+void Recorder::combine(std::string&& recorder_name) {
 #ifdef SUANPAN_HDF5
-    std::erase_if(file_names, [](const fs::path& file_name) { return !fs::exists(file_name); });
-    if(file_names.empty()) return;
+    barrier();
 
-    const auto target_id = H5Fcreate(target_name.generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    std::vector<fs::path> file_paths;
+    file_paths.reserve(comm_size);
+
+    for(auto I{0}; I < comm_size; ++I) {
+        std::ostringstream distributed_name;
+        distributed_name << 'P' << I << '-' << recorder_name;
+        file_paths.emplace_back(SUANPAN_OUTPUT / distributed_name.str());
+    }
+
+    std::erase_if(file_paths, [](const fs::path& file_path) { return !fs::exists(file_path); });
+    if(file_paths.empty()) return;
+
+    const auto target_path = SUANPAN_OUTPUT / recorder_name;
+
+    const auto target_id = H5Fcreate(target_path.generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     if(target_id < 0) {
-        suanpan_warning("Failed to create combined HDF5 file {}.\n", target_name.generic_string());
+        suanpan_warning("Failed to create combined HDF5 file {}.\n", recorder_name);
         return;
     }
 
     bool success = true;
 
-    for(const auto& file_name : file_names) {
-        if(file_name == target_name) continue;
-
-        const auto source_id = H5Fopen(file_name.generic_string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+    for(const auto& file_path : file_paths) {
+        const auto source_id = H5Fopen(file_path.generic_string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
         if(source_id < 0) {
-            suanpan_warning("Failed to open HDF5 file {} for combination.\n", file_name.generic_string());
+            suanpan_warning("Failed to open HDF5 file {} for combination.\n", file_path.generic_string());
             success = false;
             continue;
         }
@@ -134,18 +145,17 @@ void Recorder::combine(std::vector<fs::path> file_names, const fs::path& target_
 
     if(!success) {
         std::error_code error;
-        fs::remove(target_name, error);
+        fs::remove(target_path, error);
         return;
     }
 
-    for(const auto& file_name : file_names) {
-        if(file_name == target_name) continue;
+    for(const auto& file_path : file_paths) {
         std::error_code error;
-        fs::remove(file_name, error);
-        if(error) suanpan_warning("Failed to remove distributed HDF5 file {}: {}.\n", file_name.generic_string(), error.message());
+        fs::remove(file_path, error);
+        if(error) suanpan_warning("Failed to remove distributed HDF5 file {}: {}.\n", file_path.generic_string(), error.message());
     }
 #else
-    static_cast<void>(file_names);
+    static_cast<void>(file_paths);
 #endif
 }
 
@@ -236,22 +246,9 @@ void Recorder::save(const shared_ptr<DomainBase>& D) {
         H5Gclose(group_id);
         H5Fclose(file_id);
 
-        if(is_distributed() && comm_size > 1) {
-            std::vector<fs::path> file_names;
-            file_names.reserve(static_cast<size_t>(comm_size));
-
-            recorder_name << ".h5";
-
-            for(auto I{0}; I < comm_size; ++I) {
-                std::ostringstream distributed_name;
-                distributed_name << 'P' << I << '-' << recorder_name.str();
-                file_names.emplace_back(SUANPAN_OUTPUT / distributed_name.str());
-            }
-
-            barrier();
-
-            if(0 == comm_rank) D->insert(std::async(std::launch::async, &Recorder::combine, std::move(file_names), SUANPAN_OUTPUT / recorder_name.str()));
-        }
+        // ReSharper disable once CppRedundantBooleanExpressionArgument
+        // ReSharper disable once CppUnreachableCode
+        if(is_distributed() && comm_size > 1 && 0 == comm_rank) D->insert(std::async(std::launch::async, &Recorder::combine, (recorder_name << ".h5").str()));
     }
     else
 #endif
