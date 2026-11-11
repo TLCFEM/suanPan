@@ -159,8 +159,6 @@ void Recorder::combine(std::string&& recorder_name) const {
         fs::remove(file_path, error);
         if(error) suanpan_warning("Failed to remove distributed HDF5 file {}: {}.\n", file_path.generic_string(), error.message());
     }
-#else
-    static_cast<void>(file_paths);
 #endif
 }
 
