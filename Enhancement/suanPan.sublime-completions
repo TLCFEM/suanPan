@@ -2533,6 +2533,12 @@
       "contents": "set min_step_size ${1:(1)}\n# (1) double, step size"
     },
     {
+      "trigger": "modal",
+      "details": "recorder of modal properties",
+      "kind": "keyword",
+      "contents": "recorder ${1:(1)} hdf5 Modal ${2:(2...)}\n# (1) int, unique recorder tag\n# (2...) string, DoF identifiers that define the influence directions"
+    },
+    {
       "trigger": "node",
       "details": "define node",
       "kind": "keyword",
