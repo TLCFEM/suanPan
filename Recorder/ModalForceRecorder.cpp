@@ -88,7 +88,7 @@ void ModalForceRecorder::record_impl(const shared_ptr<DomainBase>& D) {
 ModalForceRecorder::ModalForceRecorder(const unsigned T, const bool H)
     : Recorder(T, {}, OutputType::NL, 1, H) {}
 
-void ModalForceRecorder::save() {
+void ModalForceRecorder::save(const shared_ptr<DomainBase>&) {
     if(0 == mode_count) return;
 
 #ifdef SUANPAN_HDF5
