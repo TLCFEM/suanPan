@@ -70,12 +70,6 @@ public:
     void save() override;
 
     void print() override;
-
-    [[nodiscard]] const vec& get_frequency() const;
-    [[nodiscard]] const mat& get_participation_factor() const;
-    [[nodiscard]] const mat& get_effective_mass() const;
-    [[nodiscard]] const mat& get_mode_shape() const;
-    [[nodiscard]] const mat& get_force_response() const;
 };
 
 #endif

@@ -88,15 +88,11 @@ void ModalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
 
         const auto modal_mass = dot(mode_shape.col(I), mass_eigenvector.col(I));
 
-        // massless modes carry no modal information
         if(modal_mass <= mass_threshold) continue;
 
-        // normalize the mode shape with respect to the mass matrix to make the participation factor unique
-        const auto normaliser = 1. / std::sqrt(modal_mass);
-        mode_shape.col(I) *= normaliser;
-
-        // K * phi = lambda * M * phi, so the force response can be computed without the stiffness matrix
-        force_response.col(I) = eigenvalue(I) * normaliser * mass_eigenvector.col(I);
+        const auto normaliser = std::sqrt(modal_mass);
+        mode_shape.col(I) /= normaliser;
+        force_response.col(I) = eigenvalue(I) / normaliser * mass_eigenvector.col(I);
 
         for(auto J{0u}; J < components; ++J) {
             const auto gamma = dot(mode_shape.col(I), mass_influence.col(J));
@@ -119,6 +115,8 @@ void ModalRecorder::save() {
 
 #ifdef SUANPAN_HDF5
     std::ostringstream file_name;
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppUnreachableCode
     if(comm_size > 1) file_name << 'P' << comm_rank << '-';
     file_name << 'R' << get_tag() << "-Modal.h5";
 
@@ -127,14 +125,8 @@ void ModalRecorder::save() {
     hsize_t dimension[2]{frequency.n_elem, 1};
     H5LTmake_dataset(file_id, "Frequency", 2, dimension, H5T_NATIVE_DOUBLE, frequency.mem);
 
-    if(!force_response.is_empty()) {
-        hsize_t force_dimension[2]{force_response.n_rows, force_response.n_cols};
-        H5LTmake_dataset(file_id, "ForceResponse", 2, force_dimension, H5T_NATIVE_DOUBLE, force_response.mem);
-    }
-
     for(uword I{0}; I < static_cast<uword>(directions.size()); ++I) {
-        const auto group_name = std::string(magic_enum::enum_name(directions[I]));
-        const auto group_id = H5Gcreate(file_id, group_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        const auto group_id = H5Gcreate(file_id, magic_enum::enum_name(directions[I]).data(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
         dimension[0] = participation_factor.n_rows;
         H5LTmake_dataset(group_id, "ParticipationFactor", 2, dimension, H5T_NATIVE_DOUBLE, participation_factor.colptr(I));
@@ -146,20 +138,15 @@ void ModalRecorder::save() {
     for(uword I{0}; I < mode_shape.n_cols; ++I) {
         const auto group_id = H5Gcreate(file_id, ("Mode " + std::to_string(I + 1)).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-        const vec mode_shape_column = mode_shape.col(I);
-        vec mode_force_column;
-        if(!force_response.is_empty()) mode_force_column = force_response.col(I);
-
         for(const auto& [tag, dof] : node_dof) {
-            const vec nodal_shape = mode_shape_column(dof);
-            dimension[0] = nodal_shape.n_elem;
+            dimension[0] = dof.n_elem;
             dimension[1] = 1;
-            H5LTmake_dataset(group_id, ("N" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, nodal_shape.mem);
 
-            if(!mode_force_column.is_empty()) {
-                const vec nodal_force = mode_force_column(dof);
-                H5LTmake_dataset(group_id, ("F" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, nodal_force.mem);
-            }
+            const vec nodal_shape = mode_shape(dof, uvec{I});
+            H5LTmake_dataset(group_id, ("N" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, nodal_shape.memptr());
+
+            const vec nodal_force = force_response(dof, uvec{I});
+            H5LTmake_dataset(group_id, ("F" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, nodal_force.memptr());
         }
 
         H5Gclose(group_id);
@@ -170,13 +157,3 @@ void ModalRecorder::save() {
 }
 
 void ModalRecorder::print() { suanpan_info("A recorder to record modal properties, including frequencies, mode shapes, modal participation factors, effective modal masses and force responses.\n"); }
-
-const vec& ModalRecorder::get_frequency() const { return frequency; }
-
-const mat& ModalRecorder::get_participation_factor() const { return participation_factor; }
-
-const mat& ModalRecorder::get_effective_mass() const { return effective_mass; }
-
-const mat& ModalRecorder::get_mode_shape() const { return mode_shape; }
-
-const mat& ModalRecorder::get_force_response() const { return force_response; }
