@@ -18,9 +18,6 @@
 #include "Recorder.h"
 
 #include <Domain/DomainBase.h>
-#include <algorithm>
-#include <cctype>
-#include <ranges>
 
 extern fs::path SUANPAN_OUTPUT;
 
