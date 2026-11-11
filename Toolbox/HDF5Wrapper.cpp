@@ -105,8 +105,7 @@ namespace {
         bool success = true;
 
         for(const auto& name : links_impl(source, source_path)) {
-            const auto source_child = join_path(source_path, name);
-            const auto target_child = join_path(target_path, name);
+            const auto source_child = join_path(source_path, name), target_child = join_path(target_path, name);
 
             if(!exists_impl(target, target_child)) {
                 if(!copy_impl(source, source_child, target, target_child)) success = false;
@@ -146,8 +145,7 @@ namespace hdf5 {
         const auto space = H5Dget_space(id_);
         if(space < 0) return dimensions;
 
-        const auto rank = H5Sget_simple_extent_ndims(space);
-        if(rank > 0) {
+        if(const auto rank = H5Sget_simple_extent_ndims(space); rank > 0) {
             dimensions.resize(static_cast<std::size_t>(rank));
             if(H5Sget_simple_extent_dims(space, dimensions.data(), nullptr) < 0) dimensions.clear();
         }
@@ -296,7 +294,7 @@ namespace hdf5 {
 
     std::vector<std::string> File::links(const std::string& group_name) const { return links_impl(id_, group_name); }
 
-    bool File::copy(const std::string& source, File& target, const std::string& destination) const { return copy_impl(id_, source, target.id(), destination); }
+    bool File::copy(const std::string& source, const File& target, const std::string& destination) const { return copy_impl(id_, source, target.id(), destination); }
 
     bool File::merge(const File& source) const { return merge_impl(source.id(), "/", id_, "/"); }
 } // namespace hdf5

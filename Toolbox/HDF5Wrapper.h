@@ -129,14 +129,14 @@ namespace hdf5 {
 
         Dataset create_dataset(const std::string&, const double*, std::initializer_list<hsize_t>) const;
         Dataset create_dataset(const std::string&, const double*, const std::vector<hsize_t>&) const;
-        Dataset create_dataset(const std::string&, const std::vector<double>&) const;
+        [[nodiscard]] Dataset create_dataset(const std::string&, const std::vector<double>&) const;
         [[nodiscard]] Dataset open_dataset(const std::string&) const;
 
         [[nodiscard]] bool exists(const std::string&) const;
         [[nodiscard]] std::vector<std::string> links() const;
         [[nodiscard]] std::string name() const;
 
-        bool merge(const Group&) const;
+        [[nodiscard]] bool merge(const Group&) const;
     };
 
     /**
@@ -182,7 +182,7 @@ namespace hdf5 {
 
         Dataset create_dataset(const std::string&, const double*, std::initializer_list<hsize_t>) const;
         Dataset create_dataset(const std::string&, const double*, const std::vector<hsize_t>&) const;
-        Dataset create_dataset(const std::string&, const std::vector<double>&) const;
+        [[nodiscard]] Dataset create_dataset(const std::string&, const std::vector<double>&) const;
         [[nodiscard]] Dataset open_dataset(const std::string&) const;
 
         [[nodiscard]] bool exists(const std::string&) const;
@@ -190,19 +190,15 @@ namespace hdf5 {
 
         /**
          * @brief Copy one object (dataset or group) from this file into another file.
-         *
-         * @param source source path relative to this file, may be absolute.
-         * @param target destination file.
-         * @param destination destination path relative to the target file.
          */
-        bool copy(const std::string&, File&, const std::string&) const;
+        bool copy(const std::string&, const File&, const std::string&) const;
 
         /**
          * @brief Recursively merge all objects of a source file into this file.
          *
          * Existing datasets are kept, existing groups are merged recursively.
          */
-        bool merge(const File&) const;
+        [[nodiscard]] bool merge(const File&) const;
     };
 } // namespace hdf5
 
