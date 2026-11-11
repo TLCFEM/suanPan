@@ -62,8 +62,7 @@ void ModalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
             for(const auto K : I->get_dof({directions[J]})) influence(K, J) = 1.;
     }
 
-    mat mode_shape = eigenvector.cols(0, n_mode - 1);
-
+    auto mode_shape = eigenvector;
     const mat mass_eigenvector = *mass * mode_shape;
     const mat mass_influence = *mass * influence;
 

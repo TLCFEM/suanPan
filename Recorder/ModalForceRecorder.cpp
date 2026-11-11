@@ -51,8 +51,7 @@ void ModalForceRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     const auto n_dof = eigenvector.n_rows;
     if(0 == n_mode || 0 == n_dof) return;
 
-    mat mode_shape = eigenvector.cols(0, n_mode - 1);
-
+    auto mode_shape = eigenvector;
     const mat mass_eigenvector = *mass * mode_shape;
     const auto mass_threshold = 1E-12 * std::max(1., mass->max());
 
