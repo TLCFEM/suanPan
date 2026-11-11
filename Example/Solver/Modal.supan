@@ -34,6 +34,8 @@ analyze
 # Effective modal masses in the U1 direction:
 # 1.8944
 # 0.1056
+# The F datasets contain the modal elastic force K * phi; the value at node 1
+# is the base reaction.
 peek eigenvalue
 
 peek recorder 1

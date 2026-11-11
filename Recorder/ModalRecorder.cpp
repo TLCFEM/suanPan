@@ -20,6 +20,7 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
+#include <Element/Element.h>
 #include <magic_enum/magic_enum.hpp>
 #ifdef SUANPAN_HDF5
 #include <hdf5.h>
@@ -79,7 +80,6 @@ void ModalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     frequency.zeros(n_mode);
     participation_factor.zeros(n_mode, components);
     effective_mass.zeros(n_mode, components);
-    force_response.zeros(n_dof, n_mode);
 
     const auto mass_threshold = 1E-12 * std::max(1., mass->max());
 
@@ -90,9 +90,7 @@ void ModalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
 
         if(modal_mass <= mass_threshold) continue;
 
-        const auto normaliser = std::sqrt(modal_mass);
-        mode_shape.col(I) /= normaliser;
-        force_response.col(I) = eigenvalue(I) / normaliser * mass_eigenvector.col(I);
+        mode_shape.col(I) /= std::sqrt(modal_mass);
 
         for(auto J{0u}; J < components; ++J) {
             const auto gamma = dot(mode_shape.col(I), mass_influence.col(J));
@@ -100,6 +98,18 @@ void ModalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
             effective_mass(I, J) = gamma * gamma;
         }
     }
+
+    force_response.zeros(n_dof, n_mode);
+    for(const auto& t_ele : D->get_element_pool()) {
+        if(!t_ele->is_local) continue;
+
+        auto& stiffness = t_ele->get_trial_stiffness();
+        auto& encoding = t_ele->get_dof_encoding();
+        if(stiffness.is_empty() || encoding.n_elem != stiffness.n_rows) continue;
+
+        force_response.rows(encoding) += stiffness * mode_shape.rows(encoding);
+    }
+    allreduce(force_response);
 }
 
 ModalRecorder::ModalRecorder(const unsigned T, std::vector<Node::DOF>&& D, const bool H)
@@ -156,4 +166,4 @@ void ModalRecorder::save() {
 #endif
 }
 
-void ModalRecorder::print() { suanpan_info("A recorder to record modal properties, including frequencies, mode shapes, modal participation factors, effective modal masses and force responses.\n"); }
+void ModalRecorder::print() { suanpan_info("A recorder to record modal properties, including frequencies, mode shapes, modal participation factors, effective modal masses and modal elastic forces.\n"); }
