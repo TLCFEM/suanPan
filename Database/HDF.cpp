@@ -22,8 +22,6 @@
 HDF::HDF(const char* N)
     : file(std::string{N}, hdf5::File::Mode::Truncate) {}
 
-HDF::~HDF() = default;
-
 int HDF::save() { return 0; }
 
 #endif

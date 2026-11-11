@@ -48,11 +48,7 @@ public:
         OutputType, // recorder type
         unsigned    // interval
     );
-    FrameRecorder(const FrameRecorder&) = delete;
-    FrameRecorder(FrameRecorder&&) = delete;
-    FrameRecorder& operator=(const FrameRecorder&) = delete;
-    FrameRecorder& operator=(FrameRecorder&&) = delete;
-    ~FrameRecorder() override;
+    ~FrameRecorder() override = default;
 
     void save(const shared_ptr<DomainBase>&) override;
 

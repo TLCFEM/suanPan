@@ -56,8 +56,6 @@ FrameRecorder::FrameRecorder(const unsigned T, const OutputType L, const unsigne
 #endif
 }
 
-FrameRecorder::~FrameRecorder() = default;
-
 void FrameRecorder::save(const shared_ptr<DomainBase>&) {}
 
 void FrameRecorder::print() { suanpan_info("A frame recorder.\n"); }

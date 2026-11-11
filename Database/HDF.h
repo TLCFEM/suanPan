@@ -39,7 +39,7 @@ class HDF final : public Database {
 
 public:
     explicit HDF(const char*);
-    ~HDF() override;
+    ~HDF() override = default;
 
     int save() override;
 };
