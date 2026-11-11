@@ -61,11 +61,10 @@
 #include <Recorder/Recorder.h>
 
 class ModalForceRecorder final : public Recorder {
-    mat mode_shape;     // mass normalized mode shapes
-    mat force_response; // assembled nodal modal elastic force
+    uword mode_count{0}; // number of recorded modes
 
-    std::vector<std::pair<unsigned, uvec>> node_dof;     // node tag and corresponding DoF indices
-    std::vector<std::pair<unsigned, mat>> element_force; // element tag and element force matrix
+    std::vector<std::pair<unsigned, mat>> node_force;    // node tag and nodal force
+    std::vector<std::pair<unsigned, mat>> element_force; // element tag and element force
 
     void record_impl(const shared_ptr<DomainBase>&) override;
 

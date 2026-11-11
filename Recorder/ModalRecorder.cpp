@@ -34,9 +34,7 @@ void ModalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     frequency.reset();
     participation_factor.reset();
     effective_mass.reset();
-    mode_shape.reset();
-
-    node_dof.clear();
+    node_shape.clear();
 
     if(W->get_analysis_type() != AnalysisType::EIGEN) return;
 
@@ -56,45 +54,59 @@ void ModalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
 
     const auto components = static_cast<uword>(directions.size());
 
-    // unit influence vectors in all requested directions
-    mat influence(n_dof, components, fill::zeros);
+    mat mode_shape = eigenvector.cols(0, n_mode - 1);
 
+    frequency.zeros(n_mode);
+    participation_factor.zeros(n_mode, components);
+    effective_mass.zeros(n_mode, components);
+
+    {
+        // unit influence vectors in all requested directions
+        mat influence(n_dof, components, fill::zeros);
+
+        for(auto& I : D->get_node_pool()) {
+            if(!I->is_active()) continue;
+
+            auto& dof = I->get_reordered_dof();
+            if(dof.is_empty()) continue;
+
+            for(auto J{0u}; J < components; ++J)
+                for(const auto K : I->get_dof({directions[J]})) influence(K, J) = 1.;
+        }
+
+        // M * phi and M * r, computed once for all modes and directions
+        const mat mass_eigenvector = *mass * mode_shape;
+        const mat mass_influence = *mass * influence;
+
+        const auto mass_threshold = 1E-12 * std::max(1., mass->max());
+
+        for(uword I{0}; I < n_mode; ++I) {
+            frequency(I) = std::sqrt(std::max(0., eigenvalue(I))) / datum::tau;
+
+            const auto modal_mass = dot(mode_shape.col(I), mass_eigenvector.col(I));
+
+            if(modal_mass <= mass_threshold) continue;
+
+            mode_shape.col(I) /= std::sqrt(modal_mass);
+
+            for(auto J{0u}; J < components; ++J) {
+                const auto gamma = dot(mode_shape.col(I), mass_influence.col(J));
+                participation_factor(I, J) = gamma;
+                effective_mass(I, J) = gamma * gamma;
+            }
+        }
+    }
+
+    // store only the nodal quantities that are actually written to disk
+    node_shape.reserve(D->get_node_pool().size());
     for(auto& I : D->get_node_pool()) {
         if(!I->is_active()) continue;
 
         auto& dof = I->get_reordered_dof();
         if(dof.is_empty()) continue;
 
-        node_dof.emplace_back(I->get_tag(), dof);
-
-        for(auto J{0u}; J < components; ++J)
-            for(const auto K : I->get_dof({directions[J]})) influence(K, J) = 1.;
-    }
-
-    // M * phi and M * r, computed once for all modes and directions
-    const mat mass_eigenvector = *mass * (mode_shape = eigenvector.cols(0, n_mode - 1));
-    const mat mass_influence = *mass * influence;
-
-    frequency.zeros(n_mode);
-    participation_factor.zeros(n_mode, components);
-    effective_mass.zeros(n_mode, components);
-
-    const auto mass_threshold = 1E-12 * std::max(1., mass->max());
-
-    for(uword I{0}; I < n_mode; ++I) {
-        frequency(I) = std::sqrt(std::max(0., eigenvalue(I))) / datum::tau;
-
-        const auto modal_mass = dot(mode_shape.col(I), mass_eigenvector.col(I));
-
-        if(modal_mass <= mass_threshold) continue;
-
-        mode_shape.col(I) /= std::sqrt(modal_mass);
-
-        for(auto J{0u}; J < components; ++J) {
-            const auto gamma = dot(mode_shape.col(I), mass_influence.col(J));
-            participation_factor(I, J) = gamma;
-            effective_mass(I, J) = gamma * gamma;
-        }
+        const mat local_shape = mode_shape.rows(dof);
+        node_shape.emplace_back(I->get_tag(), local_shape);
     }
 }
 
@@ -131,15 +143,14 @@ void ModalRecorder::save() {
         H5Gclose(group_id);
     }
 
-    for(uword I{0}; I < mode_shape.n_cols; ++I) {
+    for(uword I{0}; I < frequency.n_elem; ++I) {
         const auto group_id = H5Gcreate(file_id, ("Mode " + std::to_string(I + 1)).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-        for(const auto& [tag, dof] : node_dof) {
-            dimension[0] = dof.n_elem;
+        for(const auto& [tag, shape] : node_shape) {
+            dimension[0] = shape.n_rows;
             dimension[1] = 1;
 
-            const vec nodal_shape = mode_shape(dof, uvec{I});
-            H5LTmake_dataset(group_id, ("N" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, nodal_shape.memptr());
+            H5LTmake_dataset(group_id, ("N" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, shape.colptr(I));
         }
 
         H5Gclose(group_id);

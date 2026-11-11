@@ -60,9 +60,8 @@ class ModalRecorder final : public Recorder {
     vec frequency;            // natural frequencies
     mat participation_factor; // modal participation factors
     mat effective_mass;       // effective modal masses
-    mat mode_shape;           // mass normalized mode shapes
 
-    std::vector<std::pair<unsigned, uvec>> node_dof; // node tag and corresponding DoF indices
+    std::vector<std::pair<unsigned, mat>> node_shape; // node tag and nodal mode shapes
 
     void record_impl(const shared_ptr<DomainBase>&) override;
 

@@ -31,9 +31,8 @@ extern fs::path SUANPAN_OUTPUT;
 void ModalForceRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     auto& W = D->get_factory();
 
-    mode_shape.reset();
-    force_response.reset();
-    node_dof.clear();
+    mode_count = 0;
+    node_force.clear();
     element_force.clear();
 
     if(W->get_analysis_type() != AnalysisType::EIGEN) return;
@@ -52,32 +51,25 @@ void ModalForceRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     const auto n_dof = eigenvector.n_rows;
     if(0 == n_mode || 0 == n_dof) return;
 
-    for(auto& I : D->get_node_pool()) {
-        if(!I->is_active()) continue;
+    mat mode_shape = eigenvector.cols(0, n_mode - 1);
 
-        auto& dof = I->get_reordered_dof();
-        if(dof.is_empty()) continue;
+    {
+        const mat mass_eigenvector = *mass * mode_shape;
+        const auto mass_threshold = 1E-12 * std::max(1., mass->max());
 
-        node_dof.emplace_back(I->get_tag(), dof);
-    }
+        for(uword I{0}; I < n_mode; ++I) {
+            const auto modal_mass = dot(mode_shape.col(I), mass_eigenvector.col(I));
 
-    mode_shape = eigenvector.cols(0, n_mode - 1);
+            if(modal_mass <= mass_threshold) {
+                mode_shape.col(I).zeros();
+                continue;
+            }
 
-    const mat mass_eigenvector = *mass * mode_shape;
-    const auto mass_threshold = 1E-12 * std::max(1., mass->max());
-
-    for(uword I{0}; I < n_mode; ++I) {
-        const auto modal_mass = dot(mode_shape.col(I), mass_eigenvector.col(I));
-
-        if(modal_mass <= mass_threshold) {
-            mode_shape.col(I).zeros();
-            continue;
+            mode_shape.col(I) /= std::sqrt(modal_mass);
         }
-
-        mode_shape.col(I) /= std::sqrt(modal_mass);
     }
 
-    force_response.zeros(n_dof, n_mode);
+    mat force_response(n_dof, n_mode, fill::zeros);
 
     for(const auto& t_ele : D->get_element_pool()) {
         if(!t_ele->is_local) continue;
@@ -94,13 +86,27 @@ void ModalForceRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     std::ranges::sort(element_force, [](const auto& A, const auto& B) { return A.first < B.first; });
 
     allreduce(force_response);
+
+    // store only the nodal quantities that are actually written to disk
+    node_force.reserve(D->get_node_pool().size());
+    for(auto& I : D->get_node_pool()) {
+        if(!I->is_active()) continue;
+
+        auto& dof = I->get_reordered_dof();
+        if(dof.is_empty()) continue;
+
+        const mat local_force = force_response.rows(dof);
+        node_force.emplace_back(I->get_tag(), local_force);
+    }
+
+    mode_count = n_mode;
 }
 
 ModalForceRecorder::ModalForceRecorder(const unsigned T, const bool H)
     : Recorder(T, {}, OutputType::NL, 1, H) {}
 
 void ModalForceRecorder::save() {
-    if(force_response.is_empty()) return;
+    if(0 == mode_count) return;
 
 #ifdef SUANPAN_HDF5
     std::ostringstream file_name;
@@ -113,15 +119,14 @@ void ModalForceRecorder::save() {
 
     hsize_t dimension[2]{1, 1};
 
-    for(uword I{0}; I < mode_shape.n_cols; ++I) {
+    for(uword I{0}; I < mode_count; ++I) {
         const auto mode_id = H5Gcreate(file_id, ("Mode " + std::to_string(I + 1)).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
         const auto nodes_id = H5Gcreate(mode_id, "Nodes", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        for(const auto& [tag, dof] : node_dof) {
-            dimension[0] = dof.n_elem;
+        for(const auto& [tag, force] : node_force) {
+            dimension[0] = force.n_rows;
 
-            const vec nodal_force = force_response(dof, uvec{I});
-            H5LTmake_dataset(nodes_id, ("N" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, nodal_force.memptr());
+            H5LTmake_dataset(nodes_id, ("N" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, force.colptr(I));
         }
         H5Gclose(nodes_id);
 
@@ -129,8 +134,7 @@ void ModalForceRecorder::save() {
         for(const auto& [tag, e_force] : element_force) {
             dimension[0] = e_force.n_rows;
 
-            const vec elemental_force = e_force.col(I);
-            H5LTmake_dataset(elements_id, ("E" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, elemental_force.memptr());
+            H5LTmake_dataset(elements_id, ("E" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, e_force.colptr(I));
         }
         H5Gclose(elements_id);
 
