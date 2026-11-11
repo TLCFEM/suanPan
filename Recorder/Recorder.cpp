@@ -102,7 +102,7 @@ std::vector<vec> Recorder::normalise_size(std::vector<vec>&& container) {
 
 const uvec& Recorder::update_tag(const shared_ptr<DomainBase>&) { return object_tag = reference_tag; }
 
-void Recorder::combine(std::string recorder_name) const {
+void Recorder::combine(const std::string_view recorder_name) const {
     if(!is_distributed() || comm_size == 1) return;
 
     barrier();
