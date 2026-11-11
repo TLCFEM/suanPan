@@ -20,7 +20,6 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
-#include <Element/Element.h>
 #include <magic_enum/magic_enum.hpp>
 #ifdef SUANPAN_HDF5
 #include <hdf5.h>
@@ -36,7 +35,6 @@ void ModalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     participation_factor.reset();
     effective_mass.reset();
     mode_shape.reset();
-    force_response.reset();
 
     node_dof.clear();
 
@@ -98,18 +96,6 @@ void ModalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
             effective_mass(I, J) = gamma * gamma;
         }
     }
-
-    force_response.zeros(n_dof, n_mode);
-    for(const auto& t_ele : D->get_element_pool()) {
-        if(!t_ele->is_local) continue;
-
-        auto& stiffness = t_ele->get_trial_stiffness();
-        auto& encoding = t_ele->get_dof_encoding();
-        if(stiffness.is_empty() || encoding.n_elem != stiffness.n_rows) continue;
-
-        force_response.rows(encoding) += stiffness * mode_shape.rows(encoding);
-    }
-    allreduce(force_response);
 }
 
 ModalRecorder::ModalRecorder(const unsigned T, std::vector<Node::DOF>&& D, const bool H)
@@ -154,9 +140,6 @@ void ModalRecorder::save() {
 
             const vec nodal_shape = mode_shape(dof, uvec{I});
             H5LTmake_dataset(group_id, ("N" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, nodal_shape.memptr());
-
-            const vec nodal_force = force_response(dof, uvec{I});
-            H5LTmake_dataset(group_id, ("F" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, nodal_force.memptr());
         }
 
         H5Gclose(group_id);
@@ -166,4 +149,4 @@ void ModalRecorder::save() {
 #endif
 }
 
-void ModalRecorder::print() { suanpan_info("A recorder to record modal properties, including frequencies, mode shapes, modal participation factors, effective modal masses and modal elastic forces.\n"); }
+void ModalRecorder::print() { suanpan_info("A recorder to record modal properties, including frequencies, mode shapes, modal participation factors and effective modal masses.\n"); }

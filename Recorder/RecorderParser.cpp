@@ -56,6 +56,12 @@ static int process_recorder_command(const shared_ptr<DomainBase>& domain, std::i
         return SUANPAN_SUCCESS;
     }
 
+    if(is_equal(object_type, "ModalForce")) {
+        if(!domain->insert(std::make_shared<ModalForceRecorder>(tag, use_hdf5)))
+            suanpan_error("Fail to create new modal force recorder.\n");
+        return SUANPAN_SUCCESS;
+    }
+
     std::string variable_type;
     if(!is_equal(object_type, "Amplitude") && !get_input(command, variable_type)) {
         suanpan_error("A valid recorder type is required.\n");

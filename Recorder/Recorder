@@ -3,6 +3,7 @@
 #include "ElementRecorder.h"
 #include "FrameRecorder.h"
 #include "GlobalRecorder.h"
+#include "ModalForceRecorder.h"
 #include "ModalRecorder.h"
 #include "NodeRecorder.h"
 #include "OutputType.h"
