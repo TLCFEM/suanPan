@@ -252,6 +252,12 @@ template<typename T> auto allreduce(T&& object) { return std::forward<T>(object)
 template<typename T> auto reduce(T&& object) { return std::forward<T>(object); }
 #endif
 
+inline void barrier() {
+#ifdef SUANPAN_DISTRIBUTED
+    comm_world.barrier();
+#endif
+}
+
 #include <fmt/color.h>
 #include <mutex>
 

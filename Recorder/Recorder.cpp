@@ -74,19 +74,7 @@ namespace {
             merge_hdf5_group(source_id, source_child, target_id, target_child);
         }
     }
-
-    fs::path combined_file_name(const fs::path& file_name) {
-        auto name = file_name.filename().string();
-
-        if(name.size() > 2 && 'P' == name.front()) {
-            const auto dash = name.find('-');
-            if(const auto rank = dash == std::string::npos ? std::string{} : name.substr(1, dash - 1); !rank.empty() && std::ranges::all_of(rank, [](const char C) { return std::isdigit(static_cast<unsigned char>(C)); }))
-                name.erase(0, dash + 1);
-        }
-
-        return file_name.parent_path() / name;
-    }
-}
+} // namespace
 #endif
 
 auto Recorder::normalise_size(std::vector<std::vector<vec>>& container) {
@@ -117,14 +105,10 @@ std::vector<vec> Recorder::normalise_size(std::vector<vec>&& container) {
 
 const uvec& Recorder::update_tag(const shared_ptr<DomainBase>&) { return object_tag = reference_tag; }
 
-void Recorder::combine(std::vector<fs::path> file_names) {
+void Recorder::combine(std::vector<fs::path> file_names, const fs::path& target_name) {
 #ifdef SUANPAN_HDF5
     std::erase_if(file_names, [](const fs::path& file_name) { return !fs::exists(file_name); });
     if(file_names.empty()) return;
-
-    auto target_name = combined_file_name(file_names.front());
-    if(std::ranges::find(file_names, target_name) != file_names.end())
-        target_name = target_name.parent_path() / (target_name.stem().string() + "-combined" + target_name.extension().string());
 
     const auto target_id = H5Fcreate(target_name.generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     if(target_id < 0) {
@@ -209,11 +193,12 @@ void Recorder::clear_status() {
 }
 
 void Recorder::save(const shared_ptr<DomainBase>& D) {
-    std::ostringstream file_name;
+    std::ostringstream file_name, recorder_name;
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
     // ReSharper disable once CppDFAUnreachableCode
     if(comm_size > 1) file_name << 'P' << comm_rank << '-';
-    file_name << 'R' << get_tag() << '-' << to_name(original_type);
+    recorder_name << 'R' << get_tag() << '-' << to_name(original_type);
+    file_name << recorder_name.str();
     const auto origin_name = file_name.str();
 
 #ifdef SUANPAN_HDF5
@@ -254,23 +239,21 @@ void Recorder::save(const shared_ptr<DomainBase>& D) {
         H5Gclose(group_id);
         H5Fclose(file_id);
 
-        if(is_distributed() && comm_size > 1 && nullptr != D) {
+        if(is_distributed() && comm_size > 1) {
             std::vector<fs::path> file_names;
             file_names.reserve(static_cast<size_t>(comm_size));
 
+            recorder_name << ".h5";
+
             for(auto I{0}; I < comm_size; ++I) {
                 std::ostringstream distributed_name;
-                distributed_name << 'P' << I << '-' << origin_name << ".h5";
+                distributed_name << 'P' << I << '-' << recorder_name.str();
                 file_names.emplace_back(SUANPAN_OUTPUT / distributed_name.str());
             }
 
-#ifdef SUANPAN_DISTRIBUTED
-            // make sure all ranks have finished writing before the root rank starts combining
-            comm_world.barrier();
-#endif
+            barrier();
 
-            if(0 == comm_rank)
-                D->insert(std::async(std::launch::async, &Recorder::combine, std::move(file_names)));
+            if(0 == comm_rank) D->insert(std::async(std::launch::async, &Recorder::combine, std::move(file_names), SUANPAN_OUTPUT / recorder_name.str()));
         }
     }
     else

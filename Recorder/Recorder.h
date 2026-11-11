@@ -61,12 +61,10 @@ public:
      * \brief Combine distributed HDF5 output files into a single file.
      *
      * The target file name is obtained by removing the leading process prefix
-     * (P&lt;rank&gt;-) from the first file name. All source files are removed
-     * after a successful combination.
-     *
-     * \param file_names list of files to combine
+     * from the first file name. All source files are removed after a successful
+     * combination.
      */
-    static void combine(std::vector<fs::path> file_names);
+    static void combine(std::vector<fs::path>, const fs::path&);
 
     /**
      * \brief Whether the recorder output is distributed across ranks.
