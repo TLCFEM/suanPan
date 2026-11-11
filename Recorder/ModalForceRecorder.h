@@ -43,6 +43,10 @@
  * elements attached to node i. The element force of element e contains the
  * element-local contribution K_e * phi_{e} in the element DoF order.
  *
+ * Only the forces are stored. For each mode, a group Mode n contains two
+ * groups, Nodes and Elements, which store the nodal forces N<tag> and the
+ * element forces E<tag>, respectively.
+ *
  * @author tlc
  * @date 11/11/2026
  * @version 0.1.0
@@ -57,9 +61,8 @@
 #include <Recorder/Recorder.h>
 
 class ModalForceRecorder final : public Recorder {
-    vec frequency;      // natural frequencies
     mat mode_shape;     // mass normalized mode shapes
-    mat force_response; // assembled modal elastic force
+    mat force_response; // assembled nodal modal elastic force
 
     std::vector<std::pair<unsigned, uvec>> node_dof;     // node tag and corresponding DoF indices
     std::vector<std::pair<unsigned, mat>> element_force; // element tag and element force matrix

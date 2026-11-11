@@ -35,9 +35,9 @@ analyze
 # Effective modal masses in the U1 direction:
 # 1.8944
 # 0.1056
-# The F datasets of the ModalForce recorder contain the nodal modal elastic
-# force K * phi and the EF datasets contain the element forces. The value at
-# node 1 is the base reaction.
+# The N datasets in the Nodes groups of the ModalForce recorder contain the
+# nodal modal elastic force K * phi and the E datasets in the Elements groups
+# contain the element forces. The value at node 1 is the base reaction.
 peek eigenvalue
 
 peek recorder 1
