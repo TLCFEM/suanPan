@@ -3,6 +3,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         command.cpp
         Expression.cpp
         ExpressionParser.cpp
+        HDF5Wrapper.cpp
         IntegrationPlan.cpp
         misc.cpp
         resampling.cpp
