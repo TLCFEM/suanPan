@@ -67,6 +67,6 @@ FrameRecorder::~FrameRecorder() {
 #endif
 }
 
-void FrameRecorder::save() {}
+void FrameRecorder::save(const shared_ptr<DomainBase>&) {}
 
 void FrameRecorder::print() { suanpan_info("A frame recorder.\n"); }

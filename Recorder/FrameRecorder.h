@@ -50,7 +50,7 @@ public:
     FrameRecorder& operator=(FrameRecorder&&) = delete;
     ~FrameRecorder() override;
 
-    void save() override;
+    void save(const shared_ptr<DomainBase>&) override;
 
     void print() override;
 };

@@ -57,6 +57,25 @@ protected:
     virtual void record_impl(const shared_ptr<DomainBase>&) = 0;
 
 public:
+    /**
+     * \brief Combine distributed HDF5 output files into a single file.
+     *
+     * The target file name is obtained by removing the leading process prefix
+     * (P&lt;rank&gt;-) from the first file name. All source files are removed
+     * after a successful combination.
+     *
+     * \param file_names list of files to combine
+     */
+    static void combine(std::vector<fs::path> file_names);
+
+    /**
+     * \brief Whether the recorder output is distributed across ranks.
+     *
+     * Distributed recorders only record local objects, so their HDF5 output
+     * needs to be combined after all ranks have written their local data.
+     */
+    [[nodiscard]] virtual bool is_distributed() const { return false; }
+
     Recorder(
         unsigned,   // tag
         uvec&&,     // object tags
@@ -74,7 +93,7 @@ public:
 
     virtual void clear_status();
 
-    virtual void save();
+    virtual void save(const shared_ptr<DomainBase>&);
 
     void print() override;
 };

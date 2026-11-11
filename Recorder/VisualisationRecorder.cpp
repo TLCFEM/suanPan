@@ -47,7 +47,7 @@ void VisualisationRecorder::clear_status() {
     Recorder::clear_status();
 }
 
-void VisualisationRecorder::save() {}
+void VisualisationRecorder::save(const shared_ptr<DomainBase>&) {}
 
 void VisualisationRecorder::print() {
     suanpan_info("A visualisation recorder.\n");

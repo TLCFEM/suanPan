@@ -39,6 +39,8 @@ public:
 
     void initialize(const shared_ptr<DomainBase>&) override;
 
+    [[nodiscard]] bool is_distributed() const override { return true; }
+
     void print() override;
 };
 
