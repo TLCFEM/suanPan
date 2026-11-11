@@ -27,7 +27,7 @@
  *
  *     f_n = K * phi_n.
  *
- * The mode shapes are normalised with respect to the mass matrix, i.e.
+ * The mode shapes are normalized with respect to the mass matrix, i.e.
  * phi' * M * phi = 1, so that the force corresponds to a unit modal
  * displacement.
  *

@@ -54,60 +54,45 @@ void ModalRecorder::record_impl(const shared_ptr<DomainBase>& D) {
 
     const auto components = static_cast<uword>(directions.size());
 
+    mat influence(n_dof, components, fill::zeros);
+    for(auto& I : D->get_node_pool()) {
+        if(!I->is_active()) continue;
+
+        for(auto J{0u}; J < components; ++J)
+            for(const auto K : I->get_dof({directions[J]})) influence(K, J) = 1.;
+    }
+
     mat mode_shape = eigenvector.cols(0, n_mode - 1);
+
+    const mat mass_eigenvector = *mass * mode_shape;
+    const mat mass_influence = *mass * influence;
 
     frequency.zeros(n_mode);
     participation_factor.zeros(n_mode, components);
     effective_mass.zeros(n_mode, components);
 
-    {
-        // unit influence vectors in all requested directions
-        mat influence(n_dof, components, fill::zeros);
+    const auto mass_threshold = 1E-12 * std::max(1., mass->max());
+    for(uword I{0}; I < n_mode; ++I) {
+        frequency(I) = std::sqrt(std::max(0., eigenvalue(I))) / datum::tau;
 
-        for(auto& I : D->get_node_pool()) {
-            if(!I->is_active()) continue;
-
-            auto& dof = I->get_reordered_dof();
-            if(dof.is_empty()) continue;
-
-            for(auto J{0u}; J < components; ++J)
-                for(const auto K : I->get_dof({directions[J]})) influence(K, J) = 1.;
+        const auto modal_mass = dot(mode_shape.col(I), mass_eigenvector.col(I));
+        if(modal_mass <= mass_threshold) {
+            mode_shape.col(I).zeros();
+            continue;
         }
+        mode_shape.col(I) /= std::sqrt(modal_mass);
 
-        // M * phi and M * r, computed once for all modes and directions
-        const mat mass_eigenvector = *mass * mode_shape;
-        const mat mass_influence = *mass * influence;
-
-        const auto mass_threshold = 1E-12 * std::max(1., mass->max());
-
-        for(uword I{0}; I < n_mode; ++I) {
-            frequency(I) = std::sqrt(std::max(0., eigenvalue(I))) / datum::tau;
-
-            const auto modal_mass = dot(mode_shape.col(I), mass_eigenvector.col(I));
-
-            if(modal_mass <= mass_threshold) continue;
-
-            mode_shape.col(I) /= std::sqrt(modal_mass);
-
-            for(auto J{0u}; J < components; ++J) {
-                const auto gamma = dot(mode_shape.col(I), mass_influence.col(J));
-                participation_factor(I, J) = gamma;
-                effective_mass(I, J) = gamma * gamma;
-            }
+        for(auto J{0u}; J < components; ++J) {
+            const auto gamma = dot(mode_shape.col(I), mass_influence.col(J));
+            participation_factor(I, J) = gamma;
+            effective_mass(I, J) = gamma * gamma;
         }
     }
 
     // store only the nodal quantities that are actually written to disk
     node_shape.reserve(D->get_node_pool().size());
-    for(auto& I : D->get_node_pool()) {
-        if(!I->is_active()) continue;
-
-        auto& dof = I->get_reordered_dof();
-        if(dof.is_empty()) continue;
-
-        const mat local_shape = mode_shape.rows(dof);
-        node_shape.emplace_back(I->get_tag(), local_shape);
-    }
+    for(auto& I : D->get_node_pool())
+        if(I->is_active()) node_shape.emplace_back(I->get_tag(), mode_shape.rows(I->get_reordered_dof()));
 }
 
 ModalRecorder::ModalRecorder(const unsigned T, std::vector<Node::DOF>&& D, const bool H)

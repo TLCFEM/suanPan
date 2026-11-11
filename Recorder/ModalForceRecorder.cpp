@@ -53,21 +53,12 @@ void ModalForceRecorder::record_impl(const shared_ptr<DomainBase>& D) {
 
     mat mode_shape = eigenvector.cols(0, n_mode - 1);
 
-    {
-        const mat mass_eigenvector = *mass * mode_shape;
-        const auto mass_threshold = 1E-12 * std::max(1., mass->max());
+    const mat mass_eigenvector = *mass * mode_shape;
+    const auto mass_threshold = 1E-12 * std::max(1., mass->max());
 
-        for(uword I{0}; I < n_mode; ++I) {
-            const auto modal_mass = dot(mode_shape.col(I), mass_eigenvector.col(I));
-
-            if(modal_mass <= mass_threshold) {
-                mode_shape.col(I).zeros();
-                continue;
-            }
-
-            mode_shape.col(I) /= std::sqrt(modal_mass);
-        }
-    }
+    for(uword I{0}; I < n_mode; ++I)
+        if(const auto modal_mass = dot(mode_shape.col(I), mass_eigenvector.col(I)); modal_mass <= mass_threshold) mode_shape.col(I).zeros();
+        else mode_shape.col(I) /= std::sqrt(modal_mass);
 
     mat force_response(n_dof, n_mode, fill::zeros);
 
@@ -75,9 +66,9 @@ void ModalForceRecorder::record_impl(const shared_ptr<DomainBase>& D) {
         if(!t_ele->is_local) continue;
 
         auto& stiffness = t_ele->get_trial_stiffness();
-        auto& encoding = t_ele->get_dof_encoding();
-        if(stiffness.is_empty() || encoding.n_elem != stiffness.n_rows) continue;
+        if(stiffness.is_empty()) continue;
 
+        auto& encoding = t_ele->get_dof_encoding();
         mat local_force = stiffness * mode_shape.rows(encoding);
         force_response.rows(encoding) += local_force;
         element_force.emplace_back(t_ele->get_tag(), std::move(local_force));
@@ -92,11 +83,7 @@ void ModalForceRecorder::record_impl(const shared_ptr<DomainBase>& D) {
     for(auto& I : D->get_node_pool()) {
         if(!I->is_active()) continue;
 
-        auto& dof = I->get_reordered_dof();
-        if(dof.is_empty()) continue;
-
-        const mat local_force = force_response.rows(dof);
-        node_force.emplace_back(I->get_tag(), local_force);
+        node_force.emplace_back(I->get_tag(), force_response.rows(I->get_reordered_dof()));
     }
 
     mode_count = n_mode;
@@ -123,18 +110,18 @@ void ModalForceRecorder::save() {
         const auto mode_id = H5Gcreate(file_id, ("Mode " + std::to_string(I + 1)).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
         const auto nodes_id = H5Gcreate(mode_id, "Nodes", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        for(const auto& [tag, force] : node_force) {
-            dimension[0] = force.n_rows;
+        for(const auto& [tag, nodal_force] : node_force) {
+            dimension[0] = nodal_force.n_rows;
 
-            H5LTmake_dataset(nodes_id, ("N" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, force.colptr(I));
+            H5LTmake_dataset(nodes_id, ("N" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, nodal_force.colptr(I));
         }
         H5Gclose(nodes_id);
 
         const auto elements_id = H5Gcreate(mode_id, "Elements", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        for(const auto& [tag, e_force] : element_force) {
-            dimension[0] = e_force.n_rows;
+        for(const auto& [tag, elemental_force] : element_force) {
+            dimension[0] = elemental_force.n_rows;
 
-            H5LTmake_dataset(elements_id, ("E" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, e_force.colptr(I));
+            H5LTmake_dataset(elements_id, ("E" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, elemental_force.colptr(I));
         }
         H5Gclose(elements_id);
 
