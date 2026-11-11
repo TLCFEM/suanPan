@@ -34,12 +34,13 @@
 class ElementRecorder : public Recorder {
     void record_impl(const shared_ptr<DomainBase>&) override;
 
+protected:
+    [[nodiscard]] bool is_distributed() const override { return true; }
+
 public:
     using Recorder::Recorder;
 
     void initialize(const shared_ptr<DomainBase>&) override;
-
-    [[nodiscard]] bool is_distributed() const override { return true; }
 
     void print() override;
 };

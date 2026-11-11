@@ -55,8 +55,7 @@ protected:
     virtual const uvec& update_tag(const shared_ptr<DomainBase>&);
 
     virtual void record_impl(const shared_ptr<DomainBase>&) = 0;
-
-public:
+    
     /**
      * \brief Combine distributed HDF5 output files into a single file.
      *
@@ -74,6 +73,7 @@ public:
      */
     [[nodiscard]] virtual bool is_distributed() const { return false; }
 
+public:
     Recorder(
         unsigned,   // tag
         uvec&&,     // object tags
