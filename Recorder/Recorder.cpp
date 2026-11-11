@@ -102,10 +102,15 @@ std::vector<vec> Recorder::normalise_size(std::vector<vec>&& container) {
 
 const uvec& Recorder::update_tag(const shared_ptr<DomainBase>&) { return object_tag = reference_tag; }
 
-void Recorder::combine(std::string&& recorder_name) {
-#ifdef SUANPAN_HDF5
+void Recorder::combine(std::string&& recorder_name) const {
+    if(!is_distributed() || comm_size == 1) return;
+
     barrier();
 
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    if(0 != comm_rank) return;
+
+#ifdef SUANPAN_HDF5
     std::vector<fs::path> file_paths;
     file_paths.reserve(comm_size);
 
@@ -246,9 +251,7 @@ void Recorder::save(const shared_ptr<DomainBase>& D) {
         H5Gclose(group_id);
         H5Fclose(file_id);
 
-        // ReSharper disable once CppRedundantBooleanExpressionArgument
-        // ReSharper disable once CppUnreachableCode
-        if(is_distributed() && comm_size > 1 && 0 == comm_rank) D->insert(std::async(std::launch::async, &Recorder::combine, (recorder_name << ".h5").str()));
+        D->insert(std::async(std::launch::async, &Recorder::combine, (recorder_name << ".h5").str()));
     }
     else
 #endif

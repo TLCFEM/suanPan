@@ -63,7 +63,7 @@ protected:
      * from the first file name. All source files are removed after a successful
      * combination.
      */
-    static void combine(std::string&&);
+    void combine(std::string&&) const;
 
     /**
      * \brief Whether the recorder output is distributed across ranks.
