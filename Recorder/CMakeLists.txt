@@ -4,6 +4,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         ElementRecorder.cpp
         FrameRecorder.cpp
         GlobalRecorder.cpp
+        ModalRecorder.cpp
         NodeRecorder.cpp
         OutputType.cpp
         Recorder.cpp

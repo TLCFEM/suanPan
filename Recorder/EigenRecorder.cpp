@@ -54,6 +54,8 @@ void EigenRecorder::save() {
 
 #ifdef SUANPAN_HDF5
     std::ostringstream file_name;
+    // ReSharper disable once CppIfCanBeReplacedByConstexprIf
+    // ReSharper disable once CppUnreachableCode
     if(comm_size > 1) file_name << 'P' << comm_rank << '-';
     file_name << "Eigenvalue.h5";
 

@@ -17,6 +17,7 @@
 
 #include "RecorderParser.h"
 
+#include <Domain/ConditionalModifier.h>
 #include <Domain/DomainBase.h>
 #include <Recorder/Recorder>
 #include <Toolbox/utility.h>
@@ -31,6 +32,27 @@ static int process_recorder_command(const shared_ptr<DomainBase>& domain, std::i
     if(is_equal(object_type, "Eigen")) {
         if(!domain->insert(std::make_shared<EigenRecorder>(tag, use_hdf5)))
             suanpan_error("Fail to create new eigen recorder.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    if(is_equal(object_type, "Modal")) {
+        std::vector<Node::DOF> dof_pool;
+        for(const auto& token : get_remaining<std::string>(command)) {
+            const auto dof = parse_dof(token);
+            if(dof.empty()) {
+                suanpan_error("A valid dof identifier is required.\n");
+                return SUANPAN_SUCCESS;
+            }
+            dof_pool.insert(dof_pool.end(), dof.cbegin(), dof.cend());
+        }
+
+        if(dof_pool.empty()) {
+            suanpan_error("At least one dof identifier is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        if(!domain->insert(std::make_shared<ModalRecorder>(tag, std::move(dof_pool), use_hdf5)))
+            suanpan_error("Fail to create new modal recorder.\n");
         return SUANPAN_SUCCESS;
     }
 

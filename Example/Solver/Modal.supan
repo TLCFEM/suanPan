@@ -1,0 +1,43 @@
+# A TEST MODEL FOR THE MODAL RECORDER
+
+node 1 0 0
+node 2 1 0
+node 3 2 0
+
+material Elastic1D 1 1 0
+
+element Spring01 1 1 2 1
+element Spring01 2 2 3 1
+
+mass 3 2 1 1
+mass 4 3 1 1
+
+fix 1 E 1
+fix 2 U2 1 2 3
+
+recorder 1 hdf5 Modal U1 U2 U3 UR1 UR2 UR3
+
+step frequency 1 2
+set band_mat 0
+
+analyze
+
+# Eigenvalues:
+# 0.3820
+# 2.6180
+# Frequencies (Hz):
+# 0.0984
+# 0.2575
+# Modal participation factors in the U1 direction:
+# 1.3764
+# 0.3249
+# Effective modal masses in the U1 direction:
+# 1.8944
+# 0.1056
+peek eigenvalue
+
+peek recorder 1
+
+save recorder 1
+
+exit
