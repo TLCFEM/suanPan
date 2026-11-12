@@ -564,6 +564,12 @@ int CDPM2::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate + solve_opts::no_approx)) return SUANPAN_FAIL;
 
+        // the hardening variable can be extremely sensitive to the plastic multiplier when the
+        // ductility measure is small; an unrestricted Newton step may overshoot it by several
+        // orders of magnitude and leave the basin of attraction of the return mapping, hence the
+        // increment is capped by max(1, kp) which allows at most doubling per iteration
+        if(const auto kp_limit = std::max(1., kp); std::fabs(incre(3)) > kp_limit) incre(3) = std::copysign(kp_limit, incre(3));
+
         const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local plasticity iteration error: {:.5E}.\n", error);
