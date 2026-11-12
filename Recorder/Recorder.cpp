@@ -18,61 +18,9 @@
 #include "Recorder.h"
 
 #include <Domain/DomainBase.h>
+#include <Toolbox/HDF5Wrapper.h>
 
 extern fs::path SUANPAN_OUTPUT;
-
-#ifdef SUANPAN_HDF5
-#include <hdf5.h>
-#include <hdf5_hl.h>
-
-namespace {
-    std::string join_hdf5_path(const std::string& parent, const std::string& name) {
-        if(parent.empty() || "/" == parent) return "/" + name;
-        return parent + "/" + name;
-    }
-
-    std::vector<std::string> list_hdf5_links(const hid_t file_id, const std::string& group_path) {
-        std::vector<std::string> names;
-
-        const auto group_id = H5Gopen2(file_id, group_path.c_str(), H5P_DEFAULT);
-        if(group_id < 0) return names;
-
-        H5G_info_t info;
-        if(H5Gget_info(group_id, &info) >= 0)
-            for(hsize_t I{0}; I < info.nlinks; ++I) {
-                const auto length = H5Lget_name_by_idx(group_id, ".", H5_INDEX_NAME, H5_ITER_INC, I, nullptr, 0, H5P_DEFAULT);
-                if(length < 0) continue;
-
-                std::vector<char> buffer(static_cast<size_t>(length) + 1, '\0');
-                if(H5Lget_name_by_idx(group_id, ".", H5_INDEX_NAME, H5_ITER_INC, I, buffer.data(), buffer.size(), H5P_DEFAULT) >= 0)
-                    names.emplace_back(buffer.data(), static_cast<size_t>(length));
-            }
-
-        H5Gclose(group_id);
-
-        return names;
-    }
-
-    void merge_hdf5_group(const hid_t source_id, const std::string& source_path, const hid_t target_id, const std::string& target_path) {
-        for(const auto& name : list_hdf5_links(source_id, source_path)) {
-            const auto source_child = join_hdf5_path(source_path, name);
-            const auto target_child = join_hdf5_path(target_path, name);
-
-            if(H5Lexists(target_id, target_child.c_str(), H5P_DEFAULT) <= 0) {
-                H5Ocopy(source_id, source_child.c_str(), target_id, target_child.c_str(), H5P_DEFAULT, H5P_DEFAULT);
-                continue;
-            }
-
-            // both objects exist, merge groups recursively and keep the existing dataset otherwise
-            const auto target_group = H5Gopen2(target_id, target_child.c_str(), H5P_DEFAULT);
-            if(target_group < 0) continue;
-
-            H5Gclose(target_group);
-            merge_hdf5_group(source_id, source_child, target_id, target_child);
-        }
-    }
-} // namespace
-#endif
 
 auto Recorder::normalise_size(std::vector<std::vector<vec>>& container) {
     uword cell_size{0}, inner_size{0};
@@ -125,28 +73,22 @@ void Recorder::combine(const std::string_view recorder_name) const {
 
     const auto target_path = SUANPAN_OUTPUT / recorder_name;
 
-    const auto target_id = H5Fcreate(target_path.generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-    if(target_id < 0) {
+    hdf5::File target(target_path, hdf5::File::Mode::Truncate);
+    if(!target) {
         suanpan_warning("Failed to create combined HDF5 file {}.\n", recorder_name);
         return;
     }
 
     bool success = true;
 
-    for(const auto& file_path : file_paths) {
-        const auto source_id = H5Fopen(file_path.generic_string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-        if(source_id < 0) {
+    for(const auto& file_path : file_paths)
+        if(!target.merge(hdf5::File(file_path, hdf5::File::Mode::ReadOnly))) {
             suanpan_warning("Failed to open HDF5 file {} for combination.\n", file_path.generic_string());
             success = false;
             continue;
         }
 
-        merge_hdf5_group(source_id, "/", target_id, "/");
-
-        H5Fclose(source_id);
-    }
-
-    H5Fclose(target_id);
+    target.close();
 
     if(!success) {
         std::error_code error;
@@ -215,12 +157,9 @@ void Recorder::save(const shared_ptr<DomainBase>& D) {
     if(use_hdf5) {
         file_name << ".h5";
 
-        const auto file_id = H5Fcreate((SUANPAN_OUTPUT / file_name.str()).generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+        hdf5::File file(SUANPAN_OUTPUT / file_name.str(), hdf5::File::Mode::Truncate);
 
-        std::string group_name = "/";
-        group_name += origin_name;
-
-        const auto group_id = H5Gcreate(file_id, group_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        auto group = file.create_group('/' + origin_name);
 
         for(auto& [tag, object_data] : data_pool) {
             if(object_data.empty()) continue;
@@ -238,16 +177,14 @@ void Recorder::save(const shared_ptr<DomainBase>& D) {
                 }
             }
 
-            hsize_t dimension[2]{data_to_write.n_cols, data_to_write.n_rows};
-
             std::ostringstream dataset_name;
             dataset_name << origin_name.c_str() << tag;
 
-            H5LTmake_dataset(group_id, dataset_name.str().c_str(), 2, dimension, H5T_NATIVE_DOUBLE, data_to_write.mem);
+            group.create_dataset(dataset_name.str(), data_to_write.mem, {static_cast<hsize_t>(data_to_write.n_cols), static_cast<hsize_t>(data_to_write.n_rows)});
         }
 
-        H5Gclose(group_id);
-        H5Fclose(file_id);
+        group.close();
+        file.close();
 
         recorder_name << ".h5";
         D->insert(std::async(std::launch::async, &Recorder::combine, this, recorder_name.str()));

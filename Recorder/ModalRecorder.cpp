@@ -20,11 +20,8 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
+#include <Toolbox/HDF5Wrapper.h>
 #include <magic_enum/magic_enum.hpp>
-#ifdef SUANPAN_HDF5
-#include <hdf5.h>
-#include <hdf5_hl.h>
-#endif
 
 extern fs::path SUANPAN_OUTPUT;
 
@@ -111,35 +108,24 @@ void ModalRecorder::save(const shared_ptr<DomainBase>&) {
     if(comm_size > 1) file_name << 'P' << comm_rank << '-';
     file_name << 'R' << get_tag() << "-Modal.h5";
 
-    const auto file_id = H5Fcreate((SUANPAN_OUTPUT / file_name.str()).generic_string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    hdf5::File file(SUANPAN_OUTPUT / file_name.str(), hdf5::File::Mode::Truncate);
 
-    hsize_t dimension[2]{frequency.n_elem, 1};
-    H5LTmake_dataset(file_id, "Frequency", 2, dimension, H5T_NATIVE_DOUBLE, frequency.mem);
+    file.create_dataset("Frequency", frequency.mem, {static_cast<hsize_t>(frequency.n_elem), 1});
 
     for(uword I{0}; I < static_cast<uword>(directions.size()); ++I) {
-        const auto group_id = H5Gcreate(file_id, magic_enum::enum_name(directions[I]).data(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        auto group = file.create_group(magic_enum::enum_name(directions[I]).data());
 
-        dimension[0] = participation_factor.n_rows;
-        H5LTmake_dataset(group_id, "ParticipationFactor", 2, dimension, H5T_NATIVE_DOUBLE, participation_factor.colptr(I));
-        H5LTmake_dataset(group_id, "EffectiveMass", 2, dimension, H5T_NATIVE_DOUBLE, effective_mass.colptr(I));
-
-        H5Gclose(group_id);
+        const auto rows = static_cast<hsize_t>(participation_factor.n_rows);
+        group.create_dataset("ParticipationFactor", participation_factor.colptr(I), {rows, 1});
+        group.create_dataset("EffectiveMass", effective_mass.colptr(I), {rows, 1});
     }
 
     for(uword I{0}; I < frequency.n_elem; ++I) {
-        const auto group_id = H5Gcreate(file_id, ("Mode " + std::to_string(I + 1)).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        auto group = file.create_group("Mode " + std::to_string(I + 1));
 
-        for(const auto& [tag, shape] : node_shape) {
-            dimension[0] = shape.n_rows;
-            dimension[1] = 1;
-
-            H5LTmake_dataset(group_id, ("N" + std::to_string(tag)).c_str(), 2, dimension, H5T_NATIVE_DOUBLE, shape.colptr(I));
-        }
-
-        H5Gclose(group_id);
+        for(const auto& [tag, shape] : node_shape)
+            group.create_dataset("N" + std::to_string(tag), shape.colptr(I), {static_cast<hsize_t>(shape.n_rows), 1});
     }
-
-    H5Fclose(file_id);
 #endif
 }
 

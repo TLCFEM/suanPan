@@ -30,10 +30,11 @@
 #define FRAMERECORDER_H
 
 #include <Recorder/Recorder.h>
+#include <Toolbox/HDF5Wrapper.h>
 
 class FrameRecorder final : public Recorder {
 #ifdef SUANPAN_HDF5
-    hid_t file_id = 0;
+    hdf5::File file;
 #endif
 
     void record_impl(const shared_ptr<DomainBase>&) override;
@@ -44,11 +45,7 @@ public:
         OutputType, // recorder type
         unsigned    // interval
     );
-    FrameRecorder(const FrameRecorder&) = delete;
-    FrameRecorder(FrameRecorder&&) = delete;
-    FrameRecorder& operator=(const FrameRecorder&) = delete;
-    FrameRecorder& operator=(FrameRecorder&&) = delete;
-    ~FrameRecorder() override;
+    ~FrameRecorder() override = default;
 
     void save(const shared_ptr<DomainBase>&) override;
 

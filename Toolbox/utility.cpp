@@ -104,7 +104,9 @@ bool is_equal(const char A, const char B) { return tolower(static_cast<int>(A)) 
 
 bool is_equal(const int A, const char B) { return tolower(A) == tolower(static_cast<int>(B)); }
 
-bool is_equal(const std::string_view A, const std::string_view B) { return _strcmpi(A.data(), B.data()) == 0; }
+bool is_equal(const std::string_view A, const std::string_view B) {
+    return A.size() == B.size() && std::ranges::equal(A, B, [](const char L, const char R) { return std::tolower(static_cast<unsigned char>(L)) == std::tolower(static_cast<unsigned char>(R)); });
+}
 
 bool if_startswith(const std::string_view A, const std::string_view B) {
     if(A.size() < B.size()) return false;
@@ -123,6 +125,6 @@ bool is_true(const std::string_view S) { return is_equal_any(S, "On", "True", "T
 
 bool is_false(const std::string_view S) { return is_equal_any(S, "Off", "False", "F", "0", "No", "N"); }
 
-bool is_integer(const std::string& S) { return !S.empty() && std::all_of(S.cbegin(), S.cend(), isdigit); }
+bool is_integer(const std::string& S) { return !S.empty() && std::ranges::all_of(S, isdigit); }
 
 double perturb(const double input, const double fraction) { return input * (1. + randu<double>() * fraction); }

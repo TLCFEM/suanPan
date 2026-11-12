@@ -19,14 +19,8 @@
 
 #include "HDF.h"
 
-#include <hdf5.h>
-
-// #include <hdf5_hl.h>
-
 HDF::HDF(const char* N)
-    : file_id(H5Fcreate(N, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) {}
-
-HDF::~HDF() { H5Fclose(file_id); }
+    : file(std::string{N}, hdf5::File::Mode::Truncate) {}
 
 int HDF::save() { return 0; }
 
