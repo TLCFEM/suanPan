@@ -435,6 +435,8 @@
     <ClCompile Include="..\..\..\Recorder\ElementRecorder.cpp" />
     <ClCompile Include="..\..\..\Recorder\FrameRecorder.cpp" />
     <ClCompile Include="..\..\..\Recorder\GlobalRecorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\ModalForceRecorder.cpp" />
+    <ClCompile Include="..\..\..\Recorder\ModalRecorder.cpp" />
     <ClCompile Include="..\..\..\Recorder\NodeRecorder.cpp" />
     <ClCompile Include="..\..\..\Recorder\OutputType.cpp" />
     <ClCompile Include="..\..\..\Recorder\Recorder.cpp" />
@@ -530,6 +532,7 @@
     <ClCompile Include="..\..\..\Toolbox\command.cpp" />
     <ClCompile Include="..\..\..\Toolbox\Expression.cpp" />
     <ClCompile Include="..\..\..\Toolbox\ExpressionParser.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\HDF5Wrapper.cpp" />
     <ClCompile Include="..\..\..\Toolbox\IntegrationPlan.cpp" />
     <ClCompile Include="..\..\..\Toolbox\misc.cpp" />
     <ClCompile Include="..\..\..\Toolbox\resampling.cpp" />
@@ -909,6 +912,8 @@
     <ClInclude Include="..\..\..\Recorder\ElementRecorder.h" />
     <ClInclude Include="..\..\..\Recorder\FrameRecorder.h" />
     <ClInclude Include="..\..\..\Recorder\GlobalRecorder.h" />
+    <ClInclude Include="..\..\..\Recorder\ModalForceRecorder.h" />
+    <ClInclude Include="..\..\..\Recorder\ModalRecorder.h" />
     <ClInclude Include="..\..\..\Recorder\NodeRecorder.h" />
     <ClInclude Include="..\..\..\Recorder\OutputType.h" />
     <ClInclude Include="..\..\..\Recorder\Recorder.h" />
@@ -1005,6 +1010,7 @@
     <ClInclude Include="..\..\..\Toolbox\container.h" />
     <ClInclude Include="..\..\..\Toolbox\Expression.h" />
     <ClInclude Include="..\..\..\Toolbox\ExpressionParser.h" />
+    <ClInclude Include="..\..\..\Toolbox\HDF5Wrapper.h" />
     <ClInclude Include="..\..\..\Toolbox\LBFGS.hpp" />
     <ClInclude Include="..\..\..\Toolbox\IntegrationPlan.h" />
     <ClInclude Include="..\..\..\Toolbox\misc.h" />

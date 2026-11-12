@@ -1600,6 +1600,15 @@
     <ClCompile Include="..\..\..\UnitTest\TestUtility.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\HDF5Wrapper.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\ModalForceRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\ModalRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\Criterion\Criterion.h">
@@ -2976,6 +2985,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Material\Material3D\Nonlocal\NonlocalBilinearJ2.h">
       <Filter>Material\Material3D\Nonlocal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\HDF5Wrapper.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\ModalForceRecorder.h">
+      <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recorder\ModalRecorder.h">
+      <Filter>Recorder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

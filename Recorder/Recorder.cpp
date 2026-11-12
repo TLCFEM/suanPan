@@ -101,6 +101,8 @@ void Recorder::combine(const std::string_view recorder_name) const {
         fs::remove(file_path, error);
         if(error) suanpan_warning("Failed to remove distributed HDF5 file {}: {}.\n", file_path.generic_string(), error.message());
     }
+#else
+    (void)recorder_name;
 #endif
 }
 
@@ -192,6 +194,7 @@ void Recorder::save(const shared_ptr<DomainBase>& D) {
     else
 #endif
     {
+        (void)D;
         for(auto& [tag, object_data] : data_pool) {
             if(object_data.empty()) continue;
 
