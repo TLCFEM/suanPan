@@ -104,7 +104,9 @@ bool is_equal(const char A, const char B) { return tolower(static_cast<int>(A)) 
 
 bool is_equal(const int A, const char B) { return tolower(A) == tolower(static_cast<int>(B)); }
 
-bool is_equal(const std::string_view A, const std::string_view B) { return _strcmpi(A.data(), B.data()) == 0; }
+bool is_equal(const std::string_view A, const std::string_view B) {
+    return A.size() == B.size() && std::ranges::equal(A, B, [](const char L, const char R) { return std::tolower(static_cast<unsigned char>(L)) == std::tolower(static_cast<unsigned char>(R)); });
+}
 
 bool if_startswith(const std::string_view A, const std::string_view B) {
     if(A.size() < B.size()) return false;
