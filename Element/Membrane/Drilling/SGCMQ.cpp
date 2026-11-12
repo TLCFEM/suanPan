@@ -155,7 +155,8 @@ void SGCMQ::form_body_force(const mat& diff_coor) {
         const mat n_drilling = I.factor * form_drilling_n(I.coor, diff_coor);
         for(auto J = 0u, L = 0u; J < m_node; ++J, L += m_dof) {
             for(uword K{0}; K < uword{2}; ++K) body_force(L + K, K) += n_translation(J);
-            body_force(L + 2, 2) += n_drilling(J);
+            body_force(L + 2, 0) += n_drilling(0, L + 2);
+            body_force(L + 2, 1) += n_drilling(1, L + 2);
         }
     }
 }
