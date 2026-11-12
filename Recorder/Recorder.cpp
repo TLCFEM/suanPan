@@ -84,16 +84,12 @@ void Recorder::combine(const std::string_view recorder_name) const {
 
     bool success = true;
 
-    for(const auto& file_path : file_paths) {
-        hdf5::File source(file_path, hdf5::File::Mode::ReadOnly);
-        if(!source) {
+    for(const auto& file_path : file_paths)
+        if(!target.merge(hdf5::File(file_path, hdf5::File::Mode::ReadOnly))) {
             suanpan_warning("Failed to open HDF5 file {} for combination.\n", file_path.generic_string());
             success = false;
             continue;
         }
-
-        target.merge(source);
-    }
 
     target.close();
 
@@ -166,10 +162,7 @@ void Recorder::save(const shared_ptr<DomainBase>& D) {
 
         hdf5::File file(SUANPAN_OUTPUT / file_name.str(), hdf5::File::Mode::Truncate);
 
-        std::string group_name = "/";
-        group_name += origin_name;
-
-        auto group = file.create_group(group_name);
+        auto group = file.create_group('/' + origin_name);
 
         for(auto& [tag, object_data] : data_pool) {
             if(object_data.empty()) continue;
