@@ -20,10 +20,8 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
-#include <magic_enum/magic_enum.hpp>
-#ifdef SUANPAN_HDF5
 #include <Toolbox/HDF5Wrapper.h>
-#endif
+#include <magic_enum/magic_enum.hpp>
 
 extern fs::path SUANPAN_OUTPUT;
 

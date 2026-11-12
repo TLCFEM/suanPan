@@ -18,12 +18,10 @@
 #include "Recorder.h"
 
 #include <Domain/DomainBase.h>
+#include <Toolbox/HDF5Wrapper.h>
+
 
 extern fs::path SUANPAN_OUTPUT;
-
-#ifdef SUANPAN_HDF5
-#include <Toolbox/HDF5Wrapper.h>
-#endif
 
 auto Recorder::normalise_size(std::vector<std::vector<vec>>& container) {
     uword cell_size{0}, inner_size{0};

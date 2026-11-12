@@ -30,10 +30,7 @@
 #define FRAMERECORDER_H
 
 #include <Recorder/Recorder.h>
-
-#ifdef SUANPAN_HDF5
 #include <Toolbox/HDF5Wrapper.h>
-#endif
 
 class FrameRecorder final : public Recorder {
 #ifdef SUANPAN_HDF5

@@ -21,10 +21,6 @@
 #include <Domain/Factory.hpp>
 #include <Element/Element.h>
 
-#ifdef SUANPAN_HDF5
-#include <Toolbox/HDF5Wrapper.h>
-#endif
-
 extern fs::path SUANPAN_OUTPUT;
 
 void FrameRecorder::record_impl([[maybe_unused]] const shared_ptr<DomainBase>& D) {

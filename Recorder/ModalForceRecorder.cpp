@@ -21,9 +21,7 @@
 #include <Domain/Factory.hpp>
 #include <Domain/Node.h>
 #include <Element/Element.h>
-#ifdef SUANPAN_HDF5
 #include <Toolbox/HDF5Wrapper.h>
-#endif
 
 extern fs::path SUANPAN_OUTPUT;
 
