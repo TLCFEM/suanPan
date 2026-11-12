@@ -53,8 +53,7 @@ void NodeRecorder::initialize(const shared_ptr<DomainBase>& D) {
     std::vector<uword> pool;
     pool.reserve(object_tag.n_elem);
     for(const auto I : object_tag)
-        if(!D->find<Node>(I) || !D->get<Node>(I)->is_active())
-            suanpan_warning("Node {} is not available/active, removed from recorder {}.\n", I, get_tag());
+        if(!D->find<Node>(I) || !D->get<Node>(I)->is_active()) suanpan_warning("Node {} is not available/active, removed from recorder {}.\n", I, get_tag());
         else pool.emplace_back(I);
 
     object_tag = pool;

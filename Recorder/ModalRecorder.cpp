@@ -123,8 +123,7 @@ void ModalRecorder::save(const shared_ptr<DomainBase>&) {
     for(uword I{0}; I < frequency.n_elem; ++I) {
         auto group = file.create_group("Mode " + std::to_string(I + 1));
 
-        for(const auto& [tag, shape] : node_shape)
-            group.create_dataset("N" + std::to_string(tag), shape.colptr(I), {static_cast<hsize_t>(shape.n_rows), 1});
+        for(const auto& [tag, shape] : node_shape) group.create_dataset("N" + std::to_string(tag), shape.colptr(I), {static_cast<hsize_t>(shape.n_rows), 1});
     }
 #endif
 }

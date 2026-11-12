@@ -38,8 +38,7 @@ void ElementRecorder::initialize(const shared_ptr<DomainBase>& D) {
     std::vector<uword> pool;
     pool.reserve(object_tag.n_elem);
     for(const auto I : object_tag)
-        if(auto& t_element = D->get<Element>(I); !t_element || !t_element->is_active())
-            suanpan_warning("Element {} is not available/active, removed from recorder {}.\n", I, get_tag());
+        if(auto& t_element = D->get<Element>(I); !t_element || !t_element->is_active()) suanpan_warning("Element {} is not available/active, removed from recorder {}.\n", I, get_tag());
         else if(t_element->is_local) pool.emplace_back(I);
 
     object_tag = pool;
