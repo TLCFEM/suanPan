@@ -125,6 +125,6 @@ bool is_true(const std::string_view S) { return is_equal_any(S, "On", "True", "T
 
 bool is_false(const std::string_view S) { return is_equal_any(S, "Off", "False", "F", "0", "No", "N"); }
 
-bool is_integer(const std::string& S) { return !S.empty() && std::all_of(S.cbegin(), S.cend(), isdigit); }
+bool is_integer(const std::string& S) { return !S.empty() && std::ranges::all_of(S, isdigit); }
 
 double perturb(const double input, const double fraction) { return input * (1. + randu<double>() * fraction); }
