@@ -181,7 +181,7 @@ int YLD0418P::with_kinematic() {
         if(1u == counter && residual(sa) < 0.) return SUANPAN_SUCCESS;
 
         const auto pk = -4. * exponent * std::pow(k, exponent - 1.) * dk;
-        const vec6 en = initial_stiffness * n;
+        const vec6 en = dev_ini_stiffness * n;
         const rowvec6 scaled_u = (u % tensor::strain::norm_weight).t();
 
         residual(sb) = dev_s + en * gamma - trial_dev_s;
@@ -205,7 +205,7 @@ int YLD0418P::with_kinematic() {
         if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) {
             plastic_strain += n * gamma;
 
-            trial_stress -= en * gamma;
+            trial_stress -= initial_stiffness * n * gamma;
 
             mat::fixed<13, 6> right(fill::zeros);
             right.rows(sb) = dev_ini_stiffness;
@@ -259,7 +259,7 @@ int YLD0418P::without_kinematic() {
         if(1u == counter && residual(sa) < 0.) return SUANPAN_SUCCESS;
 
         const auto pk = -4. * exponent * std::pow(k, exponent - 1.) * dk;
-        const vec6 en = initial_stiffness * n;
+        const vec6 en = dev_ini_stiffness * n;
 
         residual(sb) = dev_s + en * gamma - trial_dev_s;
 
@@ -276,7 +276,7 @@ int YLD0418P::without_kinematic() {
         if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) {
             plastic_strain += n * gamma;
 
-            trial_stress -= en * gamma;
+            trial_stress -= initial_stiffness * n * gamma;
 
             mat::fixed<7, 6> right(fill::zeros);
             right.rows(sb) = dev_ini_stiffness;

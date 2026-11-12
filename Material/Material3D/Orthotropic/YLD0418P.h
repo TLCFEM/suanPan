@@ -54,7 +54,7 @@ struct DataYLD0418P {
 class YLD0418P final : protected DataYLD0418P, public Material3D {
     static constexpr double two_third = 2. / 3.;
     static const double root_two_third;
-    static constexpr unsigned max_iteration = 20u;
+    static constexpr unsigned max_iteration = 30u;
     static constexpr uword sa{0};
     static const span sb, sc;
     static const mat unit_dev_tensor;
