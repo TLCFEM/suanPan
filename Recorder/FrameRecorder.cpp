@@ -30,7 +30,7 @@ extern fs::path SUANPAN_OUTPUT;
 void FrameRecorder::record_impl([[maybe_unused]] const shared_ptr<DomainBase>& D) {
 #ifdef SUANPAN_HDF5
     std::ostringstream group_name;
-    group_name << "/" << D->get_factory()->get_current_time();
+    group_name << '/' << D->get_factory()->get_current_time();
 
     auto group = file.create_group(group_name.str());
 

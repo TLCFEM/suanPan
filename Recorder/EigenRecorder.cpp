@@ -66,7 +66,7 @@ void EigenRecorder::save(const shared_ptr<DomainBase>&) {
         auto group = file.create_group("Eigenvalue " + std::to_string(J));
 
         for(const auto& [e_val, e_vec] : eigen_pool[I]) {
-            const auto dataset_name = "N" + std::to_string(e_val);
+            const auto dataset_name = 'N' + std::to_string(e_val);
             group.create_dataset(dataset_name, e_vec.mem, {static_cast<hsize_t>(e_vec.n_cols), static_cast<hsize_t>(e_vec.n_rows)});
         }
     }

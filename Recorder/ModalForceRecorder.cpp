@@ -104,11 +104,11 @@ void ModalForceRecorder::save(const shared_ptr<DomainBase>&) {
 
         auto nodes = mode_group.create_group("Nodes");
         for(const auto& [tag, nodal_force] : node_force)
-            nodes.create_dataset("N" + std::to_string(tag), nodal_force.colptr(I), {static_cast<hsize_t>(nodal_force.n_rows), 1});
+            nodes.create_dataset('N' + std::to_string(tag), nodal_force.colptr(I), {static_cast<hsize_t>(nodal_force.n_rows), 1});
 
         auto elements = mode_group.create_group("Elements");
         for(const auto& [tag, elemental_force] : element_force)
-            elements.create_dataset("E" + std::to_string(tag), elemental_force.colptr(I), {static_cast<hsize_t>(elemental_force.n_rows), 1});
+            elements.create_dataset('E' + std::to_string(tag), elemental_force.colptr(I), {static_cast<hsize_t>(elemental_force.n_rows), 1});
     }
 #endif
 }
