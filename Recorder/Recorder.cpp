@@ -20,7 +20,6 @@
 #include <Domain/DomainBase.h>
 #include <Toolbox/HDF5Wrapper.h>
 
-
 extern fs::path SUANPAN_OUTPUT;
 
 auto Recorder::normalise_size(std::vector<std::vector<vec>>& container) {
