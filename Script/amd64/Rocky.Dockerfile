@@ -14,7 +14,8 @@ FROM almalinux:10
 
 COPY --from=build /suanPan*.rpm /
 
-RUN dnf install ./suanPan*.rpm -y && rm ./suanPan*.rpm
+RUN dnf install ./suanPan*.rpm -y && \
+    dnf clean all && rm ./suanPan*.rpm
 
 RUN ln -s /usr/bin/suanPan /usr/bin/suanpan
 RUN ln -s /usr/bin/suanPan /usr/bin/sp

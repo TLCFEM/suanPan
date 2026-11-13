@@ -39,7 +39,7 @@ FROM debian:12
 COPY --from=build /suanPan*.deb /
 COPY --from=build /suanPan-debian12.tar.gz /
 
-RUN apt-get update -y && apt-get install -y --no-install-recommends ./suanPan*.deb && rm ./suanPan*.deb && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y --no-install-recommends coreutils ./suanPan*.deb && rm ./suanPan*.deb && rm -rf /var/lib/apt/lists/*
 
 RUN ln -s /usr/bin/suanPan /usr/bin/suanpan
 RUN ln -s /usr/bin/suanPan /usr/bin/sp
