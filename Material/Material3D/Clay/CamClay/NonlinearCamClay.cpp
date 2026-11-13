@@ -107,7 +107,7 @@ int NonlinearCamClay::update_trial_status(const vec& t_strain) {
             return SUANPAN_SUCCESS;
         }
 
-        gamma -= incre(0);
+        gamma = std::max(0., gamma - incre(0));
         alpha -= incre(1);
     }
 }
