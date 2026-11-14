@@ -53,6 +53,9 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     const auto incre_ev = tensor::trace<3>(incre_strain);
     const vec incre_ed = unit_dev_tensor * incre_strain;
 
+    // lower bound on the (negative) pressure, also used to regularise the state parameter
+    const auto p_reg = std::min(-datum::eps, gr * gr * pc);
+
     // assume no plasticity
     // compute trial stress
 
@@ -73,7 +76,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     auto ref_error = 1.;
 
     while(true) {
-        if(max_iteration == ++counter) {
+        if(++counter > max_iteration) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
@@ -157,10 +160,13 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     auto update_ini_alpha = false;
 
     while(true) {
-        if(max_iteration == ++counter) {
+        if(++counter > max_iteration) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
+
+        const auto bounding_p = p > p_reg;
+        const auto p_bounded = std::min(p, p_reg);
 
         // shear modulus
 
@@ -178,9 +184,9 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         // state parameter
 
-        tmp_term = lc * std::pow(std::max(datum::eps, p / pc), xi);
+        tmp_term = lc * std::pow(p_bounded / pc, xi);
         const auto psi = void_ratio - e0 + tmp_term;
-        const auto ppsipp = xi * tmp_term / p;
+        const auto ppsipp = bounding_p ? 0. : xi * tmp_term / p_bounded;
 
         // surface
 
@@ -240,10 +246,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         // hardening
 
-        tmp_term = shear_modulus * h0 * std::sqrt(std::max(datum::eps, pc / p));
+        tmp_term = shear_modulus * h0 * std::sqrt(pc / p_bounded);
         const auto b0 = tmp_term * (1. - ch * void_ratio);
         const auto pb0pe = -ch * tmp_term * dede;
-        const auto pb0pp = -.5 * b0 / p;
+        const auto pb0pp = bounding_p ? 0. : -.5 * b0 / p_bounded;
 
         update_ini_alpha = false;
         vec diff_alpha = (ini_alpha - alpha) % tensor::stress::norm_weight;
@@ -258,7 +264,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
         h = tmp_term * b0;
 
         phpe = tmp_term * pb0pe;
-        const auto phpp = tmp_term * pb0pp;
+        const auto phpp = h * h1 * dot(diff_alpha, np) + tmp_term * pb0pp;
         const rowvec phps = h * h1 * diff_alpha.t() * ns;
         const rowvec phpa = p * phps - h * h1 * unit_n.t();
 
