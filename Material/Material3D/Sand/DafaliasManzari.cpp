@@ -73,7 +73,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     auto ref_error = 1.;
 
     while(true) {
-        if(max_iteration == ++counter) {
+        if(++counter > max_iteration) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
@@ -99,10 +99,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
-        const auto error = suanpan::inf_norm(residual);
-        if(1u == counter) ref_error = error;
+        const auto error = suanpan::inf_norm(incre);
+        if(1u == counter) ref_error = std::max(1., error);
         suanpan_debug("Local elastic iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) break;
+        if(error < tolerance || ((error < tolerance * ref_error || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) break;
 
         p -= incre(sa);
         s -= incre(sb);
@@ -135,6 +135,9 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
     // yield function violated
 
+    // lower bound on the (negative) pressure, also used to regularise the state parameter
+    const auto p_reg = std::min(-datum::eps, gr * gr * pc);
+
     const vec current_z(&current_history(6), 6);
 
     trial_history = current_history;
@@ -157,10 +160,13 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     auto update_ini_alpha = false;
 
     while(true) {
-        if(max_iteration == ++counter) {
+        if(++counter > max_iteration) {
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
+
+        const auto bounding_p = p > p_reg;
+        const auto p_bounded = std::min(p, p_reg);
 
         // shear modulus
 
@@ -178,9 +184,9 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         // state parameter
 
-        tmp_term = lc * std::pow(std::max(datum::eps, p / pc), xi);
+        tmp_term = lc * std::pow(p_bounded / pc, xi);
         const auto psi = void_ratio - e0 + tmp_term;
-        const auto ppsipp = xi * tmp_term / p;
+        const auto ppsipp = bounding_p ? 0. : xi * tmp_term / p_bounded;
 
         // surface
 
@@ -240,10 +246,10 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
         // hardening
 
-        tmp_term = shear_modulus * h0 * std::sqrt(std::max(datum::eps, pc / p));
+        tmp_term = shear_modulus * h0 * std::sqrt(pc / p_bounded);
         const auto b0 = tmp_term * (1. - ch * void_ratio);
         const auto pb0pe = -ch * tmp_term * dede;
-        const auto pb0pp = -.5 * b0 / p;
+        const auto pb0pp = bounding_p ? 0. : -.5 * b0 / p_bounded;
 
         update_ini_alpha = false;
         vec diff_alpha = (ini_alpha - alpha) % tensor::stress::norm_weight;
@@ -258,7 +264,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
         h = tmp_term * b0;
 
         phpe = tmp_term * pb0pe;
-        const auto phpp = tmp_term * pb0pp;
+        const auto phpp = h * h1 * dot(diff_alpha, np) + tmp_term * pb0pp;
         const rowvec phps = h * h1 * diff_alpha.t() * ns;
         const rowvec phpa = p * phps - h * h1 * unit_n.t();
 
@@ -316,12 +322,12 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
             jacobian(sm, sl).zeros();
         }
 
-        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
+        if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
-        const auto error = suanpan::inf_norm(residual);
-        if(1u == counter) ref_error = error;
+        const auto error = suanpan::inf_norm(incre);
+        if(1u == counter) ref_error = std::max(1., error);
         suanpan_debug("Local plastic iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) break;
+        if(error < tolerance || ((error < tolerance * ref_error || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) break;
 
         gamma -= incre(si);
         p -= incre(sj);
@@ -342,7 +348,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     if(d > 0.) left.rows(sm) = -cz * gamma * pdpe * zz * tensor::unit_tensor2.t();
     else left.rows(sm).zeros();
 
-    if(!solve(right, jacobian, left)) return SUANPAN_FAIL;
+    if(!solve(right, jacobian, left, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
     trial_stiffness = right.rows(sk);
     trial_stiffness.row(0) += right.row(sj);
