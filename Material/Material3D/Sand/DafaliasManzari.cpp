@@ -53,9 +53,6 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     const auto incre_ev = tensor::trace<3>(incre_strain);
     const vec incre_ed = unit_dev_tensor * incre_strain;
 
-    // lower bound on the (negative) pressure, also used to regularise the state parameter
-    const auto p_reg = std::min(-datum::eps, gr * gr * pc);
-
     // assume no plasticity
     // compute trial stress
 
@@ -137,6 +134,9 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     }
 
     // yield function violated
+
+    // lower bound on the (negative) pressure, also used to regularise the state parameter
+    const auto p_reg = std::min(-datum::eps, gr * gr * pc);
 
     const vec current_z(&current_history(6), 6);
 
