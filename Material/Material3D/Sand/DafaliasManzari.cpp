@@ -322,7 +322,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
             jacobian(sm, sl).zeros();
         }
 
-        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
+        if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
         const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = std::max(1., error);
@@ -348,7 +348,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     if(d > 0.) left.rows(sm) = -cz * gamma * pdpe * zz * tensor::unit_tensor2.t();
     else left.rows(sm).zeros();
 
-    if(!solve(right, jacobian, left)) return SUANPAN_FAIL;
+    if(!solve(right, jacobian, left, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
     trial_stiffness = right.rows(sk);
     trial_stiffness.row(0) += right.row(sj);
