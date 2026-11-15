@@ -158,6 +158,24 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
     // yield function violated
 
+    // the elastic trial response is kept: if the local iterations stall because dilatancy drives
+    // the pressure towards tension, no admissible plastic solution exists; the model has no
+    // tensile strength, so the capped response is used instead. this band must be wider than the
+    // numerical check above, otherwise it would already have consumed these trial states
+    const auto trial_p = p;
+    const vec trial_s = s;
+    const auto tension_band = -1E-2 * std::fabs(pc);
+
+    const auto cap_tension = [&] {
+        if(trial_p <= tension_band) return false;
+
+        trial_history = current_history;
+        trial_stress = trial_s;
+        trial_stiffness = 2. * gi * unit_dev_tensor;
+
+        return true;
+    };
+
     // lower bound on the (negative) pressure, also used to regularise the state parameter
     const auto p_reg = std::min(-datum::eps, gr * gr * pc);
 
@@ -196,6 +214,8 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
     while(true) {
         if(++counter > max_iteration) {
+            if(cap_tension()) return SUANPAN_SUCCESS;
+
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
@@ -360,6 +380,8 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
         // if the previous step did not reduce the residual, restore the state and halve the step
         if(1u < counter && suanpan::inf_norm(residual) > pre_norm) {
             if(relax < 1E-4) {
+                if(cap_tension()) return SUANPAN_SUCCESS;
+
                 suanpan_error("Backtracking line search failed.\n");
                 return SUANPAN_FAIL;
             }
