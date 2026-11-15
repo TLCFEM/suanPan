@@ -12,6 +12,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         TestMatrix.cpp
         TestMode.cpp
         TestNURBS.cpp
+        TestNonlinearDruckerPrager.cpp
         TestQuaternion.cpp
         TestRootFinding.cpp
         TestSampling.cpp
