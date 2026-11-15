@@ -64,12 +64,12 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
     vec n;
     double alpha_d, alpha_b;
-    auto gamma = 0., ref_error = 1.;
+    auto gamma = 0.;
 
     auto counter = 0u;
 
     while(true) {
-        if(max_iteration == ++counter) return SUANPAN_FAIL;
+        if(++counter > max_iteration) return SUANPAN_FAIL;
 
         const vec eta = s + p * alpha;
         const auto norm_eta = tensor::stress::norm(eta);
@@ -115,9 +115,11 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
         const auto error = suanpan::inf_norm(incre);
-        if(1u == counter) ref_error = error;
+        // both the increment and the residual are checked against the current stress scale so that
+        // the tolerance remains meaningful when the stress itself is large
+        const auto error_scale = 1. + std::max(std::fabs(p), suanpan::inf_norm(s));
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) break;
+        if(error < tolerance * error_scale || (counter > 5u && suanpan::inf_norm(residual) < tolerance * error_scale)) break;
 
         gamma -= incre(sa);
         p -= incre(sb);
