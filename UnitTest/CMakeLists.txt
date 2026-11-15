@@ -16,6 +16,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         TestRootFinding.cpp
         TestSampling.cpp
         TestShape.cpp
+        TestSimpleSand.cpp
         TestSolver.cpp
         TestSorting.cpp
         TestString.cpp

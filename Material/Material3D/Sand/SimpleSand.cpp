@@ -54,8 +54,32 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
     const auto trial_s = tensor::dev(trial_stress);
     const auto trial_p = tensor::mean<3>(trial_stress);
+
+    if(trial_p > -std::fabs(pc) * tolerance) {
+        trial_stress = trial_s;
+        trial_stiffness = double_shear * unit_dev_tensor;
+
+        return SUANPAN_SUCCESS;
+    }
+
     auto s = trial_s;
     auto p = trial_p;
+
+    // bound the pressure away from zero so that the state parameter and its derivatives remain finite
+    const auto p_reg = std::min(-datum::eps, -1E-2 * std::fabs(pc));
+    const auto p_width = .1 * std::fabs(p_reg);
+
+    auto at_bound = false;
+
+    const auto tension_cap = [&] {
+        if(!at_bound && trial_p <= -5E-2 * std::fabs(pc)) return false;
+
+        trial_history = current_history;
+        trial_stress = trial_s;
+        trial_stiffness = double_shear * unit_dev_tensor;
+
+        return true;
+    };
 
     mat::fixed<14, 14> jacobian(fill::none);
     vec::fixed<14> residual(fill::none), incre(fill::none);
@@ -64,12 +88,27 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
     vec n;
     double alpha_d, alpha_b;
-    auto gamma = 0., ref_error = 1.;
+    auto gamma = 0.;
 
     auto counter = 0u;
 
+    auto relax{1.}, pre_residual_norm{0.}, pre_gamma{gamma}, pre_p{p};
+    vec pre_s, pre_alpha;
+
+    const auto progress = [&](const double scale) {
+        gamma -= scale * incre(sa);
+        p -= scale * incre(sb);
+        s -= scale * incre(sc);
+        alpha -= scale * incre(sd);
+    };
+
     while(true) {
-        if(max_iteration == ++counter) return SUANPAN_FAIL;
+        if(++counter > max_iteration) {
+            if(tension_cap()) return SUANPAN_SUCCESS;
+
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
+            return SUANPAN_FAIL;
+        }
 
         const vec eta = s + p * alpha;
         const auto norm_eta = tensor::stress::norm(eta);
@@ -79,7 +118,12 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
         if(1u == counter && residual(sa) < 0.) return SUANPAN_SUCCESS;
 
-        const auto state = state_const + lc * std::log(p / pc);
+        // smooth soft minimum of p and p_reg, the pressure is bounded for the state parameter only
+        const auto shifted = (p_reg - p) / p_width;
+        const auto soft = shifted > 0. ? 1. / (1. + std::exp(-shifted)) : std::exp(shifted) / (1. + std::exp(shifted));
+        const auto p_bounded = p_reg - p_width * (std::max(shifted, 0.) + std::log1p(std::exp(-std::fabs(shifted))));
+        const auto dlp = soft * lc / p_bounded;
+        const auto state = state_const + lc * std::log(p_bounded / pc);
         alpha_d = ac * std::exp(nd * state);
         alpha_b = ac * std::exp(-nb * state);
         const auto alpha_d_m = alpha_d - m;
@@ -97,7 +141,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         jacobian(sa, sd) = p * jacobian(sa, sc);
 
         jacobian(sb, sa) = bulk * a * (alpha_d_m - alpha_n);
-        jacobian(sb, sb) = 1. + bulk * a * gamma * (alpha_d * nd * lc / p - (dot(alpha, unit_alpha) - alpha_n * alpha_n) / norm_eta);
+        jacobian(sb, sb) = 1. + bulk * a * gamma * (alpha_d * nd * dlp - (dot(alpha, unit_alpha) - alpha_n * alpha_n) / norm_eta);
         jacobian(sb, sc) = bulk * a * gamma / norm_eta * (alpha_n * unit_n.t() - unit_alpha.t());
         jacobian(sb, sd) = p * jacobian(sb, sc) - bulk * a * gamma * unit_n.t();
 
@@ -108,21 +152,51 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         jacobian(sc, sc) += eye(6, 6);
 
         jacobian(sd, sa) = h * alpha_b_m * n - h * alpha;
-        jacobian(sd, sb) = gamma * h * alpha_b_m / norm_eta * alpha - gamma * h * (alpha_b_m * alpha_n / norm_eta + alpha_b * nb * lc / p) * n;
+        jacobian(sd, sb) = gamma * h * alpha_b_m / norm_eta * alpha - gamma * h * (alpha_b_m * alpha_n / norm_eta + alpha_b * nb * dlp) * n;
         jacobian(sd, sc) = gamma * h * alpha_b_m / norm_eta * eye(6, 6) - gamma * h * alpha_b_m / norm_eta * n * unit_n.t();
         jacobian(sd, sd) = p * jacobian(sd, sc) - (gamma * h + 1.) * eye(6, 6);
+
+        if(p > 0. && counter > 1u && tension_cap()) return SUANPAN_SUCCESS;
+
+        const auto residual_norm = suanpan::inf_norm(residual);
+
+        // if the previous step did not reduce the residual, restore the state and halve the step
+        if(1u < counter && residual_norm > pre_residual_norm) {
+            if(relax < 1E-4) {
+                if(tension_cap()) return SUANPAN_SUCCESS;
+
+                suanpan_error("Backtracking line search failed.\n");
+                return SUANPAN_FAIL;
+            }
+
+            gamma = pre_gamma;
+            p = pre_p;
+            s = pre_s;
+            alpha = pre_alpha;
+
+            progress(relax *= .5);
+
+            if(p > p_reg) at_bound = true;
+
+            continue;
+        }
 
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
         const auto error = suanpan::inf_norm(incre);
-        if(1u == counter) ref_error = error;
+        const auto error_scale = 1. + std::max(std::fabs(p), suanpan::inf_norm(s));
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) break;
+        pre_residual_norm = residual_norm;
+        if(error < tolerance * error_scale || (counter > 5u && pre_residual_norm < tolerance * error_scale)) break;
 
-        gamma -= incre(sa);
-        p -= incre(sb);
-        s -= incre(sc);
-        alpha -= incre(sd);
+        pre_gamma = gamma;
+        pre_p = p;
+        pre_s = s;
+        pre_alpha = alpha;
+
+        progress(relax = 1.);
+
+        if(p > p_reg) at_bound = true;
     }
 
     trial_stress = s + p * tensor::unit_tensor2;
@@ -144,6 +218,4 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-void SimpleSand::print() {
-    suanpan_info("A simple sand model.\n");
-}
+void SimpleSand::print() { suanpan_info("A simple sand model.\n"); }
