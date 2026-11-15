@@ -54,6 +54,17 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
     const auto trial_s = tensor::dev(trial_stress);
     const auto trial_p = tensor::mean<3>(trial_stress);
+
+    // the yield surface and the critical state are defined for p<0 only, the sand has no
+    // tensile strength; cap a non-negative trial pressure at zero and keep the purely
+    // deviatoric elastic response
+    if(trial_p > -std::fabs(pc) * tolerance) {
+        trial_stress = trial_s;
+        trial_stiffness = double_shear * unit_dev_tensor;
+
+        return SUANPAN_SUCCESS;
+    }
+
     auto s = trial_s;
     auto p = trial_p;
 
@@ -63,6 +74,21 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
     // cycle around the kink when the pressure repeatedly crosses the bound
     const auto p_reg = std::min(-datum::eps, -1E-2 * std::fabs(pc));
     const auto p_width = .1 * std::fabs(p_reg);
+
+    // if the local iterations stall because dilatancy drives the pressure towards tension, no
+    // admissible plastic solution exists; the capped response is then used, the cap is only
+    // allowed if the trial state or an iterate has reached the tension boundary
+    auto at_bound = false;
+
+    const auto tension_cap = [&] {
+        if(!at_bound && trial_p <= -5E-2 * std::fabs(pc)) return false;
+
+        trial_history = current_history;
+        trial_stress = trial_s;
+        trial_stiffness = double_shear * unit_dev_tensor;
+
+        return true;
+    };
 
     mat::fixed<14, 14> jacobian(fill::none);
     vec::fixed<14> residual(fill::none), incre(fill::none);
@@ -76,7 +102,11 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
     auto counter = 0u;
 
     while(true) {
-        if(++counter > max_iteration) return SUANPAN_FAIL;
+        if(++counter > max_iteration) {
+            if(tension_cap()) return SUANPAN_SUCCESS;
+
+            return SUANPAN_FAIL;
+        }
 
         const vec eta = s + p * alpha;
         const auto norm_eta = tensor::stress::norm(eta);
@@ -124,7 +154,11 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         jacobian(sd, sc) = gamma * h * alpha_b_m / norm_eta * eye(6, 6) - gamma * h * alpha_b_m / norm_eta * n * unit_n.t();
         jacobian(sd, sd) = p * jacobian(sd, sc) - (gamma * h + 1.) * eye(6, 6);
 
-        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
+        if(!solve(incre, jacobian, residual)) {
+            if(tension_cap()) return SUANPAN_SUCCESS;
+
+            return SUANPAN_FAIL;
+        }
 
         const auto error = suanpan::inf_norm(incre);
         // both the increment and the residual are checked against the current stress scale so that
@@ -137,6 +171,8 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         p -= incre(sb);
         s -= incre(sc);
         alpha -= incre(sd);
+
+        if(p > p_reg) at_bound = true;
     }
 
     trial_stress = s + p * tensor::unit_tensor2;
