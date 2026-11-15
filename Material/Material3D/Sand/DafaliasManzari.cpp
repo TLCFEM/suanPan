@@ -183,7 +183,7 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     auto update_ini_alpha = false;
 
     // backtracking line search on the local residual
-    double relax, pre_norm, pre_gamma, pre_p;
+    double relax{1.}, pre_norm{0.}, pre_gamma{gamma}, pre_p{p};
     vec pre_s, pre_alpha, pre_z;
 
     const auto progress = [&](const double scale) {
