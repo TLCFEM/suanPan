@@ -1534,6 +1534,18 @@
     <ClCompile Include="..\..\..\Material\Material3D\Nonlocal\NonlocalBilinearJ2.cpp">
       <Filter>Material\Material3D\Nonlocal</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\HDF5Wrapper.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\ModalForceRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recorder\ModalRecorder.cpp">
+      <Filter>Recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestCDPM2.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\UnitTest\TestColor.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
@@ -1541,6 +1553,9 @@
       <Filter>UnitTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\UnitTest\TestContainer.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestDafaliasManzari.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\UnitTest\TestEigen.cpp">
@@ -1552,6 +1567,9 @@
     <ClCompile Include="..\..\..\UnitTest\TestHomotopy.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestIGAValidation.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\UnitTest\TestIntegration.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
@@ -1559,6 +1577,9 @@
       <Filter>UnitTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\UnitTest\TestMode.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestNonlinearDruckerPrager.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\UnitTest\TestNURBS.cpp">
@@ -1574,6 +1595,9 @@
       <Filter>UnitTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\UnitTest\TestShape.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestSimpleSand.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\UnitTest\TestSolver.cpp">
@@ -1599,15 +1623,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\UnitTest\TestUtility.cpp">
       <Filter>UnitTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\HDF5Wrapper.cpp">
-      <Filter>Toolbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Recorder\ModalForceRecorder.cpp">
-      <Filter>Recorder</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Recorder\ModalRecorder.cpp">
-      <Filter>Recorder</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
