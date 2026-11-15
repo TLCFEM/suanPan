@@ -39,12 +39,12 @@ jobs:
           sudo apt-get install patchelf lcov
           echo "SP_TIME=$(date +''%y%m%d'')" >> $GITHUB_ENV
           cmake -S . -B build \
-          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_BUILD_TYPE=RelWithDebInfo \
           -DCMAKE_INSTALL_PREFIX=build/dist \
           -DSP_ENABLE_ASAN=ON \
-          -DSP_ENABLE_CODECOV=ON \
+          -DSP_ENABLE_CODECOV=OFF \
           -DSP_ENABLE_AVX2=OFF
-          cmake --build build --target install --config Debug -j $(nproc)
+          cmake --build build --target install --config RelWithDebInfo -j $(nproc)
           ./Script/linux-patcher.sh ./build/dist/bin/suanPan
       - name: Cosign
         uses: sigstore/gh-action-sigstore-python@v3.5.0
@@ -52,7 +52,7 @@ jobs:
           inputs: build/dist/bin/*
       - name: Pack
         run: |
-          file_name="suanPan-linux-debug-openblas-${{ env.SP_TIME }}.tar.gz"
+          file_name="suanPan-linux-relwithdebinfo-openblas-${{ env.SP_TIME }}.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
           export LD_LIBRARY_PATH=/home/runner/work/suanPan/suanPan/build/dist/lib
@@ -80,11 +80,11 @@ jobs:
           ./Script/mac-dependency.sh ${{ matrix.os }}
           export CC=gcc-15 && export CXX=g++-15 && export FC=gfortran-15
           cmake -S . -B build \
-          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_BUILD_TYPE=RelWithDebInfo \
           -DCMAKE_PREFIX_PATH="$(brew --prefix gcc@15)" \
           -DSP_ENABLE_AVX2=OFF \
           -DCMAKE_INSTALL_PREFIX=build/dist
-          cmake --build build --target install --config Debug -j 3
+          cmake --build build --target install --config RelWithDebInfo -j 3
           ./Script/mac-patcher.sh build/dist
       - name: Cosign
         uses: sigstore/gh-action-sigstore-python@v3.5.0
@@ -95,7 +95,7 @@ jobs:
           file_name="suanPan-${{ matrix.os }}"
           file_name="${file_name//xlarge/arm64}"
           file_name="${file_name//large/amd64}"
-          file_name+="-debug-gcc-${{ env.SP_TIME }}.tar.gz"
+          file_name+="-relwithdebinfo-gcc-${{ env.SP_TIME }}.tar.gz"
           echo "ARTIFACT=$file_name" >> "$GITHUB_ENV"
           tar czf $file_name -C build/dist .
           ./build/dist/bin/suanPan -v
@@ -128,16 +128,16 @@ jobs:
         run: |
           "SP_TIME=$(Get-Date -Format 'yyMMdd')" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           cmake -G "MinGW Makefiles" -S . -B build `
-          -DCMAKE_BUILD_TYPE=Debug `
+          -DCMAKE_BUILD_TYPE=RelWithDebInfo `
           -DCMAKE_C_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gcc.exe `
           -DCMAKE_CXX_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/g++.exe `
           -DCMAKE_Fortran_COMPILER=D:/a/suanPan/suanPan/mingw64/bin/gfortran.exe `
           -DCMAKE_INSTALL_PREFIX=build/dist `
           -DSP_ENABLE_AVX2=OFF
-          cmake --build build --target install --config Debug -j 4
+          cmake --build build --target install --config RelWithDebInfo -j 4
       - name: Name
         run: |
-          echo "ARTIFACT=suanPan-win-gcc-debug-openblas-${{ env.SP_TIME }}.zip" >> "$GITHUB_ENV"
+          echo "ARTIFACT=suanPan-win-gcc-relwithdebinfo-openblas-${{ env.SP_TIME }}.zip" >> "$GITHUB_ENV"
           ./Script/win-patcher.sh build/dist/bin/suanPan.exe
         shell: bash
       - name: Cosign
