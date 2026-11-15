@@ -57,6 +57,13 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
     auto s = trial_s;
     auto p = trial_p;
 
+    // the critical state is undefined at p=0; bound the pressure away from zero so that the
+    // state parameter and its derivatives remain finite if an iteration overshoots into tension,
+    // the hard bound is replaced by a smooth soft minimum so that the local iteration does not
+    // cycle around the kink when the pressure repeatedly crosses the bound
+    const auto p_reg = std::min(-datum::eps, -1E-2 * std::fabs(pc));
+    const auto p_width = .1 * std::fabs(p_reg);
+
     mat::fixed<14, 14> jacobian(fill::none);
     vec::fixed<14> residual(fill::none), incre(fill::none);
 
@@ -79,7 +86,12 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
         if(1u == counter && residual(sa) < 0.) return SUANPAN_SUCCESS;
 
-        const auto state = state_const + lc * std::log(p / pc);
+        // smooth soft minimum of p and p_reg, the pressure is bounded for the state parameter only
+        const auto shifted = (p_reg - p) / p_width;
+        const auto soft = shifted > 0. ? 1. / (1. + std::exp(-shifted)) : std::exp(shifted) / (1. + std::exp(shifted));
+        const auto p_bounded = p_reg - p_width * (std::max(shifted, 0.) + std::log1p(std::exp(-std::fabs(shifted))));
+        const auto dlp = soft * lc / p_bounded;
+        const auto state = state_const + lc * std::log(p_bounded / pc);
         alpha_d = ac * std::exp(nd * state);
         alpha_b = ac * std::exp(-nb * state);
         const auto alpha_d_m = alpha_d - m;
@@ -97,7 +109,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         jacobian(sa, sd) = p * jacobian(sa, sc);
 
         jacobian(sb, sa) = bulk * a * (alpha_d_m - alpha_n);
-        jacobian(sb, sb) = 1. + bulk * a * gamma * (alpha_d * nd * lc / p - (dot(alpha, unit_alpha) - alpha_n * alpha_n) / norm_eta);
+        jacobian(sb, sb) = 1. + bulk * a * gamma * (alpha_d * nd * dlp - (dot(alpha, unit_alpha) - alpha_n * alpha_n) / norm_eta);
         jacobian(sb, sc) = bulk * a * gamma / norm_eta * (alpha_n * unit_n.t() - unit_alpha.t());
         jacobian(sb, sd) = p * jacobian(sb, sc) - bulk * a * gamma * unit_n.t();
 
@@ -108,7 +120,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         jacobian(sc, sc) += eye(6, 6);
 
         jacobian(sd, sa) = h * alpha_b_m * n - h * alpha;
-        jacobian(sd, sb) = gamma * h * alpha_b_m / norm_eta * alpha - gamma * h * (alpha_b_m * alpha_n / norm_eta + alpha_b * nb * lc / p) * n;
+        jacobian(sd, sb) = gamma * h * alpha_b_m / norm_eta * alpha - gamma * h * (alpha_b_m * alpha_n / norm_eta + alpha_b * nb * dlp) * n;
         jacobian(sd, sc) = gamma * h * alpha_b_m / norm_eta * eye(6, 6) - gamma * h * alpha_b_m / norm_eta * n * unit_n.t();
         jacobian(sd, sd) = p * jacobian(sd, sc) - (gamma * h + 1.) * eye(6, 6);
 
