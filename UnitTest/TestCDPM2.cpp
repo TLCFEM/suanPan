@@ -31,7 +31,7 @@
 #include <Recorder/OutputType.h>
 #include <Toolbox/tensor.h>
 
-namespace {
+namespace suanpan::test::cdpm2 {
     constexpr auto kp_index = 0u;
     constexpr auto kdt_index = 10u;
     constexpr auto kdc_index = 11u;
@@ -195,9 +195,11 @@ namespace {
 
         REQUIRE(norm(tangent - numerical) <= relative_tolerance * norm(numerical));
     }
-} // namespace
+} // namespace suanpan::test::cdpm2
 
 TEST_CASE("CDPM2 Elastic Response", "[Material.CDPM2]") {
+    using namespace suanpan::test::cdpm2;
+
     const auto material = make_cdpm2();
 
     const vec strain{1E-6, -2E-6, 3E-7, 1E-7, -2E-7, 3E-7};
@@ -211,6 +213,8 @@ TEST_CASE("CDPM2 Elastic Response", "[Material.CDPM2]") {
 }
 
 TEST_CASE("CDPM2 Hydrostatic Elastic Response", "[Material.CDPM2]") {
+    using namespace suanpan::test::cdpm2;
+
     // a purely volumetric state has no unique deviatoric direction and must not generate NaNs
     const vec strain{-2E-6, -2E-6, -2E-6, 0., 0., 0.};
 
@@ -224,6 +228,8 @@ TEST_CASE("CDPM2 Hydrostatic Elastic Response", "[Material.CDPM2]") {
 }
 
 TEST_CASE("CDPM2 Hydrostatic Plastic Response", "[Material.CDPM2]") {
+    using namespace suanpan::test::cdpm2;
+
     const auto material = make_cdpm2(CDPM2::DamageType::ANISOTROPIC);
 
     for(auto I = 0u; I < 50u; ++I) {
@@ -235,6 +241,8 @@ TEST_CASE("CDPM2 Hydrostatic Plastic Response", "[Material.CDPM2]") {
 }
 
 TEST_CASE("CDPM2 Consistent Tangent", "[Material.CDPM2]") {
+    using namespace suanpan::test::cdpm2;
+
     SECTION("Uniaxial Compression") { require_consistent_tangent({}, vec{0., 0., -1E-2, 0., 0., 0.}); }
     SECTION("Uniaxial Tension") { require_consistent_tangent({}, vec{5E-4, 0., 0., 0., 0., 0.}); }
     SECTION("Shear") { require_consistent_tangent({}, vec{0., 0., 0., 0., 0., -1E-2}); }
@@ -244,6 +252,8 @@ TEST_CASE("CDPM2 Consistent Tangent", "[Material.CDPM2]") {
 }
 
 TEST_CASE("CDPM2 Consistent Tangent After Damage", "[Material.CDPM2]") {
+    using namespace suanpan::test::cdpm2;
+
     const std::vector<vec> preload(40u, vec{1E-5, 0., 0., 0., 0., 0.});
 
     SECTION("Unloading With Isotropic Damage") { require_consistent_tangent(preload, vec{-5E-5, 0., 0., 0., 0., 0.}, CDPM2::DamageType::ISOTROPIC); }
@@ -252,6 +262,8 @@ TEST_CASE("CDPM2 Consistent Tangent After Damage", "[Material.CDPM2]") {
 }
 
 TEST_CASE("CDPM2 Damage Evolution", "[Material.CDPM2]") {
+    using namespace suanpan::test::cdpm2;
+
     const auto check = [](const vec& increment, const bool tensile, const unsigned steps) {
         auto material = make_cdpm2(CDPM2::DamageType::ANISOTROPIC);
 
@@ -293,6 +305,8 @@ TEST_CASE("CDPM2 Damage Evolution", "[Material.CDPM2]") {
 }
 
 TEST_CASE("CDPM2 Return Mapping Satisfies Yield Condition", "[Material.CDPM2]") {
+    using namespace suanpan::test::cdpm2;
+
     const auto check = [](const vec& increment) {
         const auto material = make_cdpm2();
 
@@ -325,6 +339,8 @@ TEST_CASE("CDPM2 Return Mapping Satisfies Yield Condition", "[Material.CDPM2]") 
 }
 
 TEST_CASE("CDPM2 Zero Increment", "[Material.CDPM2]") {
+    using namespace suanpan::test::cdpm2;
+
     const auto material = make_cdpm2(CDPM2::DamageType::ANISOTROPIC);
 
     for(auto I = 0u; I < 20u; ++I) {
@@ -338,6 +354,8 @@ TEST_CASE("CDPM2 Zero Increment", "[Material.CDPM2]") {
 }
 
 TEST_CASE("CDPM2 Fully Damaged State", "[Material.CDPM2]") {
+    using namespace suanpan::test::cdpm2;
+
     const auto material = make_cdpm2(CDPM2::DamageType::ANISOTROPIC);
 
     const vec incre{0., 0., 1E-3, 0., 0., 0.};
