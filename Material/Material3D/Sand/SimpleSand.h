@@ -49,7 +49,7 @@ struct DataSimpleSand {
 };
 
 class SimpleSand final : protected DataSimpleSand, public Material3D {
-    static constexpr unsigned max_iteration = 100u;
+    static constexpr unsigned max_iteration = 25u;
     static const mat unit_dev_tensor;
 
     static constexpr uword sa = 0, sb = 1;
