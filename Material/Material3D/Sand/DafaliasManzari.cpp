@@ -53,16 +53,29 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     const auto incre_ev = tensor::trace<3>(incre_strain);
     const vec incre_ed = unit_dev_tensor * incre_strain;
 
-    // assume no plasticity
-    // compute trial stress
-
-    auto p = current_p + pr * gi * incre_ev;
-    vec s = current_s + 2. * gi * incre_ed;
-
     const auto dede = 1. + e0;
     const auto void_ratio = e0 + dede * tensor::trace<3>(trial_strain);
     const auto v_term_a = std::pow(2.97 - void_ratio, 2.) / (1. + void_ratio);
     const auto v_term_b = (void_ratio * (void_ratio + 2.) - 14.7609) * std::pow(1. + void_ratio, -2.) * dede;
+
+    // assume no plasticity
+    // compute trial stress
+
+    // use the closed-form solution
+    const auto c_modulus = shear_modulus * v_term_a * std::sqrt(std::fabs(pc));
+    const auto old_q = std::max(0., -current_p);
+    const auto beta = -pr * incre_ev;
+
+    double q = old_q + beta * gi;
+    if(c_modulus > datum::eps && q > std::pow(gi / c_modulus, 2.)) {
+        const auto alpha = beta * c_modulus;
+        q = .25 * std::pow(alpha + std::sqrt(alpha * alpha + 4. * old_q), 2.);
+    }
+
+    q = std::max(0., q);
+
+    auto p = -q;
+    vec s = current_s + 2. * std::max(gi, c_modulus * std::sqrt(q)) * incre_ed;
 
     double g, pgpe, pgpp;
 
@@ -70,7 +83,6 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     mat jacobian(7, 7, fill::eye);
 
     auto counter = 0u;
-    auto ref_error = 1.;
 
     while(true) {
         if(++counter > max_iteration) {
@@ -100,12 +112,23 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
         if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
         const auto error = suanpan::inf_norm(incre);
-        if(1u == counter) ref_error = std::max(1., error);
+        const auto error_scale = 1. + std::max(std::fabs(p), suanpan::inf_norm(s));
         suanpan_debug("Local elastic iteration error: {:.5E}.\n", error);
-        if(error < tolerance || ((error < tolerance * ref_error || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) break;
+        if(error < tolerance * error_scale || (counter > 5u && suanpan::inf_norm(residual) < tolerance * error_scale)) break;
 
         p -= incre(sa);
         s -= incre(sb);
+    }
+
+    // the yield surface is only defined for p<0 (compression)
+    // a tensile trial pressure means the sand loses all confinement, cap it at zero and
+    // keep the deviatoric response, which already uses the pressure-independent floor modulus gi
+    // a small tolerance is used as the cap is also approached at p=0 from below
+    if(p > -std::fabs(pc) * tolerance) {
+        trial_stress = s;
+        trial_stiffness = 2. * gi * unit_dev_tensor;
+
+        return SUANPAN_SUCCESS;
     }
 
     // check if yield
@@ -135,6 +158,20 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
     // yield function violated
 
+    // the elastic trial response is kept
+    const auto trial_p = p;
+    const vec trial_s = s;
+
+    const auto cap_tension = [&] {
+        if(trial_p <= -1E-2 * std::fabs(pc)) return false;
+
+        trial_history = current_history;
+        trial_stress = trial_s;
+        trial_stiffness = 2. * gi * unit_dev_tensor;
+
+        return true;
+    };
+
     // lower bound on the (negative) pressure, also used to regularise the state parameter
     const auto p_reg = std::min(-datum::eps, gr * gr * pc);
 
@@ -159,8 +196,22 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     double pabpe, d, pdpe, h, phpe;
     auto update_ini_alpha = false;
 
+    // backtracking line search on the local residual
+    double relax{1.}, pre_norm{0.}, pre_gamma{gamma}, pre_p{p};
+    vec pre_s, pre_alpha, pre_z;
+
+    const auto progress = [&](const double scale) {
+        gamma -= scale * incre(si);
+        p -= scale * incre(sj);
+        s -= scale * incre(sk);
+        alpha -= scale * incre(sl);
+        z -= scale * incre(sm);
+    };
+
     while(true) {
         if(++counter > max_iteration) {
+            if(cap_tension()) return SUANPAN_SUCCESS;
+
             suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
@@ -322,18 +373,42 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
             jacobian(sm, sl).zeros();
         }
 
+        // if the previous step did not reduce the residual, restore the state and halve the step
+        if(1u < counter && suanpan::inf_norm(residual) > pre_norm) {
+            if(relax < 1E-4) {
+                if(cap_tension()) return SUANPAN_SUCCESS;
+
+                suanpan_error("Backtracking line search failed.\n");
+                return SUANPAN_FAIL;
+            }
+
+            gamma = pre_gamma;
+            p = pre_p;
+            s = pre_s;
+            alpha = pre_alpha;
+            z = pre_z;
+
+            progress(relax *= .5);
+
+            continue;
+        }
+
         if(!solve(incre, jacobian, residual, solve_opts::equilibrate)) return SUANPAN_FAIL;
 
         const auto error = suanpan::inf_norm(incre);
-        if(1u == counter) ref_error = std::max(1., error);
+        const auto error_scale = 1. + std::max(std::fabs(p), suanpan::inf_norm(s));
         suanpan_debug("Local plastic iteration error: {:.5E}.\n", error);
-        if(error < tolerance || ((error < tolerance * ref_error || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) break;
+        pre_norm = suanpan::inf_norm(residual);
+        if(error < tolerance * error_scale || (counter > 5u && pre_norm < tolerance * error_scale)) break;
 
-        gamma -= incre(si);
-        p -= incre(sj);
-        s -= incre(sk);
-        alpha -= incre(sl);
-        z -= incre(sm);
+        // save the current state as the line search reference
+        pre_gamma = gamma;
+        pre_p = p;
+        pre_s = s;
+        pre_alpha = alpha;
+        pre_z = z;
+
+        progress(relax = 1.);
     }
 
     trial_stress = s + p * tensor::unit_tensor2;
@@ -360,6 +435,4 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-void DafaliasManzari::print() {
-    suanpan_info("A Dafalias-Manzari sand model. doi:10.1061/(ASCE)0733-9399(2004)130:6(622)\n");
-}
+void DafaliasManzari::print() { suanpan_info("A Dafalias-Manzari sand model. doi:10.1061/(ASCE)0733-9399(2004)130:6(622)\n"); }
