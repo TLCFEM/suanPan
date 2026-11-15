@@ -31,8 +31,8 @@
 #include <Toolbox/tensor.h>
 
 namespace {
-    unique_ptr<DafaliasManzari> make_dm() {
-        auto material = std::make_unique<DafaliasManzari>(1u, 125., .05, 1.25, .02, .9, .7, .01, 7., .1, .9, 1.1, -.7, 3.5, 4., 6E2, -130., .2);
+    unique_ptr<DafaliasManzari> make_dm(const double a = -.7) {
+        auto material = std::make_unique<DafaliasManzari>(1u, 125., .05, 1.25, .02, .9, .7, .01, 7., .1, .9, 1.1, a, 3.5, 4., 6E2, -130., .2);
 
         material->initialize_base(nullptr);
         material->initialize(nullptr);
@@ -80,6 +80,102 @@ TEST_CASE("DafaliasManzari Consistent Tangent", "[Material.DafaliasManzari]") {
     SECTION("Compression") { require_consistent_tangent(vec{-1.5E-3, -1.5E-3, 0., 0., 0., 0.}); }
     SECTION("Compression And Shear") { require_consistent_tangent(vec{-1E-3, -3E-4, -3E-4, 0., 2E-3, 0.}); }
     SECTION("Shear") { require_consistent_tangent(vec{-1E-4, 0., 0., 0., 2E-3, 0.}); }
+}
+
+TEST_CASE("DafaliasManzari Material Properties", "[Material.DafaliasManzari]") {
+    const auto material = make_dm();
+
+    constexpr auto gi = .2 * 125. * 130.;
+    constexpr auto elastic_modulus = gi * (2. + 2. * .05);
+
+    REQUIRE(material->get(DafaliasManzari::Parameter::ELASTIC) == Approx(elastic_modulus));
+    REQUIRE(material->get(DafaliasManzari::Parameter::POISSON) == Approx(.05));
+    REQUIRE(material->get(DafaliasManzari::Parameter::SHEAR) == Approx(gi));
+    REQUIRE(material->get(DafaliasManzari::Parameter::BULK) == Approx(elastic_modulus / 2.7));
+    REQUIRE(material->get(DafaliasManzari::Parameter::PEAKSTRAIN) == Approx(0.));
+    REQUIRE(material->get(DafaliasManzari::Parameter::CRACKSTRAIN) == Approx(0.));
+
+    REQUIRE(material->get_initial_history().n_elem == 18);
+
+    const auto copy = material->unique_copy();
+    REQUIRE(copy != nullptr);
+    REQUIRE(copy->get(DafaliasManzari::Parameter::ELASTIC) == Approx(elastic_modulus));
+    REQUIRE(copy->get_initial_history().n_elem == 18);
+
+    REQUIRE_NOTHROW(material->print());
+}
+
+TEST_CASE("DafaliasManzari Zero Increment", "[Material.DafaliasManzari]") {
+    const auto material = make_confined();
+
+    const auto stress = material->get_current_stress();
+    const auto stiffness = material->get_current_stiffness();
+
+    REQUIRE(SUANPAN_SUCCESS == material->update_trial_status(material->get_current_strain()));
+    REQUIRE(norm(material->get_trial_stress() - stress) < 1E-12);
+    REQUIRE(norm(material->get_trial_stiffness() - stiffness) < 1E-12);
+}
+
+TEST_CASE("DafaliasManzari Small Strain Response", "[Material.DafaliasManzari]") {
+    SECTION("Elastic Compression") {
+        const auto material = make_dm();
+
+        REQUIRE(SUANPAN_SUCCESS == material->update_trial_status(vec{-1E-6, -1E-6, -1E-6, 0., 0., 0.}));
+
+        REQUIRE(material->get_trial_stress().is_finite());
+        REQUIRE(material->get_trial_stiffness().is_finite());
+        REQUIRE(tensor::mean<3>(material->get_trial_stress()) < 0.);
+    }
+
+    SECTION("Elastic Shear") {
+        const auto material = make_dm();
+
+        REQUIRE(SUANPAN_SUCCESS == material->update_trial_status(vec{0., 0., 0., 0., 1E-6, 0.}));
+
+        REQUIRE(material->get_trial_stress().is_finite());
+        REQUIRE(material->get_trial_stiffness().is_finite());
+        REQUIRE(tensor::stress::norm(tensor::dev(material->get_trial_stress())) > 0.);
+    }
+}
+
+TEST_CASE("DafaliasManzari Drained Shearing", "[Material.DafaliasManzari]") {
+    SECTION("Contractive") {
+        const auto material = make_dm();
+
+        // build up a dense state before shearing
+        for(auto I = 0u; I < 1000u; ++I) {
+            REQUIRE(SUANPAN_SUCCESS == material->update_incre_status(vec{-2E-5, -2E-5, 0., 0., 0., 0.}));
+            material->commit_status();
+        }
+
+        // constant volume shearing mobilises the dilatancy memory
+        for(auto I = 0u; I < 1000u; ++I) {
+            REQUIRE(SUANPAN_SUCCESS == material->update_incre_status(vec{2E-5, -1E-5, -1E-5, 0., 0., 0.}));
+            material->commit_status();
+        }
+
+        REQUIRE(material->get_trial_stress().is_finite());
+        REQUIRE(material->get_trial_stiffness().is_finite());
+    }
+
+    SECTION("Dilative") {
+        // a positive dilatancy coefficient reverses the sign of the plastic volumetric
+        // response, which exercises the dilative branch of the model
+        const auto material = make_dm(.7);
+
+        for(auto I = 0u; I < 200u; ++I) {
+            REQUIRE(SUANPAN_SUCCESS == material->update_incre_status(vec{-1.5E-5, -1.5E-5, 0., 0., 0., 0.}));
+            material->commit_status();
+        }
+
+        for(auto I = 0u; I < 400u; ++I) {
+            REQUIRE(SUANPAN_SUCCESS == material->update_incre_status(vec{1E-5, -.5E-5, -.5E-5, 0., 0., 0.}));
+            material->commit_status();
+        }
+
+        REQUIRE(material->get_trial_stress().is_finite());
+        REQUIRE(material->get_trial_stiffness().is_finite());
+    }
 }
 
 TEST_CASE("DafaliasManzari Tension Cap", "[Material.DafaliasManzari]") {

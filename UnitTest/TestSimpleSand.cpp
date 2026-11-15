@@ -82,6 +82,76 @@ TEST_CASE("SimpleSand Consistent Tangent", "[Material.SimpleSand]") {
     SECTION("Shear") { require_consistent_tangent(vec{-1E-4, 0., 0., 0., 2E-3, 0.}); }
 }
 
+TEST_CASE("SimpleSand Material Properties", "[Material.SimpleSand]") {
+    const auto material = make_sand();
+
+    REQUIRE(material->get(SimpleSand::Parameter::ELASTIC) == Approx(10E4));
+    REQUIRE(material->get(SimpleSand::Parameter::POISSON) == Approx(.2));
+    REQUIRE(material->get(SimpleSand::Parameter::SHEAR) == Approx(10E4 / 2.4));
+    REQUIRE(material->get(SimpleSand::Parameter::BULK) == Approx(10E4 / 1.8));
+    REQUIRE(material->get(SimpleSand::Parameter::PEAKSTRAIN) == Approx(0.));
+    REQUIRE(material->get(SimpleSand::Parameter::CRACKSTRAIN) == Approx(0.));
+
+    REQUIRE(material->get_initial_history().n_elem == 6);
+
+    const auto copy = material->unique_copy();
+    REQUIRE(copy != nullptr);
+    REQUIRE(copy->get(SimpleSand::Parameter::ELASTIC) == Approx(10E4));
+    REQUIRE(copy->get_initial_history().n_elem == 6);
+
+    REQUIRE_NOTHROW(material->print());
+}
+
+TEST_CASE("SimpleSand Zero Increment", "[Material.SimpleSand]") {
+    const auto material = make_confined();
+
+    const auto stress = material->get_current_stress();
+    const auto stiffness = material->get_current_stiffness();
+
+    REQUIRE(SUANPAN_SUCCESS == material->update_trial_status(material->get_current_strain()));
+    REQUIRE(norm(material->get_trial_stress() - stress) < 1E-12);
+    REQUIRE(norm(material->get_trial_stiffness() - stiffness) < 1E-12);
+}
+
+TEST_CASE("SimpleSand Small Strain Response", "[Material.SimpleSand]") {
+    SECTION("Elastic Compression") {
+        const auto material = make_sand();
+
+        REQUIRE(SUANPAN_SUCCESS == material->update_trial_status(vec{-1E-5, -1E-5, 0., 0., 0., 0.}));
+
+        REQUIRE(material->get_trial_stress().is_finite());
+        REQUIRE(material->get_trial_stiffness().is_finite());
+        REQUIRE(tensor::mean<3>(material->get_trial_stress()) < 0.);
+    }
+
+    SECTION("Elastic Shear") {
+        const auto material = make_sand();
+
+        REQUIRE(SUANPAN_SUCCESS == material->update_trial_status(vec{-1E-6, 0., 0., 0., 1E-5, 0.}));
+
+        REQUIRE(material->get_trial_stress().is_finite());
+        REQUIRE(material->get_trial_stiffness().is_finite());
+        REQUIRE(tensor::stress::norm(tensor::dev(material->get_trial_stress())) > 0.);
+    }
+}
+
+TEST_CASE("SimpleSand Drained Extension Increments", "[Material.SimpleSand]") {
+    // larger extensions drive the pressure through zero inside the plastic correction,
+    // where the tension cap takes over
+    const auto check = [](const double extension) {
+        const auto material = make_confined();
+
+        REQUIRE(SUANPAN_SUCCESS == material->update_trial_status(material->get_current_strain() + vec{extension, 0., 0., 0., 0., 0.}));
+
+        REQUIRE(material->get_trial_stress().is_finite());
+        REQUIRE(material->get_trial_stiffness().is_finite());
+    };
+
+    SECTION("Moderate") { check(1E-3); }
+    SECTION("Large") { check(2E-3); }
+    SECTION("Very Large") { check(5E-3); }
+}
+
 TEST_CASE("SimpleSand Tension Cap", "[Material.SimpleSand]") {
     SECTION("Elastic Tension") {
         const auto material = make_sand();
