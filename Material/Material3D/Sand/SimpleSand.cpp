@@ -79,6 +79,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
     // admissible plastic solution exists; the capped response is then used, the cap is only
     // allowed if the trial state or an iterate has reached the tension boundary
     auto at_bound = false;
+    auto tension_counter = 0u;
 
     const auto tension_cap = [&] {
         if(!at_bound && trial_p <= -5E-2 * std::fabs(pc)) return false;
@@ -168,6 +169,15 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         jacobian(sd, sb) = gamma * h * alpha_b_m / norm_eta * alpha - gamma * h * (alpha_b_m * alpha_n / norm_eta + alpha_b * nb * dlp) * n;
         jacobian(sd, sc) = gamma * h * alpha_b_m / norm_eta * eye(6, 6) - gamma * h * alpha_b_m / norm_eta * n * unit_n.t();
         jacobian(sd, sd) = p * jacobian(sd, sc) - (gamma * h + 1.) * eye(6, 6);
+
+        // the yield function cannot vanish for a positive pressure since norm(eta) >= 0 and m > 0,
+        // so an iterate that remains in tension cannot converge; a single overshoot is recoverable
+        // as the next step returns to compression, hence the cap is used only after the pressure
+        // has stayed positive, otherwise the iteration would approach an unreachable tension limit
+        if(p > 0.) {
+            if(++tension_counter > 1u && tension_cap()) return SUANPAN_SUCCESS;
+        }
+        else tension_counter = 0u;
 
         // if the previous step did not reduce the residual, restore the state and halve the step
         if(1u < counter && suanpan::inf_norm(residual) > pre_norm) {
