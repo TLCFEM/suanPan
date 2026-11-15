@@ -158,16 +158,12 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
 
     // yield function violated
 
-    // the elastic trial response is kept: if the local iterations stall because dilatancy drives
-    // the pressure towards tension, no admissible plastic solution exists; the model has no
-    // tensile strength, so the capped response is used instead. this band must be wider than the
-    // numerical check above, otherwise it would already have consumed these trial states
+    // the elastic trial response is kept
     const auto trial_p = p;
     const vec trial_s = s;
-    const auto tension_band = -1E-2 * std::fabs(pc);
 
     const auto cap_tension = [&] {
-        if(trial_p <= tension_band) return false;
+        if(trial_p <= -1E-2 * std::fabs(pc)) return false;
 
         trial_history = current_history;
         trial_stress = trial_s;
