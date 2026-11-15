@@ -85,8 +85,8 @@ TEST_CASE("DafaliasManzari Consistent Tangent", "[Material.DafaliasManzari]") {
 TEST_CASE("DafaliasManzari Material Properties", "[Material.DafaliasManzari]") {
     const auto material = make_dm();
 
-    const auto gi = .2 * 125. * 130.;
-    const auto elastic_modulus = gi * (2. + 2. * .05);
+    constexpr auto gi = .2 * 125. * 130.;
+    constexpr auto elastic_modulus = gi * (2. + 2. * .05);
 
     REQUIRE(material->get(DafaliasManzari::Parameter::ELASTIC) == Approx(elastic_modulus));
     REQUIRE(material->get(DafaliasManzari::Parameter::POISSON) == Approx(.05));
