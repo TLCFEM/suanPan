@@ -101,6 +101,21 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
     auto counter = 0u;
 
+    // backtracking line search on the local residual: when a step increases the residual norm,
+    // the previous state is restored and a halved step is taken instead, this damps the
+    // oscillation that appears when the local system approaches the narrow tension wedge
+    double relax{1.}, pre_norm{0.};
+    auto pre_gamma = 0.;
+    auto pre_p = 0.;
+    vec pre_s, pre_alpha;
+
+    const auto progress = [&](const double scale) {
+        gamma -= scale * incre(sa);
+        p -= scale * incre(sb);
+        s -= scale * incre(sc);
+        alpha -= scale * incre(sd);
+    };
+
     while(true) {
         if(++counter > max_iteration) {
             if(tension_cap()) return SUANPAN_SUCCESS;
@@ -154,6 +169,26 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         jacobian(sd, sc) = gamma * h * alpha_b_m / norm_eta * eye(6, 6) - gamma * h * alpha_b_m / norm_eta * n * unit_n.t();
         jacobian(sd, sd) = p * jacobian(sd, sc) - (gamma * h + 1.) * eye(6, 6);
 
+        // if the previous step did not reduce the residual, restore the state and halve the step
+        if(1u < counter && suanpan::inf_norm(residual) > pre_norm) {
+            if(relax < 1E-4) {
+                if(tension_cap()) return SUANPAN_SUCCESS;
+
+                return SUANPAN_FAIL;
+            }
+
+            gamma = pre_gamma;
+            p = pre_p;
+            s = pre_s;
+            alpha = pre_alpha;
+
+            progress(relax *= .5);
+
+            if(p > p_reg) at_bound = true;
+
+            continue;
+        }
+
         if(!solve(incre, jacobian, residual)) {
             if(tension_cap()) return SUANPAN_SUCCESS;
 
@@ -167,10 +202,13 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
         if(error < tolerance * error_scale || (counter > 5u && suanpan::inf_norm(residual) < tolerance * error_scale)) break;
 
-        gamma -= incre(sa);
-        p -= incre(sb);
-        s -= incre(sc);
-        alpha -= incre(sd);
+        pre_norm = suanpan::inf_norm(residual);
+        pre_gamma = gamma;
+        pre_p = p;
+        pre_s = s;
+        pre_alpha = alpha;
+
+        progress(relax = 1.);
 
         if(p > p_reg) at_bound = true;
     }
