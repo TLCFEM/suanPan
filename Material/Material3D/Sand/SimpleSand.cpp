@@ -55,9 +55,6 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
     const auto trial_s = tensor::dev(trial_stress);
     const auto trial_p = tensor::mean<3>(trial_stress);
 
-    // the yield surface and the critical state are defined for p<0 only, the sand has no
-    // tensile strength; cap a non-negative trial pressure at zero and keep the purely
-    // deviatoric elastic response
     if(trial_p > -std::fabs(pc) * tolerance) {
         trial_stress = trial_s;
         trial_stiffness = double_shear * unit_dev_tensor;
@@ -68,18 +65,11 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
     auto s = trial_s;
     auto p = trial_p;
 
-    // the critical state is undefined at p=0; bound the pressure away from zero so that the
-    // state parameter and its derivatives remain finite if an iteration overshoots into tension,
-    // the hard bound is replaced by a smooth soft minimum so that the local iteration does not
-    // cycle around the kink when the pressure repeatedly crosses the bound
+    // bound the pressure away from zero so that the state parameter and its derivatives remain finite
     const auto p_reg = std::min(-datum::eps, -1E-2 * std::fabs(pc));
     const auto p_width = .1 * std::fabs(p_reg);
 
-    // if the local iterations stall because dilatancy drives the pressure towards tension, no
-    // admissible plastic solution exists; the capped response is then used, the cap is only
-    // allowed if the trial state or an iterate has reached the tension boundary
     auto at_bound = false;
-    auto tension_counter = 0u;
 
     const auto tension_cap = [&] {
         if(!at_bound && trial_p <= -5E-2 * std::fabs(pc)) return false;
@@ -102,12 +92,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
     auto counter = 0u;
 
-    // backtracking line search on the local residual: when a step increases the residual norm,
-    // the previous state is restored and a halved step is taken instead, this damps the
-    // oscillation that appears when the local system approaches the narrow tension wedge
-    double relax{1.}, pre_norm{0.};
-    auto pre_gamma = 0.;
-    auto pre_p = 0.;
+    auto relax{1.}, pre_norm{0.}, pre_gamma{gamma}, pre_p{p};
     vec pre_s, pre_alpha;
 
     const auto progress = [&](const double scale) {
@@ -170,14 +155,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         jacobian(sd, sc) = gamma * h * alpha_b_m / norm_eta * eye(6, 6) - gamma * h * alpha_b_m / norm_eta * n * unit_n.t();
         jacobian(sd, sd) = p * jacobian(sd, sc) - (gamma * h + 1.) * eye(6, 6);
 
-        // the yield function cannot vanish for a positive pressure since norm(eta) >= 0 and m > 0,
-        // so an iterate that remains in tension cannot converge; a single overshoot is recoverable
-        // as the next step returns to compression, hence the cap is used only after the pressure
-        // has stayed positive, otherwise the iteration would approach an unreachable tension limit
-        if(p > 0.) {
-            if(++tension_counter > 1u && tension_cap()) return SUANPAN_SUCCESS;
-        }
-        else tension_counter = 0u;
+        if(p > 0. && counter > 1u && tension_cap()) return SUANPAN_SUCCESS;
 
         // if the previous step did not reduce the residual, restore the state and halve the step
         if(1u < counter && suanpan::inf_norm(residual) > pre_norm) {
@@ -210,9 +188,9 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         // the tolerance remains meaningful when the stress itself is large
         const auto error_scale = 1. + std::max(std::fabs(p), suanpan::inf_norm(s));
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * error_scale || (counter > 5u && suanpan::inf_norm(residual) < tolerance * error_scale)) break;
-
         pre_norm = suanpan::inf_norm(residual);
+        if(error < tolerance * error_scale || (counter > 5u && pre_norm < tolerance * error_scale)) break;
+
         pre_gamma = gamma;
         pre_p = p;
         pre_s = s;
@@ -242,6 +220,4 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
     return SUANPAN_SUCCESS;
 }
 
-void SimpleSand::print() {
-    suanpan_info("A simple sand model.\n");
-}
+void SimpleSand::print() { suanpan_info("A simple sand model.\n"); }
