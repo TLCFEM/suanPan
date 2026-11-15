@@ -92,7 +92,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
     auto counter = 0u;
 
-    auto relax{1.}, pre_norm{0.}, pre_gamma{gamma}, pre_p{p};
+    auto relax{1.}, pre_residual_norm{0.}, pre_gamma{gamma}, pre_p{p};
     vec pre_s, pre_alpha;
 
     const auto progress = [&](const double scale) {
@@ -106,6 +106,7 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
         if(++counter > max_iteration) {
             if(tension_cap()) return SUANPAN_SUCCESS;
 
+            suanpan_error("Cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
 
@@ -157,11 +158,14 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
 
         if(p > 0. && counter > 1u && tension_cap()) return SUANPAN_SUCCESS;
 
+        const auto residual_norm = suanpan::inf_norm(residual);
+
         // if the previous step did not reduce the residual, restore the state and halve the step
-        if(1u < counter && suanpan::inf_norm(residual) > pre_norm) {
+        if(1u < counter && residual_norm > pre_residual_norm) {
             if(relax < 1E-4) {
                 if(tension_cap()) return SUANPAN_SUCCESS;
 
+                suanpan_error("Backtracking line search failed.\n");
                 return SUANPAN_FAIL;
             }
 
@@ -177,19 +181,13 @@ int SimpleSand::update_trial_status(const vec& t_strain) {
             continue;
         }
 
-        if(!solve(incre, jacobian, residual)) {
-            if(tension_cap()) return SUANPAN_SUCCESS;
-
-            return SUANPAN_FAIL;
-        }
+        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
 
         const auto error = suanpan::inf_norm(incre);
-        // both the increment and the residual are checked against the current stress scale so that
-        // the tolerance remains meaningful when the stress itself is large
         const auto error_scale = 1. + std::max(std::fabs(p), suanpan::inf_norm(s));
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        pre_norm = suanpan::inf_norm(residual);
-        if(error < tolerance * error_scale || (counter > 5u && pre_norm < tolerance * error_scale)) break;
+        pre_residual_norm = residual_norm;
+        if(error < tolerance * error_scale || (counter > 5u && pre_residual_norm < tolerance * error_scale)) break;
 
         pre_gamma = gamma;
         pre_p = p;
