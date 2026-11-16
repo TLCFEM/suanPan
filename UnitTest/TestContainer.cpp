@@ -1,5 +1,6 @@
 #include "CatchHeader.h"
 
+#include <Toolbox/TokenRegistry.h>
 #include <Toolbox/container.h>
 
 TEST_CASE("Set to uvec", "[Utility.Container]") {
@@ -20,6 +21,16 @@ TEST_CASE("Unordered Set to uvec", "[Utility.Container]") {
     REQUIRE(3 == vals(0));
     REQUIRE(5 == vals(1));
     REQUIRE(8 == vals(2));
+}
+
+TEST_CASE("Token Registry", "[Utility.Container]") {
+    const TokenRegistry<int> registry{{"One", 1}, {"Two", 2}};
+    REQUIRE(1 == registry.fetch("One"));
+    REQUIRE(1 == registry.fetch("one"));
+    REQUIRE(1 == registry.fetch("ONE"));
+    REQUIRE(2 == registry.fetch("tWo"));
+    REQUIRE(0 == registry.fetch("Three"));
+    REQUIRE(2 == registry.size());
 }
 
 TEST_CASE("Container Aliases", "[Utility.Container]") {
