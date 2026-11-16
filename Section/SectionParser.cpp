@@ -23,13 +23,7 @@
 #include <Toolbox/TokenRegistry.h>
 
 namespace {
-    void new_cell2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_cell2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         double area;
         if(!get_input(command, area)) {
             suanpan_error("A valid area is required.\n");
@@ -51,13 +45,7 @@ namespace {
         return_obj = std::make_unique<Cell2D>(tag, area, material_id, eccentricity);
     }
 
-    void new_cell3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_cell3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         double area;
         if(!get_input(command, area)) {
             suanpan_error("A valid area is required.\n");
@@ -83,13 +71,7 @@ namespace {
         return_obj = std::make_unique<Cell3D>(tag, area, material_id, eccentricity_a, eccentricity_b);
     }
 
-    void new_box2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_box2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         double width;
         if(!get_input(command, width)) {
             suanpan_error("A valid width is required.\n");
@@ -131,13 +113,7 @@ namespace {
         return_obj = std::make_unique<Box2D>(tag, width, height, thickness, material_id, int_pt, eccentricity);
     }
 
-    void new_box3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_box3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         double width;
         if(!get_input(command, width)) {
             suanpan_error("A valid width is required.\n");
@@ -183,13 +159,7 @@ namespace {
         return_obj = std::make_unique<Box3D>(tag, width, height, thickness, material_id, int_pt, eccentricity_a, eccentricity_b);
     }
 
-    void new_cell3dos(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_cell3dos(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         double area, omega, py, pz;
         if(!get_input(command, area, omega, py, pz)) {
             suanpan_error("A valid parameter is required.\n");
@@ -215,13 +185,7 @@ namespace {
         return_obj = std::make_unique<Cell3DOS>(tag, area, omega, py, pz, material_id, eccentricity_a, eccentricity_b);
     }
 
-    void new_circle1d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_circle1d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         double radius;
         if(!get_input(command, radius)) {
             suanpan_error("A valid radius is required.\n");
@@ -237,13 +201,7 @@ namespace {
         return_obj = std::make_unique<Circle1D>(tag, radius, material_id);
     }
 
-    void new_circle2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_circle2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         double radius;
         if(!get_input(command, radius)) {
             suanpan_error("A valid radius is required.\n");
@@ -271,13 +229,7 @@ namespace {
         return_obj = std::make_unique<Circle2D>(tag, radius, material_id, int_pt, eccentricity);
     }
 
-    void new_circle3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_circle3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         double radius;
         if(!get_input(command, radius)) {
             suanpan_error("A valid radius is required.\n");
@@ -310,13 +262,7 @@ namespace {
         return_obj = std::make_unique<Circle3D>(tag, radius, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
     }
 
-    void new_circularhollow2D(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_circularhollow2D(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         double radius;
         if(!get_input(command, radius)) {
             suanpan_error("A valid radius is required.\n");
@@ -350,13 +296,7 @@ namespace {
         return_obj = std::make_unique<CircularHollow2D>(tag, radius, thickness, material_id, int_pt, eccentricity);
     }
 
-    void new_circularhollow3D(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_circularhollow3D(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         double radius;
         if(!get_input(command, radius)) {
             suanpan_error("A valid radius is required.\n");
@@ -395,44 +335,20 @@ namespace {
         return_obj = std::make_unique<CircularHollow3D>(tag, radius, thickness, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
     }
 
-    void new_fibre1d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_fibre1d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         return_obj = std::make_unique<Fibre1D>(tag, get_remaining<uword>(command));
     }
 
-    void new_fibre2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_fibre2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         return_obj = std::make_unique<Fibre2D>(tag, get_remaining<uword>(command));
     }
 
-    template<bool if_os> void new_fibre3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<bool if_os> void new_fibre3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         if constexpr(if_os) return_obj = std::make_unique<Fibre3DOS>(tag, get_remaining<uword>(command));
         else return_obj = std::make_unique<Fibre3D>(tag, get_remaining<uword>(command));
     }
 
-    void new_hsection2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_hsection2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         vec dim(6);
         if(!get_input(command, dim)) {
             suanpan_error("A valid dimension is required.\n");
@@ -481,13 +397,7 @@ namespace {
         return -.5 * (top_flange_area * (dim(1) + dim(4)) + bottom_flange_area * (dim(3) + dim(4))) / (top_flange_area + bottom_flange_area + dim(4) * dim(5));
     }
 
-    template<bool recenter> void new_isection2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<bool recenter> void new_isection2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         vec dim(6);
         if(!get_input(command, dim)) {
             suanpan_error("A valid dimension is required.\n");
@@ -516,13 +426,7 @@ namespace {
         return_obj = std::make_unique<ISection2D>(tag, dim(0), dim(1), dim(2), dim(3), dim(4), dim(5), material_id, int_pt, eccentricity);
     }
 
-    template<bool recenter> void new_isection3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<bool recenter> void new_isection3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         vec dim(6);
         if(!get_input(command, dim)) {
             suanpan_error("A valid dimension is required.\n");
@@ -557,13 +461,7 @@ namespace {
         return_obj = std::make_unique<ISection3D>(tag, std::move(dim), material_id, int_pt, vec{eccentricity_y, eccentricity_z});
     }
 
-    void new_rectangle1d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_rectangle1d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         double width;
         if(!get_input(command, width)) {
             suanpan_error("A valid width is required.\n");
@@ -585,13 +483,7 @@ namespace {
         return_obj = std::make_unique<Rectangle1D>(tag, width, height, material_id);
     }
 
-    void new_rectangle2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_rectangle2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         double width;
         if(!get_input(command, width)) {
             suanpan_error("A valid width is required.\n");
@@ -627,13 +519,7 @@ namespace {
         return_obj = std::make_unique<Rectangle2D>(tag, width, height, material_id, int_pt, eccentricity);
     }
 
-    void new_rectangle3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_rectangle3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         double width;
         if(!get_input(command, width)) {
             suanpan_error("A valid width is required.\n");
@@ -673,13 +559,7 @@ namespace {
         return_obj = std::make_unique<Rectangle3D>(tag, width, height, material_id, int_pt, eccentricity_a, eccentricity_b);
     }
 
-    void new_trusssection(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_trusssection(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         double area;
         if(!get_input(command, area)) {
             suanpan_error("A valid area is required.\n");
@@ -695,13 +575,7 @@ namespace {
         return_obj = std::make_unique<TrussSection>(tag, area, material_id);
     }
 
-    template<bool recenter> void new_tsection2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<bool recenter> void new_tsection2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         vec dim(4);
         if(!get_input(command, dim)) {
             suanpan_error("A valid dimension is required.\n");
@@ -730,13 +604,7 @@ namespace {
         return_obj = std::make_unique<TSection2D>(tag, dim(0), dim(1), dim(2), dim(3), material_id, int_pt, eccentricity);
     }
 
-    template<bool recenter> void new_tsection3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<bool recenter> void new_tsection3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         vec dim(4);
         if(!get_input(command, dim)) {
             suanpan_error("A valid dimension is required.\n");
@@ -771,13 +639,7 @@ namespace {
         return_obj = std::make_unique<TSection3D>(tag, std::move(dim), material_id, int_pt, vec{eccentricity_y, eccentricity_z});
     }
 
-    template<unsigned size> void new_nm2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<unsigned size> void new_nm2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         vec P(size);
         if(!get_input(command, P)) {
             suanpan_error("A valid parameter is required.\n");
@@ -803,13 +665,7 @@ namespace {
         else if constexpr(11u == size) return_obj = std::make_unique<NM2D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), vec{P(8), P(8)}, vec{P(9), P(9)}, P(10), std::move(poly_set));
     }
 
-    template<unsigned size> void new_nm3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<unsigned size> void new_nm3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         vec P(size);
         if(!get_input(command, P)) {
             suanpan_error("A valid parameter is required.\n");
@@ -835,13 +691,7 @@ namespace {
         else if constexpr(13u == size) return_obj = std::make_unique<NM3D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), vec{P(10), P(10), P(10)}, vec{P(11), P(11), P(11)}, P(12), std::move(poly_set));
     }
 
-    template<unsigned size> void new_nmk(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<unsigned size> void new_nmk(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string&) {
         vec P(size);
         if(!get_input(command, P)) {
             suanpan_error("A valid parameter is required.\n");
@@ -2649,19 +2499,7 @@ namespace {
         return registry.fetch(type);
     }
 
-    void new_eu2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        std::string type;
-        if(!get_input(command, type)) {
-            suanpan_error("A valid designation is required.\n");
-            return;
-        }
-
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_eu2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
         unsigned material_id;
         if(!get_input(command, material_id)) {
             suanpan_error("A valid material tag is required.\n");
@@ -2696,19 +2534,7 @@ namespace {
         return_obj = std::make_unique<ISection2D>(tag, scale * dim, material_id, int_pt, eccentricity);
     }
 
-    void new_eu3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        std::string type;
-        if(!get_input(command, type)) {
-            suanpan_error("A valid designation is required.\n");
-            return;
-        }
-
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_eu3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
         unsigned material_id;
         if(!get_input(command, material_id)) {
             suanpan_error("A valid material tag is required.\n");
@@ -2749,19 +2575,7 @@ namespace {
         return_obj = std::make_unique<ISection3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
     }
 
-    void new_nz2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        std::string type;
-        if(!get_input(command, type)) {
-            suanpan_error("A valid designation is required.\n");
-            return;
-        }
-
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_nz2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
         unsigned material_id;
         if(!get_input(command, material_id)) {
             suanpan_error("A valid material tag is required.\n");
@@ -2821,19 +2635,7 @@ namespace {
         suanpan_error("Cannot identify section type.\n");
     }
 
-    void new_nz3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        std::string type;
-        if(!get_input(command, type)) {
-            suanpan_error("A valid designation is required.\n");
-            return;
-        }
-
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_nz3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
         unsigned material_id;
         if(!get_input(command, material_id)) {
             suanpan_error("A valid material tag is required.\n");
@@ -2899,19 +2701,7 @@ namespace {
         suanpan_error("Cannot identify section type.\n");
     }
 
-    template<bool recenter> void new_us2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        std::string type;
-        if(!get_input(command, type)) {
-            suanpan_error("A valid designation is required.\n");
-            return;
-        }
-
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<bool recenter> void new_us2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
         unsigned material_id;
         if(!get_input(command, material_id)) {
             suanpan_error("A valid material tag is required.\n");
@@ -2968,19 +2758,7 @@ namespace {
         suanpan_error("Cannot identify section type.\n");
     }
 
-    template<bool recenter> void new_us3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
-        std::string type;
-        if(!get_input(command, type)) {
-            suanpan_error("A valid designation is required.\n");
-            return;
-        }
-
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<bool recenter> void new_us3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
         unsigned material_id;
         if(!get_input(command, material_id)) {
             suanpan_error("A valid material tag is required.\n");
@@ -3045,7 +2823,7 @@ namespace {
 } // namespace
 
 int create_new_section(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
-    static const TokenRegistry<void (*)(unique_ptr<Section>&, std::istringstream&)> registry{
+    static const TokenRegistry<void (*)(unique_ptr<Section>&, std::istringstream&, unsigned, const std::string&)> registry{
         {"Box2D", new_box2d},
         {"Box3D", new_box3d},
         {"Cell2D", new_cell2d},
@@ -3099,10 +2877,23 @@ int create_new_section(const shared_ptr<DomainBase>& domain, std::istringstream&
         return SUANPAN_SUCCESS;
     }
 
+    // code-based sections take an additional designation before the tag
+    std::string designation;
+    if(is_equal_any(section_id, "EU2D", "EU3D", "NZ2D", "NZ3D", "US2D", "US3D", "US2DC", "US3DC") && !get_input(command, designation)) {
+        suanpan_error("A valid designation is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
     unique_ptr<Section> new_section = nullptr;
 
-    if(const auto factory = registry.fetch(section_id); nullptr != factory) factory(new_section, command);
-    else external_module::object(new_section, domain, section_id, command);
+    if(const auto factory = registry.fetch(section_id); nullptr != factory) factory(new_section, command, tag, designation);
+    else external_module::object(new_section, domain, section_id, command, tag);
 
     if(new_section == nullptr || !domain->insert(std::move(new_section))) suanpan_error("Fail to create new section via \"{}\".\n", command.str());
 

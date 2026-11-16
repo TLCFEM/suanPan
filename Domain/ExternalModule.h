@@ -61,22 +61,23 @@ public:
     bool locate_c_module(const std::string&);
     bool locate_cpp_module(const std::string&);
 
-    template<typename T> void new_object(unique_ptr<T>& return_obj, std::istringstream& command) const {
-        if(ext_creator) reinterpret_cast<void (*)(unique_ptr<T>&, std::istringstream&)>(ext_creator)(return_obj, command);
+    template<typename T> void new_object(unique_ptr<T>& return_obj, std::istringstream& command, const unsigned tag) const {
+        if(ext_creator) reinterpret_cast<void (*)(unique_ptr<T>&, std::istringstream&, unsigned)>(ext_creator)(return_obj, command, tag);
     }
 
-    void new_adapter(unique_ptr<Element>&, std::istringstream&) const;
-    void new_adapter(unique_ptr<Load>&, std::istringstream&) const;
-    void new_adapter(unique_ptr<Material>&, std::istringstream&) const;
-    void new_adapter(unique_ptr<Section>&, std::istringstream&) const;
-    void new_adapter(unique_ptr<Solver>&, std::istringstream&) const;
-    void new_adapter(unique_ptr<Amplitude>&, std::istringstream&) const;
-    void new_adapter(unique_ptr<Modifier>&, std::istringstream&) const;
-    void new_adapter(unique_ptr<Constraint>&, std::istringstream&) const;
+    void new_adapter(unique_ptr<Element>&, std::istringstream&, unsigned) const;
+    void new_adapter(unique_ptr<Load>&, std::istringstream&, unsigned) const;
+    void new_adapter(unique_ptr<Material>&, std::istringstream&, unsigned) const;
+    void new_adapter(unique_ptr<Section>&, std::istringstream&, unsigned) const;
+    void new_adapter(unique_ptr<Solver>&, std::istringstream&, unsigned) const;
+    void new_adapter(unique_ptr<Amplitude>&, std::istringstream&, unsigned) const;
+    void new_adapter(unique_ptr<Modifier>&, std::istringstream&, unsigned) const;
+    void new_adapter(unique_ptr<Constraint>&, std::istringstream&, unsigned) const;
 };
 
 namespace external_module {
-    template<typename T> void object(unique_ptr<T>& new_object, const shared_ptr<DomainBase>& domain, const std::string& id, std::istringstream& command) {
+    // the tag is parsed by the create function, it thus has to be forwarded to the external module
+    template<typename T> void object(unique_ptr<T>& new_object, const shared_ptr<DomainBase>& domain, const std::string& id, std::istringstream& command, const unsigned tag) {
         // check if the library is already loaded
         auto loaded = false;
         for(const auto& I : domain->get_external_module_pool())
@@ -89,9 +90,9 @@ namespace external_module {
         // if loaded find corresponding function
         if(loaded || domain->insert(std::make_shared<ExternalModule>(id)))
             for(const auto& I : domain->get_external_module_pool()) {
-                if(I->locate_cpp_module(id)) I->new_object(new_object, command);
+                if(I->locate_cpp_module(id)) I->new_object(new_object, command, tag);
                 if(new_object != nullptr) break;
-                if(I->locate_c_module(id)) I->new_adapter(new_object, command);
+                if(I->locate_c_module(id)) I->new_adapter(new_object, command, tag);
                 if(new_object != nullptr) break;
             }
     }

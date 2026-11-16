@@ -53,7 +53,7 @@ public:
     void print() override;
 };
 
-SUANPAN_EXPORT void new_sectionexample(unique_ptr<Section>&, std::istringstream&);
+SUANPAN_EXPORT void new_sectionexample(unique_ptr<Section>&, std::istringstream&, unsigned);
 
 #endif
 

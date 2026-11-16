@@ -19,13 +19,7 @@
 
 #include <Toolbox/utility.h>
 
-SUANPAN_EXPORT void new_sectionexample(unique_ptr<Section>& return_obj, std::istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
+SUANPAN_EXPORT void new_sectionexample(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag) {
     double edge;
     if(!get_input(command, edge)) {
         suanpan_error("A valid width is required.\n");

@@ -385,7 +385,7 @@ int create_new_load(const shared_ptr<DomainBase>& domain, std::istringstream& co
     };
 
     if(const auto factory = registry.fetch(load_id); nullptr != factory) factory(new_load, command, tag);
-    else external_module::object(new_load, domain, load_id, command);
+    else external_module::object(new_load, domain, load_id, command, tag);
 
     if(new_load != nullptr) new_load->set_start_step(domain->get_current_step_tag());
 

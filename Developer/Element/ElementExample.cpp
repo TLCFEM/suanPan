@@ -21,13 +21,7 @@
 #include <Material/Material.h>
 #include <Toolbox/utility.h>
 
-SUANPAN_EXPORT void new_elementexample(unique_ptr<Element>& return_obj, std::istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
+SUANPAN_EXPORT void new_elementexample(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned tag) {
     std::vector<uword> node_tag(3);
     for(auto& I : node_tag)
         if(!get_input(command, I)) {

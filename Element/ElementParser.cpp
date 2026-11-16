@@ -2227,7 +2227,7 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     };
 
     if(const auto factory = registry.fetch(element_id); nullptr != factory) factory(new_element, command, tag);
-    else external_module::object(new_element, domain, element_id, command);
+    else external_module::object(new_element, domain, element_id, command, tag);
 
     if(nullptr == new_element || !domain->insert(std::move(new_element)))
         suanpan_error("Fail to create new element via \"{}\".\n", command.str());
@@ -2279,25 +2279,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream
     };
 
     if(const auto factory = registry.fetch(modifier_type); nullptr != factory) factory(new_modifier, command, tag);
-    else {
-        // check if the library is already loaded
-        auto code = false;
-        for(const auto& I : domain->get_external_module_pool())
-            if(is_equal(I->library_name, modifier_type) || I->locate_cpp_module(modifier_type)) {
-                code = true;
-                break;
-            }
-
-        // not loaded then try load it
-        if(!code && domain->insert(std::make_shared<ExternalModule>(modifier_type))) code = true;
-
-        // if loaded find corresponding function
-        if(code)
-            for(const auto& I : domain->get_external_module_pool()) {
-                if(I->locate_cpp_module(modifier_type)) I->new_object(new_modifier, command);
-                if(new_modifier != nullptr) break;
-            }
-    }
+    else external_module::object(new_modifier, domain, modifier_type, command, tag);
 
     if(nullptr == new_modifier || !domain->insert(std::move(new_modifier)))
         suanpan_error("Fail to create new modifier via \"{}\".\n", command.str());

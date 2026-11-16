@@ -98,27 +98,20 @@ bool ExternalModule::locate_c_module(const std::string& module_name) { return lo
 
 bool ExternalModule::locate_cpp_module(const std::string& module_name) { return locate_module("new_" + module_name); }
 
-void ExternalModule::new_adapter(unique_ptr<Element>&, std::istringstream&) const {}
+void ExternalModule::new_adapter(unique_ptr<Element>&, std::istringstream&, const unsigned) const {}
 
-void ExternalModule::new_adapter(unique_ptr<Load>&, std::istringstream&) const {}
+void ExternalModule::new_adapter(unique_ptr<Load>&, std::istringstream&, const unsigned) const {}
 
-void ExternalModule::new_adapter(unique_ptr<Material>& return_obj, std::istringstream& command) const {
-    unsigned tag;
-
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
+void ExternalModule::new_adapter(unique_ptr<Material>& return_obj, std::istringstream& command, const unsigned tag) const {
     if(auto ext_obj = std::make_unique<ExternalMaterial>(tag, get_remaining<double>(command), ext_creator); ext_obj->validate()) return_obj = std::move(ext_obj);
 }
 
-void ExternalModule::new_adapter(unique_ptr<Section>&, std::istringstream&) const {}
+void ExternalModule::new_adapter(unique_ptr<Section>&, std::istringstream&, const unsigned) const {}
 
-void ExternalModule::new_adapter(unique_ptr<Solver>&, std::istringstream&) const {}
+void ExternalModule::new_adapter(unique_ptr<Solver>&, std::istringstream&, const unsigned) const {}
 
-void ExternalModule::new_adapter(unique_ptr<Amplitude>&, std::istringstream&) const {}
+void ExternalModule::new_adapter(unique_ptr<Amplitude>&, std::istringstream&, const unsigned) const {}
 
-void ExternalModule::new_adapter(unique_ptr<Modifier>&, std::istringstream&) const {}
+void ExternalModule::new_adapter(unique_ptr<Modifier>&, std::istringstream&, const unsigned) const {}
 
-void ExternalModule::new_adapter(unique_ptr<Constraint>&, std::istringstream&) const {}
+void ExternalModule::new_adapter(unique_ptr<Constraint>&, std::istringstream&, const unsigned) const {}

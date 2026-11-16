@@ -19,13 +19,7 @@
 
 #include <Toolbox/utility.h>
 
-SUANPAN_EXPORT void new_materialexample(unique_ptr<Material>& return_obj, std::istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
+SUANPAN_EXPORT void new_materialexample(unique_ptr<Material>& return_obj, std::istringstream& command, const unsigned tag) {
     double elastic_modulus;
     if(!get_input(command, elastic_modulus)) {
         suanpan_error("A valid elastic modulus is required.\n");

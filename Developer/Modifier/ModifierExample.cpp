@@ -19,13 +19,7 @@
 
 #include <Toolbox/utility.h>
 
-SUANPAN_EXPORT void new_modifierexample(unique_ptr<Modifier>& return_obj, std::istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return;
-    }
-
+SUANPAN_EXPORT void new_modifierexample(unique_ptr<Modifier>& return_obj, std::istringstream& command, const unsigned tag) {
     double a, b;
     if(!get_input(command, a, b)) {
         suanpan_debug("Two valid numbers are required.\n");

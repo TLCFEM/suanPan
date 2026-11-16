@@ -497,7 +497,7 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
     };
 
     if(const auto factory = registry.fetch(constraint_id); nullptr != factory) factory(new_constraint, command, tag);
-    else external_module::object(new_constraint, domain, constraint_id, command);
+    else external_module::object(new_constraint, domain, constraint_id, command, tag);
 
     if(new_constraint) new_constraint->set_start_step(domain->get_current_step_tag());
 

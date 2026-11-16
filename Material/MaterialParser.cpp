@@ -3167,7 +3167,7 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     };
 
     if(const auto factory = registry.fetch(material_id); nullptr != factory) factory(new_material, command, tag);
-    else external_module::object(new_material, domain, material_id, command);
+    else external_module::object(new_material, domain, material_id, command, tag);
 
     if(nullptr == new_material || !domain->insert(std::move(new_material)))
         suanpan_error("Fail to create new material via \"{}\".\n", command.str());

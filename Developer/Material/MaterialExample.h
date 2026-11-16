@@ -72,7 +72,7 @@ public:
     void print() override;
 };
 
-SUANPAN_EXPORT void new_materialexample(unique_ptr<Material>&, std::istringstream&);
+SUANPAN_EXPORT void new_materialexample(unique_ptr<Material>&, std::istringstream&, unsigned);
 
 #endif
 
