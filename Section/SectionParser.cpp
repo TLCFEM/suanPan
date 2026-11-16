@@ -3043,75 +3043,69 @@ namespace {
 
         suanpan_error("Cannot identify section type.\n");
     }
-
-    using SectionFactory = void (*)(unique_ptr<Section>&, std::istringstream&);
-
-    const TokenRegistry<SectionFactory>& get_section_registry() {
-        static const TokenRegistry<SectionFactory> registry{
-            {"Box2D", new_box2d},
-            {"Box3D", new_box3d},
-            {"Cell2D", new_cell2d},
-            {"Bar2D", new_cell2d},
-            {"Cell3D", new_cell3d},
-            {"Bar3D", new_cell3d},
-            {"Cell3DOS", new_cell3dos},
-            {"Circle1D", new_circle1d},
-            {"Circle2D", new_circle2d},
-            {"Circle3D", new_circle3d},
-            {"CircularHollow2D", new_circularhollow2D},
-            {"CircularHollow3D", new_circularhollow3D},
-            {"Fibre1D", new_fibre1d},
-            {"Fibre2D", new_fibre2d},
-            {"Fibre3D", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_fibre3d<false>(obj, cmd); }},
-            {"Fibre3DOS", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_fibre3d<true>(obj, cmd); }},
-            {"HSection2D", new_hsection2d},
-            {"ISection2D", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_isection2d<false>(obj, cmd); }},
-            {"ISection3D", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_isection3d<false>(obj, cmd); }},
-            {"ISection2DC", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_isection2d<true>(obj, cmd); }},
-            {"ISection3DC", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_isection3d<true>(obj, cmd); }},
-            {"Rectangle1D", new_rectangle1d},
-            {"Rectangle2D", new_rectangle2d},
-            {"Rectangle3D", new_rectangle3d},
-            {"TrussSection", new_trusssection},
-            {"TSection2D", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_tsection2d<false>(obj, cmd); }},
-            {"TSection3D", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_tsection3d<false>(obj, cmd); }},
-            {"TSection2DC", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_tsection2d<true>(obj, cmd); }},
-            {"TSection3DC", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_tsection3d<true>(obj, cmd); }},
-            {"NM2D1", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_nm2d<3>(obj, cmd); }},
-            {"NM2D2", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_nm2d<8>(obj, cmd); }},
-            {"NM2D3", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_nm2d<11>(obj, cmd); }},
-            {"NM3D1", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_nm3d<4>(obj, cmd); }},
-            {"NM3D2", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_nm3d<10>(obj, cmd); }},
-            {"NM3D3", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_nm3d<13>(obj, cmd); }},
-            {"NM2D3K", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_nmk<13>(obj, cmd); }},
-            {"NM3D3K", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_nmk<17>(obj, cmd); }},
-            {"EU2D", new_eu2d},
-            {"EU3D", new_eu3d},
-            {"NZ2D", new_nz2d},
-            {"NZ3D", new_nz3d},
-            {"US2D", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_us2d<false>(obj, cmd); }},
-            {"US3D", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_us3d<false>(obj, cmd); }},
-            {"US2DC", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_us2d<true>(obj, cmd); }},
-            {"US3DC", [](unique_ptr<Section>& obj, std::istringstream& cmd) { new_us3d<true>(obj, cmd); }},
-        };
-        return registry;
-    }
 } // namespace
 
 int create_new_section(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    static const TokenRegistry<void (*)(unique_ptr<Section>&, std::istringstream&)> registry{
+        {"Box2D", new_box2d},
+        {"Box3D", new_box3d},
+        {"Cell2D", new_cell2d},
+        {"Bar2D", new_cell2d},
+        {"Cell3D", new_cell3d},
+        {"Bar3D", new_cell3d},
+        {"Cell3DOS", new_cell3dos},
+        {"Circle1D", new_circle1d},
+        {"Circle2D", new_circle2d},
+        {"Circle3D", new_circle3d},
+        {"CircularHollow2D", new_circularhollow2D},
+        {"CircularHollow3D", new_circularhollow3D},
+        {"Fibre1D", new_fibre1d},
+        {"Fibre2D", new_fibre2d},
+        {"Fibre3D", new_fibre3d<false>},
+        {"Fibre3DOS", new_fibre3d<true>},
+        {"HSection2D", new_hsection2d},
+        {"ISection2D", new_isection2d<false>},
+        {"ISection3D", new_isection3d<false>},
+        {"ISection2DC", new_isection2d<true>},
+        {"ISection3DC", new_isection3d<true>},
+        {"Rectangle1D", new_rectangle1d},
+        {"Rectangle2D", new_rectangle2d},
+        {"Rectangle3D", new_rectangle3d},
+        {"TrussSection", new_trusssection},
+        {"TSection2D", new_tsection2d<false>},
+        {"TSection3D", new_tsection3d<false>},
+        {"TSection2DC", new_tsection2d<true>},
+        {"TSection3DC", new_tsection3d<true>},
+        {"NM2D1", new_nm2d<3>},
+        {"NM2D2", new_nm2d<8>},
+        {"NM2D3", new_nm2d<11>},
+        {"NM3D1", new_nm3d<4>},
+        {"NM3D2", new_nm3d<10>},
+        {"NM3D3", new_nm3d<13>},
+        {"NM2D3K", new_nmk<13>},
+        {"NM3D3K", new_nmk<17>},
+        {"EU2D", new_eu2d},
+        {"EU3D", new_eu3d},
+        {"NZ2D", new_nz2d},
+        {"NZ3D", new_nz3d},
+        {"US2D", new_us2d<false>},
+        {"US3D", new_us3d<false>},
+        {"US2DC", new_us2d<true>},
+        {"US3DC", new_us3d<true>},
+    };
+
     std::string section_id;
     if(!get_input(command, section_id)) {
         suanpan_error("A valid section type is required.\n");
-        return 0;
+        return SUANPAN_SUCCESS;
     }
 
     unique_ptr<Section> new_section = nullptr;
 
-    if(const auto factory = get_section_registry().fetch(section_id); nullptr != factory) factory(new_section, command);
+    if(const auto factory = registry.fetch(section_id); nullptr != factory) factory(new_section, command);
     else external_module::object(new_section, domain, section_id, command);
 
-    if(new_section == nullptr || !domain->insert(std::move(new_section)))
-        suanpan_error("Fail to create new section via \"{}\".\n", command.str());
+    if(new_section == nullptr || !domain->insert(std::move(new_section))) suanpan_error("Fail to create new section via \"{}\".\n", command.str());
 
-    return 0;
+    return SUANPAN_SUCCESS;
 }

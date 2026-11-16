@@ -30,13 +30,6 @@
 
 #include <Toolbox/utility.h>
 
-#include <cassert>
-#include <initializer_list>
-#include <string>
-#include <string_view>
-#include <unordered_map>
-#include <utility>
-
 /**
  * @brief An immutable registry of values keyed by command token.
  *
@@ -46,30 +39,20 @@
  * @tparam V value type, which may also be a factory function pointer
  */
 template<typename V> class TokenRegistry {
+    std::unordered_map<std::string, V> pool;
+
 public:
     TokenRegistry(std::initializer_list<std::pair<std::string_view, V>> entries) {
         pool.reserve(entries.size());
-        for(const auto& [token, value] : entries) {
-            const auto inserted = pool.emplace(suanpan::to_lower(std::string{token}), value).second;
-            assert(inserted && "duplicate registry token");
-            static_cast<void>(inserted);
-        }
+        for(const auto& [token, value] : entries) pool.emplace(suanpan::to_lower(token), value);
     }
 
-    /**
-     * @brief Fetch the value associated with the given token.
-     *
-     * @return the stored value, or a value-initialised V if the token is not registered
-     */
     [[nodiscard]] V fetch(const std::string_view token) const {
-        if(const auto iter = pool.find(suanpan::to_lower(std::string{token})); iter != pool.cend()) return iter->second;
+        if(const auto iter = pool.find(suanpan::to_lower(token)); iter != pool.cend()) return iter->second;
         return V{};
     }
 
     [[nodiscard]] auto size() const { return pool.size(); }
-
-private:
-    std::unordered_map<std::string, V> pool;
 };
 
 #endif
