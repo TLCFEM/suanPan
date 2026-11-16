@@ -23,6 +23,10 @@
 #include <Recorder/OutputType.h>
 
 namespace {
+    //
+    // constraints
+    //
+
     template<bool penalty, bool group> void new_bc(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned bc_id;
         if(!get_input(command, bc_id)) {
@@ -410,164 +414,155 @@ namespace {
             suanpan_error("A valid number of parameters is required.\n");
         }
     }
-} // namespace
 
-int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
-    std::string criterion_type;
-    if(!get_input(command, criterion_type)) {
-        suanpan_error("A valid criterion type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
+    //
+    // criteria
+    //
 
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
+    template<typename T> void new_logic_criterion(unique_ptr<Criterion>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    unique_ptr<Criterion> new_criterion = nullptr;
-
-    if(is_equal(criterion_type.substr(0, 5), "Logic")) {
         auto tags = get_remaining<unsigned>(command);
         if(tags.empty()) {
             suanpan_error("At least one valid tag is required.\n");
-            return SUANPAN_SUCCESS;
+            return;
         }
 
-        if(is_equal_any(criterion_type, "LogicAll", "LogicCriterionAll")) new_criterion = std::make_unique<LogicCriterionAll>(tag, std::move(tags));
-        else if(is_equal_any(criterion_type, "LogicAny", "LogicCriterionAny")) new_criterion = std::make_unique<LogicCriterionAny>(tag, std::move(tags));
+        return_obj = std::make_unique<T>(tag, std::move(tags));
     }
-    else if(is_equal(criterion_type, "StrainEnergyEvolution")) {
+
+    void new_strain_energy_evolution(unique_ptr<Criterion>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
         unsigned incre_level, final_level;
         if(!get_input(command, incre_level, final_level)) {
             suanpan_error("A valid level is required.\n");
-            return SUANPAN_SUCCESS;
+            return;
         }
 
         auto weight = 1.;
         if(!command.eof() && !get_input(command, weight)) {
             suanpan_error("A valid weight of central element is required.\n");
-            return SUANPAN_SUCCESS;
+            return;
         }
         auto iteration = 2;
         if(!command.eof() && !get_input(command, iteration)) {
             suanpan_error("A valid number of iteration is required.\n");
-            return SUANPAN_SUCCESS;
+            return;
         }
         auto reactivation = 10;
         if(!command.eof() && !get_input(command, reactivation)) {
             suanpan_error("A valid number of reactivation ratio is required.\n");
-            return SUANPAN_SUCCESS;
+            return;
         }
         auto propagation = .5;
         if(!command.eof() && !get_input(command, propagation)) {
             suanpan_error("A valid propagation factor is required.\n");
-            return SUANPAN_SUCCESS;
+            return;
         }
         auto tolerance = 1E-5;
         if(!command.eof() && !get_input(command, tolerance)) {
             suanpan_error("A valid tolerance is required.\n");
-            return SUANPAN_SUCCESS;
+            return;
         }
 
-        new_criterion = std::make_unique<StrainEnergyEvolution>(tag, incre_level, final_level, weight, iteration, reactivation, propagation, tolerance);
+        return_obj = std::make_unique<StrainEnergyEvolution>(tag, incre_level, final_level, weight, iteration, reactivation, propagation, tolerance);
     }
-    else if(is_equal(criterion_type, "MaxHistory")) {
+
+    template<typename T> void new_history_criterion(unique_ptr<Criterion>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
         std::string type;
-        double limit;
         if(!get_input(command, type)) {
             suanpan_error("A valid type is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-        if(!get_input(command, limit)) {
-            suanpan_error("A valid limit is required.\n");
-            return SUANPAN_SUCCESS;
+            return;
         }
 
-        new_criterion = std::make_unique<MaxHistory>(tag, to_token(std::move(type)), limit, get_remaining<uword>(command));
-    }
-    else if(is_equal(criterion_type, "MinHistory")) {
-        std::string type;
         double limit;
-        if(!get_input(command, type)) {
-            suanpan_error("A valid type is required.\n");
-            return SUANPAN_SUCCESS;
-        }
         if(!get_input(command, limit)) {
             suanpan_error("A valid limit is required.\n");
-            return SUANPAN_SUCCESS;
+            return;
         }
 
-        new_criterion = std::make_unique<MinHistory>(tag, to_token(std::move(type)), limit, get_remaining<uword>(command));
+        return_obj = std::make_unique<T>(tag, to_token(std::move(type)), limit, get_remaining<uword>(command));
     }
-    else {
+
+    template<typename T> void new_displacement_criterion(unique_ptr<Criterion>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
         unsigned node;
         if(!get_input(command, node)) {
             suanpan_error("A valid node tag is required.\n");
-            return SUANPAN_SUCCESS;
+            return;
         }
 
         std::string dof_token;
         if(!get_input(command, dof_token)) {
             suanpan_error("A valid dof identifier is required.\n");
-            return SUANPAN_SUCCESS;
+            return;
         }
 
         auto dof_pool = parse_dof(dof_token);
         if(1 != dof_pool.size()) {
             suanpan_error("A valid dof identifier is required.\n");
-            return SUANPAN_SUCCESS;
+            return;
         }
 
         double limit;
         if(!get_input(command, limit)) {
             suanpan_error("A valid limit is required.\n");
-            return SUANPAN_SUCCESS;
+            return;
         }
 
-        if(is_equal(criterion_type, "MaxDisplacement")) new_criterion = std::make_unique<MaxDisplacement>(tag, node, dof_pool[0], limit);
-        else if(is_equal(criterion_type, "MinDisplacement")) new_criterion = std::make_unique<MinDisplacement>(tag, node, dof_pool[0], limit);
-        else if(is_equal(criterion_type, "MaxResistance")) new_criterion = std::make_unique<MaxResistance>(tag, node, dof_pool[0], limit);
-        else if(is_equal(criterion_type, "MinResistance")) new_criterion = std::make_unique<MinResistance>(tag, node, dof_pool[0], limit);
+        return_obj = std::make_unique<T>(tag, node, dof_pool[0], limit);
     }
 
-    if(new_criterion) new_criterion->set_start_step(domain->get_current_step_tag());
+    //
+    // interaction
+    //
 
-    if(!new_criterion || !domain->insert(std::move(new_criterion))) suanpan_error("Fail to create new criterion via \"{}\".\n", command.str());
+    void new_hertzian(unique_ptr<Interaction>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_interaction(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
-    std::string criterion_type;
-    if(!get_input(command, criterion_type)) {
-        suanpan_error("A valid criterion type is required.\n");
-        return SUANPAN_SUCCESS;
+        return_obj = std::make_unique<Hertzian>(tag);
     }
 
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
+    void new_fixed_particle(unique_ptr<Interaction>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
 
-    auto flag = true;
-
-    if(is_equal(criterion_type, "Hertzian")) flag = domain->insert(std::make_shared<Hertzian>(tag));
-    else if(is_equal(criterion_type, "FixedParticle")) {
         double multiplier;
         if(!get_input(command, multiplier)) {
             suanpan_error("A valid multiplier is required.\n");
-            return SUANPAN_SUCCESS;
+            return;
         }
 
-        flag = domain->insert(std::make_shared<FixedParticle>(tag, multiplier, get_remaining_as_set<unsigned>(command)));
+        return_obj = std::make_unique<FixedParticle>(tag, multiplier, get_remaining_as_set<unsigned>(command));
     }
-
-    if(!flag) suanpan_error("Fail to create new interaction via \"{}\".\n", command.str());
-
-    return SUANPAN_SUCCESS;
-}
+} // namespace
 
 int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string constraint_id;
@@ -614,6 +609,49 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
     if(new_constraint) new_constraint->set_start_step(domain->get_current_step_tag());
 
     if(!new_constraint || !domain->insert(std::move(new_constraint))) suanpan_error("Fail to create new constraint via \"{}\".\n", command.str());
+
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    std::string criterion_type;
+    if(!get_input(command, criterion_type)) {
+        suanpan_error("A valid criterion type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unique_ptr<Criterion> new_criterion = nullptr;
+
+    if(is_equal_any(criterion_type, "LogicAll", "LogicCriterionAll")) new_logic_criterion<LogicCriterionAll>(new_criterion, command);
+    else if(is_equal_any(criterion_type, "LogicAny", "LogicCriterionAny")) new_logic_criterion<LogicCriterionAny>(new_criterion, command);
+    else if(is_equal(criterion_type, "StrainEnergyEvolution")) new_strain_energy_evolution(new_criterion, command);
+    else if(is_equal(criterion_type, "MaxHistory")) new_history_criterion<MaxHistory>(new_criterion, command);
+    else if(is_equal(criterion_type, "MinHistory")) new_history_criterion<MinHistory>(new_criterion, command);
+    else if(is_equal(criterion_type, "MaxDisplacement")) new_displacement_criterion<MaxDisplacement>(new_criterion, command);
+    else if(is_equal(criterion_type, "MinDisplacement")) new_displacement_criterion<MinDisplacement>(new_criterion, command);
+    else if(is_equal(criterion_type, "MaxResistance")) new_displacement_criterion<MaxResistance>(new_criterion, command);
+    else if(is_equal(criterion_type, "MinResistance")) new_displacement_criterion<MinResistance>(new_criterion, command);
+
+    if(new_criterion) new_criterion->set_start_step(domain->get_current_step_tag());
+
+    if(nullptr == new_criterion || !domain->insert(std::move(new_criterion))) suanpan_error("Fail to create new criterion via \"{}\".\n", command.str());
+
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_interaction(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    std::string interaction_type;
+    if(!get_input(command, interaction_type)) {
+        suanpan_error("A valid interaction type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unique_ptr<Interaction> new_interaction = nullptr;
+
+    if(is_equal(interaction_type, "Hertzian")) new_hertzian(new_interaction, command);
+    else if(is_equal(interaction_type, "FixedParticle")) new_fixed_particle(new_interaction, command);
+
+    if(nullptr == new_interaction || !domain->insert(std::move(new_interaction))) suanpan_error("Fail to create new interaction via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }

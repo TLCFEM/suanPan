@@ -22,6 +22,74 @@
 #include <Step/Step.h>
 #include <Toolbox/utility.h>
 
+namespace {
+    template<typename T> void new_logic_converger(unique_ptr<Converger>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        unsigned tag_a, tag_b;
+        if(!get_input(command, tag_a, tag_b)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<T>(tag, tag_a, tag_b);
+    }
+
+    template<typename T> void new_default_converger(unique_ptr<Converger>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        auto tolerance{1E-6};
+        if(!command.eof() && !get_input(command, tolerance)) {
+            suanpan_error("A valid tolerance is required.\n");
+            return;
+        }
+
+        auto max_iteration{10u};
+        if(!command.eof() && !get_input(command, max_iteration)) {
+            suanpan_error("A valid maximum iteration is required.\n");
+            return;
+        }
+
+        std::string print_flag{"false"};
+        if(!command.eof() && !get_input(command, print_flag)) {
+            suanpan_error("A valid print flag is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<T>(tag, tolerance, max_iteration, is_true(print_flag));
+    }
+
+    void new_fixed_number(unique_ptr<Converger>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        auto max_iteration{10u};
+        if(!command.eof() && !get_input(command, max_iteration)) {
+            suanpan_error("A valid maximum iteration is required.\n");
+            return;
+        }
+
+        std::string print_flag{"false"};
+        if(!command.eof() && !get_input(command, print_flag)) {
+            suanpan_error("A valid print flag is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<FixedNumber>(tag, max_iteration, is_true(print_flag));
+    }
+} // namespace
+
 int create_new_converger(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string converger_id;
     if(!get_input(command, converger_id)) {
@@ -29,67 +97,39 @@ int create_new_converger(const shared_ptr<DomainBase>& domain, std::istringstrea
         return SUANPAN_SUCCESS;
     }
 
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
+    unique_ptr<Converger> new_converger = nullptr;
+
+    if(is_equal_any(converger_id, "LogicAND", "LogicConvergerAND")) new_logic_converger<LogicConvergerAND>(new_converger, command);
+    else if(is_equal_any(converger_id, "LogicOR", "LogicConvergerOR")) new_logic_converger<LogicConvergerOR>(new_converger, command);
+    else if(is_equal_any(converger_id, "LogicXOR", "LogicConvergerXOR")) new_logic_converger<LogicConvergerXOR>(new_converger, command);
+    else if(is_equal(converger_id, "AbsResidual")) new_default_converger<AbsResidual>(new_converger, command);
+    else if(is_equal(converger_id, "RelResidual")) new_default_converger<RelResidual>(new_converger, command);
+    else if(is_equal(converger_id, "AbsIncreDisp")) new_default_converger<AbsIncreDisp>(new_converger, command);
+    else if(is_equal(converger_id, "RelIncreDisp")) new_default_converger<RelIncreDisp>(new_converger, command);
+    else if(is_equal(converger_id, "AbsIncreAcc")) new_default_converger<AbsIncreAcc>(new_converger, command);
+    else if(is_equal(converger_id, "RelIncreAcc")) new_default_converger<RelIncreAcc>(new_converger, command);
+    else if(is_equal(converger_id, "AbsDisp")) new_default_converger<AbsDisp>(new_converger, command);
+    else if(is_equal(converger_id, "RelDisp")) new_default_converger<RelDisp>(new_converger, command);
+    else if(is_equal(converger_id, "AbsError")) new_default_converger<AbsError>(new_converger, command);
+    else if(is_equal(converger_id, "RelError")) new_default_converger<RelError>(new_converger, command);
+    else if(is_equal(converger_id, "AbsIncreEnergy")) new_default_converger<AbsIncreEnergy>(new_converger, command);
+    else if(is_equal(converger_id, "RelIncreEnergy")) new_default_converger<RelIncreEnergy>(new_converger, command);
+    else if(is_equal(converger_id, "FixedNumber")) new_fixed_number(new_converger, command);
+
+    if(nullptr == new_converger) {
+        suanpan_error("Fail to create new converger via \"{}\".\n", command.str());
         return SUANPAN_SUCCESS;
     }
 
-    auto code = 0;
-    if(is_equal(converger_id.substr(0, 5), "Logic")) {
-        unsigned tag_a, tag_b;
-        if(!get_input(command, tag_a, tag_b)) {
-            suanpan_error("A valid tag is required.\n");
-            return SUANPAN_SUCCESS;
-        }
+    const auto tag = new_converger->get_tag();
 
-        if(is_equal_any(converger_id, "LogicAND", "LogicConvergerAND") && domain->insert(std::make_shared<LogicConvergerAND>(tag, tag_a, tag_b))) code = 1; // NOLINT(bugprone-branch-clone)
-        else if(is_equal_any(converger_id, "LogicOR", "LogicConvergerOR") && domain->insert(std::make_shared<LogicConvergerOR>(tag, tag_a, tag_b))) code = 1;
-        else if(is_equal_any(converger_id, "LogicXOR", "LogicConvergerXOR") && domain->insert(std::make_shared<LogicConvergerXOR>(tag, tag_a, tag_b))) code = 1;
-        else suanpan_error("Cannot identify converger type.\n");
-    }
-    else {
-        auto tolerance = 1E-6;
-        if(!is_equal(converger_id, "FixedNumber") && (!command.eof() && !get_input(command, tolerance))) {
-            suanpan_error("A valid tolerance is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        auto max_iteration = 10;
-        if(!command.eof() && !get_input(command, max_iteration)) {
-            suanpan_error("A valid maximum iteration is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        std::string print_flag = "false";
-        if(!command.eof() && !get_input(command, print_flag)) {
-            suanpan_error("A valid print flag is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        if(is_equal(converger_id, "AbsResidual") && domain->insert(std::make_shared<AbsResidual>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1; // NOLINT(bugprone-branch-clone)
-        else if(is_equal(converger_id, "RelResidual") && domain->insert(std::make_shared<RelResidual>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "AbsIncreDisp") && domain->insert(std::make_shared<AbsIncreDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "RelIncreDisp") && domain->insert(std::make_shared<RelIncreDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "AbsIncreAcc") && domain->insert(std::make_shared<AbsIncreAcc>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "RelIncreAcc") && domain->insert(std::make_shared<RelIncreAcc>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "AbsDisp") && domain->insert(std::make_shared<AbsDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "RelDisp") && domain->insert(std::make_shared<RelDisp>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "AbsError") && domain->insert(std::make_shared<AbsError>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "RelError") && domain->insert(std::make_shared<RelError>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "AbsIncreEnergy") && domain->insert(std::make_shared<AbsIncreEnergy>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "RelIncreEnergy") && domain->insert(std::make_shared<RelIncreEnergy>(tag, tolerance, max_iteration, is_true(print_flag)))) code = 1;
-        else if(is_equal(converger_id, "FixedNumber") && domain->insert(std::make_shared<FixedNumber>(tag, max_iteration, is_true(print_flag)))) code = 1;
-        else
-            suanpan_error("Cannot identify converger type.\n");
-    }
-
-    if(1 == code) {
-        if(domain->get_current_step_tag() != 0) domain->get_current_step()->set_converger_tag(tag);
-        domain->set_current_converger_tag(tag);
-    }
-    else
+    if(!domain->insert(std::move(new_converger))) {
         suanpan_error("Fail to create new converger via \"{}\".\n", command.str());
+        return SUANPAN_SUCCESS;
+    }
+
+    if(domain->get_current_step_tag() != 0) domain->get_current_step()->set_converger_tag(tag);
+    domain->set_current_converger_tag(tag);
 
     return SUANPAN_SUCCESS;
 }

@@ -21,6 +21,82 @@
 #include <Step/Step>
 #include <Toolbox/utility.h>
 
+namespace {
+    void new_frequency(unique_ptr<Step>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        auto eigen_number = 1;
+        if(!command.eof() && !get_input(command, eigen_number)) {
+            suanpan_error("A valid number of eigenvalues is required.\n");
+            return;
+        }
+
+        char type = 's';
+        if(!get_optional_input(command, type)) {
+            suanpan_error("A valid eigenvalue type is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<Frequency>(tag, eigen_number, suanpan::to_upper(type));
+    }
+
+    void new_buckle(unique_ptr<Step>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<Buckle>(tag);
+    }
+
+    template<typename T> void new_time_step(unique_ptr<Step>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        auto time = 1.;
+        if(!command.eof() && !get_input(command, time)) {
+            suanpan_error("A valid time period is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<T>(tag, time);
+    }
+
+    template<Integrator::Type type> void new_dynamic(unique_ptr<Step>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        auto time = 1.;
+        if(!command.eof() && !get_input(command, time)) {
+            suanpan_error("A valid time period is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<Dynamic>(tag, time, type);
+    }
+
+    void new_arclength(unique_ptr<Step>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<ArcLength>(tag);
+    }
+} // namespace
+
 int create_new_step(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string step_type;
     if(!get_input(command, step_type)) {
@@ -28,81 +104,25 @@ int create_new_step(const shared_ptr<DomainBase>& domain, std::istringstream& co
         return SUANPAN_SUCCESS;
     }
 
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
+    unique_ptr<Step> new_step = nullptr;
+
+    if(is_equal(step_type, "Frequency")) new_frequency(new_step, command);
+    else if(is_equal_any(step_type, "Buckling", "Buckle")) new_buckle(new_step, command);
+    else if(is_equal_any(step_type, "Optimization", "Optimisation")) new_time_step<Optimization>(new_step, command);
+    else if(is_equal(step_type, "Static")) new_time_step<Static>(new_step, command);
+    else if(is_equal_any(step_type, "Dynamic", "ImplicitDynamic")) new_dynamic<Integrator::Type::Implicit>(new_step, command);
+    else if(is_equal(step_type, "ExplicitDynamic")) new_dynamic<Integrator::Type::Explicit>(new_step, command);
+    else if(is_equal(step_type, "ArcLength")) new_arclength(new_step, command);
+
+    if(nullptr == new_step) {
+        suanpan_error("Fail to create new step via \"{}\".\n", command.str());
         return SUANPAN_SUCCESS;
     }
 
-    if(is_equal(step_type, "Frequency")) {
-        auto eigen_number = 1;
-        if(!command.eof() && !get_input(command, eigen_number)) {
-            suanpan_error("A valid number of eigenvalues is required.\n");
-            return SUANPAN_SUCCESS;
-        }
+    const auto tag = new_step->get_tag();
 
-        char type = 's';
-        if(!get_optional_input(command, type)) {
-            suanpan_error("A valid eigenvalue type is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        if(domain->insert(std::make_shared<Frequency>(tag, eigen_number, suanpan::to_upper(type)))) domain->set_current_step_tag(tag);
-        else
-            suanpan_error("Cannot create new step.\n");
-    }
-    else if(is_equal_any(step_type, "Buckling", "Buckle")) {
-        if(domain->insert(std::make_shared<Buckle>(tag))) domain->set_current_step_tag(tag);
-        else
-            suanpan_error("Cannot create new step.\n");
-    }
-    else if(is_equal_any(step_type, "Optimization", "Optimisation")) {
-        auto time = 1.;
-        if(!command.eof() && !get_input(command, time)) {
-            suanpan_error("A valid time period is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-        if(domain->insert(std::make_shared<Optimization>(tag, time))) domain->set_current_step_tag(tag);
-        else
-            suanpan_error("Cannot create new step.\n");
-    }
-    else if(is_equal(step_type, "Static")) {
-        auto time = 1.;
-        if(!command.eof() && !get_input(command, time)) {
-            suanpan_error("A valid time period is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-        if(domain->insert(std::make_shared<Static>(tag, time))) domain->set_current_step_tag(tag);
-        else
-            suanpan_error("Cannot create new step.\n");
-    }
-    else if(is_equal_any(step_type, "Dynamic", "ImplicitDynamic")) {
-        auto time = 1.;
-        if(!command.eof() && !get_input(command, time)) {
-            suanpan_error("A valid time period is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-        if(domain->insert(std::make_shared<Dynamic>(tag, time, Integrator::Type::Implicit))) domain->set_current_step_tag(tag);
-        else
-            suanpan_error("Cannot create new step.\n");
-    }
-    else if(is_equal(step_type, "ExplicitDynamic")) {
-        auto time = 1.;
-        if(!command.eof() && !get_input(command, time)) {
-            suanpan_error("A valid time period is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-        if(domain->insert(std::make_shared<Dynamic>(tag, time, Integrator::Type::Explicit))) domain->set_current_step_tag(tag);
-        else
-            suanpan_error("Cannot create new step.\n");
-    }
-    else if(is_equal(step_type, "ArcLength")) {
-        if(domain->insert(std::make_shared<ArcLength>(tag))) domain->set_current_step_tag(tag);
-        else
-            suanpan_error("Fail to create new step via \"{}\".\n", command.str());
-    }
-    else
-        suanpan_error("Cannot identify step type.\n");
+    if(domain->insert(std::move(new_step))) domain->set_current_step_tag(tag);
+    else suanpan_error("Fail to create new step via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }
