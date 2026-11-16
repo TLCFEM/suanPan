@@ -21,6 +21,7 @@
 #include <Constraint/Constraint>
 #include <Domain/ExternalModule.h>
 #include <Recorder/OutputType.h>
+#include <Toolbox/TokenRegistry.h>
 
 namespace {
     //
@@ -573,37 +574,55 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
 
     unique_ptr<Constraint> new_constraint = nullptr;
 
-    if(is_equal(constraint_id, "Embed2D")) new_embed<2u>(new_constraint, command);
-    else if(is_equal(constraint_id, "Embed3D")) new_embed<3u>(new_constraint, command);
-    else if(is_equal_any(constraint_id, "FiniteRestitutionWall", "FiniteRestitutionWallPenalty")) new_restitutionwall<true>(new_constraint, command);
-    else if(is_equal_any(constraint_id, "FiniteRigidWall", "FiniteRigidWallPenalty")) new_rigidwall<true, true>(new_constraint, command);
-    else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall<true, false>(new_constraint, command);
-    else if(is_equal_any(constraint_id, "Fix", "PenaltyBC")) new_bc<true, false>(new_constraint, command);
-    else if(is_equal_any(constraint_id, "Fix2", "MultiplierBC")) new_bc<false, false>(new_constraint, command);
-    else if(is_equal_any(constraint_id, "FixedLength2D", "R2D2")) new_fixedlength<2u>(new_constraint, command);
-    else if(is_equal_any(constraint_id, "FixedLength3D", "R3D2")) new_fixedlength<3u>(new_constraint, command);
-    else if(is_equal(constraint_id, "GroupMultiplierBC")) new_bc<false, true>(new_constraint, command);
-    else if(is_equal(constraint_id, "GroupPenaltyBC")) new_bc<true, true>(new_constraint, command);
-    else if(is_equal(constraint_id, "LinearSpring2D")) new_linearspring(new_constraint, command);
-    else if(is_equal(constraint_id, "LJPotential2D")) new_ljpotential(new_constraint, command);
-    else if(is_equal_any(constraint_id, "MaximumForce2D", "MaxForce2D")) new_maxforce<2u>(new_constraint, command);
-    else if(is_equal_any(constraint_id, "MaximumForce3D", "MaxForce3D")) new_maxforce<3u>(new_constraint, command);
-    else if(is_equal_any(constraint_id, "MaximumGap2D", "MaxGap2D")) new_maximumgap<2u>(new_constraint, command);
-    else if(is_equal_any(constraint_id, "MaximumGap3D", "MaxGap3D")) new_maximumgap<3u>(new_constraint, command);
-    else if(is_equal_any(constraint_id, "MinimumGap2D", "MinGap2D")) new_minimumgap<2u>(new_constraint, command);
-    else if(is_equal_any(constraint_id, "MinimumGap3D", "MinGap3D")) new_minimumgap<3u>(new_constraint, command);
-    else if(is_equal(constraint_id, "MPC")) new_mpc(new_constraint, command);
-    else if(is_equal(constraint_id, "NodeFacet")) new_nodefacet(new_constraint, command);
-    else if(is_equal(constraint_id, "NodeLine")) new_nodeline(new_constraint, command);
-    else if(is_equal(constraint_id, "MolecularDynamics2D")) new_moleculardynamics<2u>(new_constraint, command);
-    else if(is_equal(constraint_id, "MolecularDynamics3D")) new_moleculardynamics<3u>(new_constraint, command);
-    else if(is_equal(constraint_id, "ParticleCollision2D")) new_particlecollision<2>(new_constraint, command);
-    else if(is_equal(constraint_id, "ParticleCollision3D")) new_particlecollision<3>(new_constraint, command);
-    else if(is_equal_any(constraint_id, "RestitutionWall", "RestitutionWallPenalty")) new_restitutionwall<false>(new_constraint, command);
-    else if(is_equal_any(constraint_id, "RigidWall", "RigidWallPenalty")) new_rigidwall<false, true>(new_constraint, command);
-    else if(is_equal(constraint_id, "RigidWallMultiplier")) new_rigidwall<false, false>(new_constraint, command);
-    else if(is_equal(constraint_id, "Sleeve2D")) new_sleeve<2u>(new_constraint, command);
-    else if(is_equal(constraint_id, "Sleeve3D")) new_sleeve<3u>(new_constraint, command);
+    static const TokenRegistry<void (*)(unique_ptr<Constraint>&, std::istringstream&)> registry{
+        {"Embed2D", new_embed<2u>},
+        {"Embed3D", new_embed<3u>},
+        {"FiniteRestitutionWall", new_restitutionwall<true>},
+        {"FiniteRestitutionWallPenalty", new_restitutionwall<true>},
+        {"FiniteRigidWall", new_rigidwall<true, true>},
+        {"FiniteRigidWallPenalty", new_rigidwall<true, true>},
+        {"FiniteRigidWallMultiplier", new_rigidwall<true, false>},
+        {"Fix", new_bc<true, false>},
+        {"PenaltyBC", new_bc<true, false>},
+        {"Fix2", new_bc<false, false>},
+        {"MultiplierBC", new_bc<false, false>},
+        {"FixedLength2D", new_fixedlength<2u>},
+        {"R2D2", new_fixedlength<2u>},
+        {"FixedLength3D", new_fixedlength<3u>},
+        {"R3D2", new_fixedlength<3u>},
+        {"GroupMultiplierBC", new_bc<false, true>},
+        {"GroupPenaltyBC", new_bc<true, true>},
+        {"LinearSpring2D", new_linearspring},
+        {"LJPotential2D", new_ljpotential},
+        {"MaximumForce2D", new_maxforce<2u>},
+        {"MaxForce2D", new_maxforce<2u>},
+        {"MaximumForce3D", new_maxforce<3u>},
+        {"MaxForce3D", new_maxforce<3u>},
+        {"MaximumGap2D", new_maximumgap<2u>},
+        {"MaxGap2D", new_maximumgap<2u>},
+        {"MaximumGap3D", new_maximumgap<3u>},
+        {"MaxGap3D", new_maximumgap<3u>},
+        {"MinimumGap2D", new_minimumgap<2u>},
+        {"MinGap2D", new_minimumgap<2u>},
+        {"MinimumGap3D", new_minimumgap<3u>},
+        {"MinGap3D", new_minimumgap<3u>},
+        {"MPC", new_mpc},
+        {"NodeFacet", new_nodefacet},
+        {"NodeLine", new_nodeline},
+        {"MolecularDynamics2D", new_moleculardynamics<2u>},
+        {"MolecularDynamics3D", new_moleculardynamics<3u>},
+        {"ParticleCollision2D", new_particlecollision<2>},
+        {"ParticleCollision3D", new_particlecollision<3>},
+        {"RestitutionWall", new_restitutionwall<false>},
+        {"RestitutionWallPenalty", new_restitutionwall<false>},
+        {"RigidWall", new_rigidwall<false, true>},
+        {"RigidWallPenalty", new_rigidwall<false, true>},
+        {"RigidWallMultiplier", new_rigidwall<false, false>},
+        {"Sleeve2D", new_sleeve<2u>},
+        {"Sleeve3D", new_sleeve<3u>},
+    };
+
+    if(const auto factory = registry.fetch(constraint_id); nullptr != factory) factory(new_constraint, command);
     else external_module::object(new_constraint, domain, constraint_id, command);
 
     if(new_constraint) new_constraint->set_start_step(domain->get_current_step_tag());
@@ -622,15 +641,21 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
 
     unique_ptr<Criterion> new_criterion = nullptr;
 
-    if(is_equal_any(criterion_type, "LogicAll", "LogicCriterionAll")) new_logic_criterion<LogicCriterionAll>(new_criterion, command);
-    else if(is_equal_any(criterion_type, "LogicAny", "LogicCriterionAny")) new_logic_criterion<LogicCriterionAny>(new_criterion, command);
-    else if(is_equal(criterion_type, "StrainEnergyEvolution")) new_strain_energy_evolution(new_criterion, command);
-    else if(is_equal(criterion_type, "MaxHistory")) new_history_criterion<MaxHistory>(new_criterion, command);
-    else if(is_equal(criterion_type, "MinHistory")) new_history_criterion<MinHistory>(new_criterion, command);
-    else if(is_equal(criterion_type, "MaxDisplacement")) new_displacement_criterion<MaxDisplacement>(new_criterion, command);
-    else if(is_equal(criterion_type, "MinDisplacement")) new_displacement_criterion<MinDisplacement>(new_criterion, command);
-    else if(is_equal(criterion_type, "MaxResistance")) new_displacement_criterion<MaxResistance>(new_criterion, command);
-    else if(is_equal(criterion_type, "MinResistance")) new_displacement_criterion<MinResistance>(new_criterion, command);
+    static const TokenRegistry<void (*)(unique_ptr<Criterion>&, std::istringstream&)> registry{
+        {"LogicAll", new_logic_criterion<LogicCriterionAll>},
+        {"LogicCriterionAll", new_logic_criterion<LogicCriterionAll>},
+        {"LogicAny", new_logic_criterion<LogicCriterionAny>},
+        {"LogicCriterionAny", new_logic_criterion<LogicCriterionAny>},
+        {"StrainEnergyEvolution", new_strain_energy_evolution},
+        {"MaxHistory", new_history_criterion<MaxHistory>},
+        {"MinHistory", new_history_criterion<MinHistory>},
+        {"MaxDisplacement", new_displacement_criterion<MaxDisplacement>},
+        {"MinDisplacement", new_displacement_criterion<MinDisplacement>},
+        {"MaxResistance", new_displacement_criterion<MaxResistance>},
+        {"MinResistance", new_displacement_criterion<MinResistance>},
+    };
+
+    if(const auto factory = registry.fetch(criterion_type); nullptr != factory) factory(new_criterion, command);
 
     if(new_criterion) new_criterion->set_start_step(domain->get_current_step_tag());
 
@@ -648,8 +673,12 @@ int create_new_interaction(const shared_ptr<DomainBase>& domain, std::istringstr
 
     unique_ptr<Interaction> new_interaction = nullptr;
 
-    if(is_equal(interaction_type, "Hertzian")) new_hertzian(new_interaction, command);
-    else if(is_equal(interaction_type, "FixedParticle")) new_fixed_particle(new_interaction, command);
+    static const TokenRegistry<void (*)(unique_ptr<Interaction>&, std::istringstream&)> registry{
+        {"Hertzian", new_hertzian},
+        {"FixedParticle", new_fixed_particle},
+    };
+
+    if(const auto factory = registry.fetch(interaction_type); nullptr != factory) factory(new_interaction, command);
 
     if(nullptr == new_interaction || !domain->insert(std::move(new_interaction))) suanpan_error("Fail to create new interaction via \"{}\".\n", command.str());
 

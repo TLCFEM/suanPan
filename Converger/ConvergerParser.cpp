@@ -20,6 +20,7 @@
 #include <Converger/Converger>
 #include <Domain/DomainBase.h>
 #include <Step/Step.h>
+#include <Toolbox/TokenRegistry.h>
 #include <Toolbox/utility.h>
 
 namespace {
@@ -99,22 +100,29 @@ int create_new_converger(const shared_ptr<DomainBase>& domain, std::istringstrea
 
     unique_ptr<Converger> new_converger = nullptr;
 
-    if(is_equal_any(converger_id, "LogicAND", "LogicConvergerAND")) new_logic_converger<LogicConvergerAND>(new_converger, command);
-    else if(is_equal_any(converger_id, "LogicOR", "LogicConvergerOR")) new_logic_converger<LogicConvergerOR>(new_converger, command);
-    else if(is_equal_any(converger_id, "LogicXOR", "LogicConvergerXOR")) new_logic_converger<LogicConvergerXOR>(new_converger, command);
-    else if(is_equal(converger_id, "AbsResidual")) new_default_converger<AbsResidual>(new_converger, command);
-    else if(is_equal(converger_id, "RelResidual")) new_default_converger<RelResidual>(new_converger, command);
-    else if(is_equal(converger_id, "AbsIncreDisp")) new_default_converger<AbsIncreDisp>(new_converger, command);
-    else if(is_equal(converger_id, "RelIncreDisp")) new_default_converger<RelIncreDisp>(new_converger, command);
-    else if(is_equal(converger_id, "AbsIncreAcc")) new_default_converger<AbsIncreAcc>(new_converger, command);
-    else if(is_equal(converger_id, "RelIncreAcc")) new_default_converger<RelIncreAcc>(new_converger, command);
-    else if(is_equal(converger_id, "AbsDisp")) new_default_converger<AbsDisp>(new_converger, command);
-    else if(is_equal(converger_id, "RelDisp")) new_default_converger<RelDisp>(new_converger, command);
-    else if(is_equal(converger_id, "AbsError")) new_default_converger<AbsError>(new_converger, command);
-    else if(is_equal(converger_id, "RelError")) new_default_converger<RelError>(new_converger, command);
-    else if(is_equal(converger_id, "AbsIncreEnergy")) new_default_converger<AbsIncreEnergy>(new_converger, command);
-    else if(is_equal(converger_id, "RelIncreEnergy")) new_default_converger<RelIncreEnergy>(new_converger, command);
-    else if(is_equal(converger_id, "FixedNumber")) new_fixed_number(new_converger, command);
+    static const TokenRegistry<void (*)(unique_ptr<Converger>&, std::istringstream&)> registry{
+        {"LogicAND", new_logic_converger<LogicConvergerAND>},
+        {"LogicConvergerAND", new_logic_converger<LogicConvergerAND>},
+        {"LogicOR", new_logic_converger<LogicConvergerOR>},
+        {"LogicConvergerOR", new_logic_converger<LogicConvergerOR>},
+        {"LogicXOR", new_logic_converger<LogicConvergerXOR>},
+        {"LogicConvergerXOR", new_logic_converger<LogicConvergerXOR>},
+        {"AbsResidual", new_default_converger<AbsResidual>},
+        {"RelResidual", new_default_converger<RelResidual>},
+        {"AbsIncreDisp", new_default_converger<AbsIncreDisp>},
+        {"RelIncreDisp", new_default_converger<RelIncreDisp>},
+        {"AbsIncreAcc", new_default_converger<AbsIncreAcc>},
+        {"RelIncreAcc", new_default_converger<RelIncreAcc>},
+        {"AbsDisp", new_default_converger<AbsDisp>},
+        {"RelDisp", new_default_converger<RelDisp>},
+        {"AbsError", new_default_converger<AbsError>},
+        {"RelError", new_default_converger<RelError>},
+        {"AbsIncreEnergy", new_default_converger<AbsIncreEnergy>},
+        {"RelIncreEnergy", new_default_converger<RelIncreEnergy>},
+        {"FixedNumber", new_fixed_number},
+    };
+
+    if(const auto factory = registry.fetch(converger_id); nullptr != factory) factory(new_converger, command);
 
     if(nullptr == new_converger) {
         suanpan_error("Fail to create new converger via \"{}\".\n", command.str());
