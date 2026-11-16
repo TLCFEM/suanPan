@@ -53,7 +53,7 @@ namespace {
         return_obj = std::make_unique<Allman>(tag, std::move(node_tag), material_tag, thickness);
     }
 
-    void new_b21(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned which) {
+    template<unsigned which> void new_b21(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -122,7 +122,7 @@ namespace {
         return_obj = std::make_unique<B21H>(tag, std::move(node_tag), section_id, elastic_length, is_true(nonlinear));
     }
 
-    void new_b31(unique_ptr<Element>& return_obj, std::istringstream& command, const bool if_os) {
+    template<bool if_os> void new_b31(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -163,7 +163,7 @@ namespace {
         else return_obj = std::make_unique<B31>(tag, std::move(node_tag), section_id, orientation_id, int_pt, is_true(nonlinear));
     }
 
-    void new_nmb21(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned which) {
+    template<unsigned which> void new_nmb21(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -288,7 +288,7 @@ namespace {
         return_obj = std::make_unique<C3D4>(tag, std::move(node_tag), material_tag, is_true(nonlinear));
     }
 
-    void new_c3d8(unique_ptr<Element>& return_obj, std::istringstream& command, const bool force_reduced) {
+    template<bool force_reduced> void new_c3d8(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -512,7 +512,7 @@ namespace {
         return_obj = std::make_unique<CP3>(tag, std::move(node_tag), material_tag, thickness, is_true(nonlinear));
     }
 
-    void new_cp4(unique_ptr<Element>& return_obj, std::istringstream& command, const bool force_reduced) {
+    template<bool force_reduced> void new_cp4(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -912,7 +912,7 @@ namespace {
         return_obj = std::make_unique<CSMT6>(tag, std::move(node_tag), material_tag, thickness, length);
     }
 
-    void new_csmq(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned size) {
+    template<unsigned size> void new_csmq(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -950,7 +950,7 @@ namespace {
         else if(8 == size) return_obj = std::make_unique<CSMQ8>(tag, std::move(node_tag), material_tag, thickness, length);
     }
 
-    void new_damper01(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned dimension) {
+    template<unsigned dimension> void new_damper01(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -972,7 +972,7 @@ namespace {
         return_obj = std::make_unique<Damper01>(tag, std::move(node_tag), damper_tag, dimension);
     }
 
-    void new_damper02(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned dimension) {
+    template<unsigned dimension> void new_damper02(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1018,7 +1018,7 @@ namespace {
         return_obj = std::make_unique<Damper02>(tag, std::move(node_tag), damper_tag, spring_tag, is_true(use_matrix), proceed, beta, dimension);
     }
 
-    void new_damper05(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned dimension) {
+    template<unsigned dimension> void new_damper05(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1588,7 +1588,7 @@ namespace {
         return_obj = std::make_unique<GCMQ>(tag, std::move(node_tag), material_tag, thickness, -1., suanpan::to_upper(int_scheme[0]));
     }
 
-    template<bool simplified> void new_gcmq(unique_ptr<Element>& return_obj, std::istringstream& command, const char int_type) {
+    template<bool simplified, char int_type> void new_gcmq(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1699,7 +1699,7 @@ namespace {
         return_obj = std::make_unique<Joint>(tag, std::move(node_tag), get_remaining<uword>(command));
     }
 
-    void new_mass(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned which) {
+    template<unsigned which> void new_mass(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1733,7 +1733,7 @@ namespace {
         else return_obj = std::make_unique<Mass3D>(tag, node, magnitude, uvec(dof_tag));
     }
 
-    void new_masspoint(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned which) {
+    template<unsigned which> void new_masspoint(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1831,7 +1831,7 @@ namespace {
         return_obj = std::make_unique<MVLEM>(tag, std::move(node_tag), B, H, R, CT, ST, shear_tag, c_height);
     }
 
-    void new_pcpedc(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned node) {
+    template<unsigned node> void new_pcpedc(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -1865,7 +1865,7 @@ namespace {
         else if(8 == node) return_obj = std::make_unique<PCPE8DC>(tag, std::move(node_tag), solid_tag, fluid_tag, alpha, n, k);
     }
 
-    void new_pcpeuc(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned node) {
+    template<unsigned node> void new_pcpeuc(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2269,7 +2269,7 @@ namespace {
         return_obj = std::make_unique<Tie>(tag, node_tag, dof_tag, weight_tag, magnitude, penalty);
     }
 
-    void new_translationconnector(unique_ptr<Element>& return_obj, std::istringstream& command, const unsigned S) {
+    template<unsigned S> void new_translationconnector(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -2622,16 +2622,16 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     unique_ptr<Element> new_element = nullptr;
 
     if(is_equal(element_id, "Allman")) new_allman(new_element, command);
-    else if(is_equal(element_id, "B21")) new_b21(new_element, command, 0);
-    else if(is_equal(element_id, "B21EH")) new_b21(new_element, command, 2);
-    else if(is_equal(element_id, "B21EL")) new_b21(new_element, command, 1);
+    else if(is_equal(element_id, "B21")) new_b21<0>(new_element, command);
+    else if(is_equal(element_id, "B21EH")) new_b21<2>(new_element, command);
+    else if(is_equal(element_id, "B21EL")) new_b21<1>(new_element, command);
     else if(is_equal(element_id, "B21H")) new_b21h(new_element, command);
-    else if(is_equal(element_id, "B31")) new_b31(new_element, command, false);
-    else if(is_equal(element_id, "B31OS")) new_b31(new_element, command, true);
+    else if(is_equal(element_id, "B31")) new_b31<false>(new_element, command);
+    else if(is_equal(element_id, "B31OS")) new_b31<true>(new_element, command);
     else if(is_equal(element_id, "C3D4")) new_c3d4(new_element, command);
-    else if(is_equal(element_id, "C3D8")) new_c3d8(new_element, command, false);
+    else if(is_equal(element_id, "C3D8")) new_c3d8<false>(new_element, command);
     else if(is_equal(element_id, "C3D8I")) new_c3d8i(new_element, command);
-    else if(is_equal(element_id, "C3D8R")) new_c3d8(new_element, command, true);
+    else if(is_equal(element_id, "C3D8R")) new_c3d8<true>(new_element, command);
     else if(is_equal(element_id, "C3D20")) new_c3d20(new_element, command);
     else if(is_equal(element_id, "CAX3")) new_cax3(new_element, command);
     else if(is_equal(element_id, "CAX4")) new_cax4(new_element, command);
@@ -2641,9 +2641,9 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "Contact2D")) new_contact2d(new_element, command);
     else if(is_equal(element_id, "Contact3D")) new_contact3d(new_element, command);
     else if(is_equal(element_id, "CP3")) new_cp3(new_element, command);
-    else if(is_equal(element_id, "CP4")) new_cp4(new_element, command, false);
+    else if(is_equal(element_id, "CP4")) new_cp4<false>(new_element, command);
     else if(is_equal(element_id, "CP4I")) new_cp4i(new_element, command);
-    else if(is_equal(element_id, "CP4R")) new_cp4(new_element, command, true);
+    else if(is_equal(element_id, "CP4R")) new_cp4<true>(new_element, command);
     else if(is_equal(element_id, "CP5")) new_cp5(new_element, command);
     else if(is_equal(element_id, "CP6")) new_cp6(new_element, command);
     else if(is_equal(element_id, "CP7")) new_cp7(new_element, command);
@@ -2651,19 +2651,19 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "CPE8")) new_cpe8(new_element, command);
     else if(is_equal(element_id, "CPE8R")) new_cpe8r(new_element, command);
     else if(is_equal(element_id, "CPS8")) new_cp8(new_element, command);
-    else if(is_equal(element_id, "CSMQ4")) new_csmq(new_element, command, 4);
-    else if(is_equal(element_id, "CSMQ5")) new_csmq(new_element, command, 5);
-    else if(is_equal(element_id, "CSMQ6")) new_csmq(new_element, command, 6);
-    else if(is_equal(element_id, "CSMQ7")) new_csmq(new_element, command, 7);
-    else if(is_equal(element_id, "CSMQ8")) new_csmq(new_element, command, 8);
+    else if(is_equal(element_id, "CSMQ4")) new_csmq<4>(new_element, command);
+    else if(is_equal(element_id, "CSMQ5")) new_csmq<5>(new_element, command);
+    else if(is_equal(element_id, "CSMQ6")) new_csmq<6>(new_element, command);
+    else if(is_equal(element_id, "CSMQ7")) new_csmq<7>(new_element, command);
+    else if(is_equal(element_id, "CSMQ8")) new_csmq<8>(new_element, command);
     else if(is_equal(element_id, "CSMT3")) new_csmt3(new_element, command);
     else if(is_equal(element_id, "CSMT6")) new_csmt6(new_element, command);
-    else if(is_equal(element_id, "Damper01")) new_damper01(new_element, command, 2);
-    else if(is_equal(element_id, "Damper02")) new_damper02(new_element, command, 2);
-    else if(is_equal(element_id, "Damper03")) new_damper01(new_element, command, 3);
-    else if(is_equal(element_id, "Damper04")) new_damper02(new_element, command, 3);
-    else if(is_equal(element_id, "Damper05")) new_damper05(new_element, command, 2);
-    else if(is_equal(element_id, "Damper06")) new_damper05(new_element, command, 3);
+    else if(is_equal(element_id, "Damper01")) new_damper01<2>(new_element, command);
+    else if(is_equal(element_id, "Damper02")) new_damper02<2>(new_element, command);
+    else if(is_equal(element_id, "Damper03")) new_damper01<3>(new_element, command);
+    else if(is_equal(element_id, "Damper04")) new_damper02<3>(new_element, command);
+    else if(is_equal(element_id, "Damper05")) new_damper05<2>(new_element, command);
+    else if(is_equal(element_id, "Damper06")) new_damper05<3>(new_element, command);
     else if(is_equal(element_id, "DC3D4")) new_dc3d4<false>(new_element, command);
     else if(is_equal(element_id, "DC3D4M")) new_dc3d4<true>(new_element, command);
     else if(is_equal(element_id, "DC3D8")) new_dc3d8<false>(new_element, command);
@@ -2683,36 +2683,36 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "F21H")) new_f21h(new_element, command);
     else if(is_equal(element_id, "F31")) new_f31(new_element, command);
     else if(is_equal(element_id, "GCMQ")) new_gcmq(new_element, command);
-    else if(is_equal(element_id, "GCMQG")) new_gcmq<false>(new_element, command, 'G');
-    else if(is_equal(element_id, "GCMQI")) new_gcmq<false>(new_element, command, 'I');
-    else if(is_equal(element_id, "GCMQL")) new_gcmq<false>(new_element, command, 'L');
+    else if(is_equal(element_id, "GCMQG")) new_gcmq<false, 'G'>(new_element, command);
+    else if(is_equal(element_id, "GCMQI")) new_gcmq<false, 'I'>(new_element, command);
+    else if(is_equal(element_id, "GCMQL")) new_gcmq<false, 'L'>(new_element, command);
     else if(is_equal(element_id, "GQ12")) new_gq12(new_element, command);
     else if(is_equal(element_id, "Joint")) new_joint(new_element, command);
-    else if(is_equal(element_id, "Mass")) new_mass(new_element, command, 3);
-    else if(is_equal(element_id, "Mass2D")) new_mass(new_element, command, 2);
-    else if(is_equal(element_id, "Mass3D")) new_mass(new_element, command, 3);
-    else if(is_equal(element_id, "MassPoint2D")) new_masspoint(new_element, command, 2);
-    else if(is_equal(element_id, "MassPoint3D")) new_masspoint(new_element, command, 3);
+    else if(is_equal(element_id, "Mass")) new_mass<3>(new_element, command);
+    else if(is_equal(element_id, "Mass2D")) new_mass<2>(new_element, command);
+    else if(is_equal(element_id, "Mass3D")) new_mass<3>(new_element, command);
+    else if(is_equal(element_id, "MassPoint2D")) new_masspoint<2>(new_element, command);
+    else if(is_equal(element_id, "MassPoint3D")) new_masspoint<3>(new_element, command);
     else if(is_equal(element_id, "Mindlin")) new_mindlin(new_element, command);
     else if(is_equal(element_id, "MVLEM")) new_mvlem(new_element, command);
-    else if(is_equal(element_id, "NMB21")) new_nmb21(new_element, command, 0);
-    else if(is_equal(element_id, "NMB21EH")) new_nmb21(new_element, command, 2);
-    else if(is_equal(element_id, "NMB21EL")) new_nmb21(new_element, command, 1);
+    else if(is_equal(element_id, "NMB21")) new_nmb21<0>(new_element, command);
+    else if(is_equal(element_id, "NMB21EH")) new_nmb21<2>(new_element, command);
+    else if(is_equal(element_id, "NMB21EL")) new_nmb21<1>(new_element, command);
     else if(is_equal(element_id, "NMB31")) new_nmb31(new_element, command);
     else if(is_equal(element_id, "NonlocalC3D8")) new_nonlocalc3d8(new_element, command);
     else if(is_equal(element_id, "NonlocalCP4")) new_nonlocalcp4(new_element, command);
     else if(is_equal(element_id, "PatchCube")) new_patchcube(new_element, command);
     else if(is_equal(element_id, "PatchQuad")) new_patchquad(new_element, command);
-    else if(is_equal(element_id, "PCPE4DC")) new_pcpedc(new_element, command, 4);
-    else if(is_equal(element_id, "PCPE4UC")) new_pcpeuc(new_element, command, 4);
-    else if(is_equal(element_id, "PCPE8DC")) new_pcpedc(new_element, command, 8);
-    else if(is_equal(element_id, "PCPE8UC")) new_pcpeuc(new_element, command, 8);
+    else if(is_equal(element_id, "PCPE4DC")) new_pcpedc<4>(new_element, command);
+    else if(is_equal(element_id, "PCPE4UC")) new_pcpeuc<4>(new_element, command);
+    else if(is_equal(element_id, "PCPE8DC")) new_pcpedc<8>(new_element, command);
+    else if(is_equal(element_id, "PCPE8UC")) new_pcpeuc<8>(new_element, command);
     else if(is_equal(element_id, "PS")) new_ps(new_element, command);
     else if(is_equal(element_id, "QE2")) new_qe2(new_element, command);
     else if(is_equal(element_id, "S4")) new_s4(new_element, command);
-    else if(is_equal(element_id, "SGCMQG")) new_gcmq<true>(new_element, command, 'G');
-    else if(is_equal(element_id, "SGCMQI")) new_gcmq<true>(new_element, command, 'I');
-    else if(is_equal(element_id, "SGCMQL")) new_gcmq<true>(new_element, command, 'L');
+    else if(is_equal(element_id, "SGCMQG")) new_gcmq<true, 'G'>(new_element, command);
+    else if(is_equal(element_id, "SGCMQI")) new_gcmq<true, 'I'>(new_element, command);
+    else if(is_equal(element_id, "SGCMQL")) new_gcmq<true, 'L'>(new_element, command);
     else if(is_equal(element_id, "SGCMS")) new_sgcms(new_element, command);
     else if(is_equal(element_id, "SingleSection2D")) new_singlesection<SingleSection2D>(new_element, command);
     else if(is_equal(element_id, "SingleSection3D")) new_singlesection<SingleSection3D>(new_element, command);
@@ -2725,8 +2725,8 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(element_id, "T3D2")) new_t3d2(new_element, command);
     else if(is_equal(element_id, "T3D2S")) new_t3d2s(new_element, command);
     else if(is_equal(element_id, "Tie")) new_tie(new_element, command);
-    else if(is_equal(element_id, "TranslationConnector2D")) new_translationconnector(new_element, command, 2u);
-    else if(is_equal(element_id, "TranslationConnector3D")) new_translationconnector(new_element, command, 3u);
+    else if(is_equal(element_id, "TranslationConnector2D")) new_translationconnector<2u>(new_element, command);
+    else if(is_equal(element_id, "TranslationConnector3D")) new_translationconnector<3u>(new_element, command);
     else external_module::object(new_element, domain, element_id, command);
 
     if(nullptr == new_element || !domain->insert(std::move(new_element)))

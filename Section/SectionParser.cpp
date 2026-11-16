@@ -414,7 +414,7 @@ void new_fibre2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
     return_obj = std::make_unique<Fibre2D>(tag, get_remaining<uword>(command));
 }
 
-void new_fibre3d(unique_ptr<Section>& return_obj, std::istringstream& command, const bool if_os) {
+template<bool if_os> void new_fibre3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -480,7 +480,7 @@ double barycenter(const vec& dim) {
     return -.5 * (top_flange_area * (dim(1) + dim(4)) + bottom_flange_area * (dim(3) + dim(4))) / (top_flange_area + bottom_flange_area + dim(4) * dim(5));
 }
 
-void new_isection2d(unique_ptr<Section>& return_obj, std::istringstream& command, const bool recenter) {
+template<bool recenter> void new_isection2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -515,7 +515,7 @@ void new_isection2d(unique_ptr<Section>& return_obj, std::istringstream& command
     return_obj = std::make_unique<ISection2D>(tag, dim(0), dim(1), dim(2), dim(3), dim(4), dim(5), material_id, int_pt, eccentricity);
 }
 
-void new_isection3d(unique_ptr<Section>& return_obj, std::istringstream& command, const bool recenter) {
+template<bool recenter> void new_isection3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -694,7 +694,7 @@ void new_trusssection(unique_ptr<Section>& return_obj, std::istringstream& comma
     return_obj = std::make_unique<TrussSection>(tag, area, material_id);
 }
 
-void new_tsection2d(unique_ptr<Section>& return_obj, std::istringstream& command, const bool recenter) {
+template<bool recenter> void new_tsection2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -729,7 +729,7 @@ void new_tsection2d(unique_ptr<Section>& return_obj, std::istringstream& command
     return_obj = std::make_unique<TSection2D>(tag, dim(0), dim(1), dim(2), dim(3), material_id, int_pt, eccentricity);
 }
 
-void new_tsection3d(unique_ptr<Section>& return_obj, std::istringstream& command, const bool recenter) {
+template<bool recenter> void new_tsection3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -770,7 +770,7 @@ void new_tsection3d(unique_ptr<Section>& return_obj, std::istringstream& command
     return_obj = std::make_unique<TSection3D>(tag, std::move(dim), material_id, int_pt, vec{eccentricity_y, eccentricity_z});
 }
 
-void new_nm2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned size) {
+template<unsigned size> void new_nm2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -802,7 +802,7 @@ void new_nm2d(unique_ptr<Section>& return_obj, std::istringstream& command, cons
     else if(11 == size) return_obj = std::make_unique<NM2D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), vec{P(8), P(8)}, vec{P(9), P(9)}, P(10), std::move(poly_set));
 }
 
-void new_nm3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned size) {
+template<unsigned size> void new_nm3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -834,7 +834,7 @@ void new_nm3d(unique_ptr<Section>& return_obj, std::istringstream& command, cons
     else if(13 == size) return_obj = std::make_unique<NM3D3>(tag, P(0), P(1), P(2), P(3), P(4), P(5), P(6), P(7), P(8), P(9), vec{P(10), P(10), P(10)}, vec{P(11), P(11), P(11)}, P(12), std::move(poly_set));
 }
 
-void new_nmk(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned size) {
+template<unsigned size> void new_nmk(unique_ptr<Section>& return_obj, std::istringstream& command) {
     unsigned tag;
     if(!get_input(command, tag)) {
         suanpan_error("A valid tag is required.\n");
@@ -2871,7 +2871,7 @@ void new_nz3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
     suanpan_error("Cannot identify section type.\n");
 }
 
-void new_us2d(unique_ptr<Section>& return_obj, std::istringstream& command, const bool recenter) {
+template<bool recenter> void new_us2d(unique_ptr<Section>& return_obj, std::istringstream& command) {
     std::string type;
     if(!get_input(command, type)) {
         suanpan_error("A valid designation is required.\n");
@@ -2940,7 +2940,7 @@ void new_us2d(unique_ptr<Section>& return_obj, std::istringstream& command, cons
     suanpan_error("Cannot identify section type.\n");
 }
 
-void new_us3d(unique_ptr<Section>& return_obj, std::istringstream& command, const bool recenter) {
+template<bool recenter> void new_us3d(unique_ptr<Section>& return_obj, std::istringstream& command) {
     std::string type;
     if(!get_input(command, type)) {
         suanpan_error("A valid designation is required.\n");
@@ -3036,37 +3036,37 @@ int create_new_section(const shared_ptr<DomainBase>& domain, std::istringstream&
     else if(is_equal(section_id, "CircularHollow3D")) new_circularhollow3D(new_section, command);
     else if(is_equal(section_id, "Fibre1D")) new_fibre1d(new_section, command);
     else if(is_equal(section_id, "Fibre2D")) new_fibre2d(new_section, command);
-    else if(is_equal(section_id, "Fibre3D")) new_fibre3d(new_section, command, false);
-    else if(is_equal(section_id, "Fibre3DOS")) new_fibre3d(new_section, command, true);
+    else if(is_equal(section_id, "Fibre3D")) new_fibre3d<false>(new_section, command);
+    else if(is_equal(section_id, "Fibre3DOS")) new_fibre3d<true>(new_section, command);
     else if(is_equal(section_id, "HSection2D")) new_hsection2d(new_section, command);
-    else if(is_equal(section_id, "ISection2D")) new_isection2d(new_section, command, false);
-    else if(is_equal(section_id, "ISection3D")) new_isection3d(new_section, command, false);
-    else if(is_equal(section_id, "ISection2DC")) new_isection2d(new_section, command, true);
-    else if(is_equal(section_id, "ISection3DC")) new_isection3d(new_section, command, true);
+    else if(is_equal(section_id, "ISection2D")) new_isection2d<false>(new_section, command);
+    else if(is_equal(section_id, "ISection3D")) new_isection3d<false>(new_section, command);
+    else if(is_equal(section_id, "ISection2DC")) new_isection2d<true>(new_section, command);
+    else if(is_equal(section_id, "ISection3DC")) new_isection3d<true>(new_section, command);
     else if(is_equal(section_id, "Rectangle1D")) new_rectangle1d(new_section, command);
     else if(is_equal(section_id, "Rectangle2D")) new_rectangle2d(new_section, command);
     else if(is_equal(section_id, "Rectangle3D")) new_rectangle3d(new_section, command);
     else if(is_equal(section_id, "TrussSection")) new_trusssection(new_section, command);
-    else if(is_equal(section_id, "TSection2D")) new_tsection2d(new_section, command, false);
-    else if(is_equal(section_id, "TSection3D")) new_tsection3d(new_section, command, false);
-    else if(is_equal(section_id, "TSection2DC")) new_tsection2d(new_section, command, true);
-    else if(is_equal(section_id, "TSection3DC")) new_tsection3d(new_section, command, true);
-    else if(is_equal(section_id, "NM2D1")) new_nm2d(new_section, command, 3);
-    else if(is_equal(section_id, "NM2D2")) new_nm2d(new_section, command, 8);
-    else if(is_equal(section_id, "NM2D3")) new_nm2d(new_section, command, 11);
-    else if(is_equal(section_id, "NM3D1")) new_nm3d(new_section, command, 4);
-    else if(is_equal(section_id, "NM3D2")) new_nm3d(new_section, command, 10);
-    else if(is_equal(section_id, "NM3D3")) new_nm3d(new_section, command, 13);
-    else if(is_equal(section_id, "NM2D3K")) new_nmk(new_section, command, 13);
-    else if(is_equal(section_id, "NM3D3K")) new_nmk(new_section, command, 17);
+    else if(is_equal(section_id, "TSection2D")) new_tsection2d<false>(new_section, command);
+    else if(is_equal(section_id, "TSection3D")) new_tsection3d<false>(new_section, command);
+    else if(is_equal(section_id, "TSection2DC")) new_tsection2d<true>(new_section, command);
+    else if(is_equal(section_id, "TSection3DC")) new_tsection3d<true>(new_section, command);
+    else if(is_equal(section_id, "NM2D1")) new_nm2d<3>(new_section, command);
+    else if(is_equal(section_id, "NM2D2")) new_nm2d<8>(new_section, command);
+    else if(is_equal(section_id, "NM2D3")) new_nm2d<11>(new_section, command);
+    else if(is_equal(section_id, "NM3D1")) new_nm3d<4>(new_section, command);
+    else if(is_equal(section_id, "NM3D2")) new_nm3d<10>(new_section, command);
+    else if(is_equal(section_id, "NM3D3")) new_nm3d<13>(new_section, command);
+    else if(is_equal(section_id, "NM2D3K")) new_nmk<13>(new_section, command);
+    else if(is_equal(section_id, "NM3D3K")) new_nmk<17>(new_section, command);
     else if(is_equal(section_id, "EU2D")) new_eu2d(new_section, command);
     else if(is_equal(section_id, "EU3D")) new_eu3d(new_section, command);
     else if(is_equal(section_id, "NZ2D")) new_nz2d(new_section, command);
     else if(is_equal(section_id, "NZ3D")) new_nz3d(new_section, command);
-    else if(is_equal(section_id, "US2D")) new_us2d(new_section, command, false);
-    else if(is_equal(section_id, "US3D")) new_us3d(new_section, command, false);
-    else if(is_equal(section_id, "US2DC")) new_us2d(new_section, command, true);
-    else if(is_equal(section_id, "US3DC")) new_us3d(new_section, command, true);
+    else if(is_equal(section_id, "US2D")) new_us2d<false>(new_section, command);
+    else if(is_equal(section_id, "US3D")) new_us3d<false>(new_section, command);
+    else if(is_equal(section_id, "US2DC")) new_us2d<true>(new_section, command);
+    else if(is_equal(section_id, "US3DC")) new_us3d<true>(new_section, command);
     else external_module::object(new_section, domain, section_id, command);
 
     if(new_section == nullptr || !domain->insert(std::move(new_section)))
