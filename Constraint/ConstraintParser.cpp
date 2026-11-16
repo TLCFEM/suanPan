@@ -48,12 +48,12 @@ namespace {
             return;
         }
 
-        if(penalty) {
-            if(group) return_obj = std::make_unique<GroupPenaltyBC>(bc_id, uvec(obj_tag), std::move(dof_pool));
+        if constexpr(penalty) {
+            if constexpr(group) return_obj = std::make_unique<GroupPenaltyBC>(bc_id, uvec(obj_tag), std::move(dof_pool));
             else return_obj = std::make_unique<PenaltyBC>(bc_id, uvec(obj_tag), std::move(dof_pool));
         }
         else {
-            if(group) return_obj = std::make_unique<GroupMultiplierBC>(bc_id, uvec(obj_tag), std::move(dof_pool));
+            if constexpr(group) return_obj = std::make_unique<GroupMultiplierBC>(bc_id, uvec(obj_tag), std::move(dof_pool));
             else return_obj = std::make_unique<MultiplierBC>(bc_id, uvec(obj_tag), std::move(dof_pool));
         }
     }
@@ -284,7 +284,8 @@ namespace {
             return;
         }
 
-        2 == dim ? return_obj = std::make_unique<ParticleCollision2D>(tag, space, alpha) : return_obj = std::make_unique<ParticleCollision3D>(tag, space, alpha);
+        if constexpr(2u == dim) return_obj = std::make_unique<ParticleCollision2D>(tag, space, alpha);
+        else return_obj = std::make_unique<ParticleCollision3D>(tag, space, alpha);
     }
 
     void new_ljpotential(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
@@ -344,29 +345,29 @@ namespace {
         switch(p.size()) {
         case 3:
             // 1D origin norm multiplier
-            if(penalty) return_obj = std::make_unique<RigidWallPenalty1D>(tag, 0, p[0], p[1], p[2]);
+            if constexpr(penalty) return_obj = std::make_unique<RigidWallPenalty1D>(tag, 0, p[0], p[1], p[2]);
             else return_obj = std::make_unique<RigidWallMultiplier1D>(tag, 0, p[0], p[1], p[2]);
             break;
         case 5:
-            if(finite) {
+            if constexpr(finite) {
                 // 2D origin edge multiplier
-                if(penalty) return_obj = std::make_unique<RigidWallPenalty2D>(tag, 0, vec2{p[0], p[1]}, vec3{p[2], p[3], 0.}, p[4]);
+                if constexpr(penalty) return_obj = std::make_unique<RigidWallPenalty2D>(tag, 0, vec2{p[0], p[1]}, vec3{p[2], p[3], 0.}, p[4]);
                 else return_obj = std::make_unique<RigidWallMultiplier2D>(tag, 0, vec2{p[0], p[1]}, vec3{p[2], p[3], 0.}, p[4]);
             }
             else {
                 // 2D origin norm multiplier
-                if(penalty) return_obj = std::make_unique<RigidWallPenalty2D>(tag, 0, vec2{p[0], p[1]}, vec2{p[2], p[3]}, p[4]);
+                if constexpr(penalty) return_obj = std::make_unique<RigidWallPenalty2D>(tag, 0, vec2{p[0], p[1]}, vec2{p[2], p[3]}, p[4]);
                 else return_obj = std::make_unique<RigidWallMultiplier2D>(tag, 0, vec2{p[0], p[1]}, vec2{p[2], p[3]}, p[4]);
             }
             break;
         case 7:
             // 3D origin norm multiplier
-            if(penalty) return_obj = std::make_unique<RigidWallPenalty3D>(tag, 0, vec3{p[0], p[1], p[2]}, vec3{p[3], p[4], p[5]}, p[6]);
+            if constexpr(penalty) return_obj = std::make_unique<RigidWallPenalty3D>(tag, 0, vec3{p[0], p[1], p[2]}, vec3{p[3], p[4], p[5]}, p[6]);
             else return_obj = std::make_unique<RigidWallMultiplier3D>(tag, 0, vec3{p[0], p[1], p[2]}, vec3{p[3], p[4], p[5]}, p[6]);
             break;
         case 10:
-            // 3D origin edge edge multiplier
-            if(penalty) return_obj = std::make_unique<RigidWallPenalty3D>(tag, 0, vec3{p[0], p[1], p[2]}, vec3{p[3], p[4], p[5]}, vec3{p[6], p[7], p[8]}, p[9]);
+            // 3D origin edge-edge multiplier
+            if constexpr(penalty) return_obj = std::make_unique<RigidWallPenalty3D>(tag, 0, vec3{p[0], p[1], p[2]}, vec3{p[3], p[4], p[5]}, vec3{p[6], p[7], p[8]}, p[9]);
             else return_obj = std::make_unique<RigidWallMultiplier3D>(tag, 0, vec3{p[0], p[1], p[2]}, vec3{p[3], p[4], p[5]}, vec3{p[6], p[7], p[8]}, p[9]);
             break;
         default:
@@ -390,7 +391,7 @@ namespace {
             return_obj = std::make_unique<RestitutionWallPenalty1D>(tag, 0, p[0], p[1], p[2], p[3]);
             break;
         case 6:
-            if(finite)
+            if constexpr(finite)
                 // 2D origin edge restitution multiplier
                 return_obj = std::make_unique<RestitutionWallPenalty2D>(tag, 0, vec2{p[0], p[1]}, vec3{p[2], p[3], 0.}, p[4], p[5]);
             else
@@ -402,7 +403,7 @@ namespace {
             return_obj = std::make_unique<RestitutionWallPenalty3D>(tag, 0, vec3{p[0], p[1], p[2]}, vec3{p[3], p[4], p[5]}, p[6], p[7]);
             break;
         case 11:
-            // 3D origin edge edge restitution multiplier
+            // 3D origin edge-edge restitution multiplier
             return_obj = std::make_unique<RestitutionWallPenalty3D>(tag, 0, vec3{p[0], p[1], p[2]}, vec3{p[3], p[4], p[5]}, vec3{p[6], p[7], p[8]}, p[9], p[10]);
             break;
         default:

@@ -219,7 +219,7 @@ namespace {
         }
 
         vec pb{.2, 5E2, 1E1};
-        if(memory) {
+        if constexpr(memory) {
             if(!get_optional_input(command, pb)) {
                 suanpan_error("Valid inputs are required.\n");
                 return;
@@ -745,7 +745,7 @@ namespace {
             return;
         }
 
-        if(is_hoffman) return_obj = std::make_unique<BilinearHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), hardening, density);
+        if constexpr(is_hoffman) return_obj = std::make_unique<BilinearHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), hardening, density);
         else return_obj = std::make_unique<BilinearTsaiWu>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), hardening, density);
     }
 
@@ -1836,7 +1836,7 @@ namespace {
             return;
         }
 
-        if(is_hoffman) return_obj = std::make_unique<ExpHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), a, b, density);
+        if constexpr(is_hoffman) return_obj = std::make_unique<ExpHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), a, b, density);
         else return_obj = std::make_unique<ExpTsaiWu>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), a, b, density);
     }
 
@@ -1879,7 +1879,7 @@ namespace {
             return;
         }
 
-        if(is_hoffman) return_obj = std::make_unique<CustomHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), expression, density);
+        if constexpr(is_hoffman) return_obj = std::make_unique<CustomHoffman>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), expression, density);
         else return_obj = std::make_unique<CustomTsaiWu>(tag, std::move(modulus), std::move(poissons_ratio), std::move(stress), expression, density);
     }
 
@@ -3252,7 +3252,7 @@ namespace {
         }
 
         vec para_pool;
-        if(abaqus) para_pool = {3E4, .2, .6, 1.16, 2. / 3., 0., 2400E-12};
+        if constexpr(abaqus) para_pool = {3E4, .2, .6, 1.16, 2. / 3., 0., 2400E-12};
         else para_pool = {3E4, .2, .2, 1.16, .5, 2400E-12};
 
         auto idx{0};
@@ -3320,7 +3320,7 @@ namespace {
             return;
         }
 
-        if(abaqus) return_obj = std::make_unique<TableCDP>(tag, para_pool(0), para_pool(1), std::move(t_table), std::move(c_table), std::move(dt_table), std::move(dc_table), g_t, g_c, para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6));
+        if constexpr(abaqus) return_obj = std::make_unique<TableCDP>(tag, para_pool(0), para_pool(1), std::move(t_table), std::move(c_table), std::move(dt_table), std::move(dc_table), g_t, g_c, para_pool(2), para_pool(3), para_pool(4), para_pool(5), para_pool(6));
         else return_obj = std::make_unique<TableCDP>(tag, para_pool(0), para_pool(1), std::move(t_table), std::move(c_table), std::move(dt_table), std::move(dc_table), g_t, g_c, para_pool(2), para_pool(3), 1., para_pool(4), para_pool(5));
     }
 
@@ -3399,7 +3399,7 @@ namespace {
             return;
         }
 
-        if(if_strain) return_obj = std::make_unique<CustomStrainDegradation>(tag, mat_tag, p_expression_tag, n_expression_tag);
+        if constexpr(if_strain) return_obj = std::make_unique<CustomStrainDegradation>(tag, mat_tag, p_expression_tag, n_expression_tag);
         else return_obj = std::make_unique<CustomStressDegradation>(tag, mat_tag, p_expression_tag, n_expression_tag);
     }
 

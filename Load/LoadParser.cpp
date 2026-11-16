@@ -89,7 +89,7 @@ namespace {
             return;
         }
 
-        if(flag) return_obj = std::make_unique<GroupBodyForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
+        if constexpr(flag) return_obj = std::make_unique<GroupBodyForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
         else return_obj = std::make_unique<BodyForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
     }
 
@@ -124,7 +124,7 @@ namespace {
             return;
         }
 
-        if(flag) return_obj = std::make_unique<GroupNodalForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
+        if constexpr(flag) return_obj = std::make_unique<GroupNodalForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
         else return_obj = std::make_unique<NodalForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
     }
 
@@ -158,7 +158,7 @@ namespace {
             return;
         }
 
-        if(flag) return_obj = std::make_unique<GroupReferenceForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool));
+        if constexpr(flag) return_obj = std::make_unique<GroupReferenceForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool));
         else return_obj = std::make_unique<ReferenceForce>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool));
     }
 
@@ -193,7 +193,7 @@ namespace {
             return;
         }
 
-        if(2 == dimension) return_obj = std::make_unique<LineUDL2D>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
+        if constexpr(2u == dimension) return_obj = std::make_unique<LineUDL2D>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
         else return_obj = std::make_unique<LineUDL3D>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
     }
 
@@ -228,7 +228,7 @@ namespace {
             return;
         }
 
-        if(flag) return_obj = std::make_unique<GroupNodalDisplacement>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
+        if constexpr(flag) return_obj = std::make_unique<GroupNodalDisplacement>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
         else return_obj = std::make_unique<NodalDisplacement>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
     }
 
@@ -263,8 +263,8 @@ namespace {
             return;
         }
 
-        if(0 == flag) return_obj = std::make_unique<SupportDisplacement>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
-        else if(1 == flag) return_obj = std::make_unique<SupportVelocity>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
+        if constexpr(0u == flag) return_obj = std::make_unique<SupportDisplacement>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
+        else if constexpr(1u == flag) return_obj = std::make_unique<SupportVelocity>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
         else return_obj = std::make_unique<SupportAcceleration>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
     }
 } // namespace
