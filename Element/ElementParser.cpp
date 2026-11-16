@@ -22,7 +22,7 @@
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Element/Element>
-#include <Toolbox/utility.h>
+#include <Toolbox/TokenRegistry.h>
 
 namespace {
     //
@@ -2597,112 +2597,116 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
 
     unique_ptr<Element> new_element = nullptr;
 
-    if(is_equal(element_id, "Allman")) new_allman(new_element, command);
-    else if(is_equal(element_id, "B21")) new_b21<0>(new_element, command);
-    else if(is_equal(element_id, "B21EH")) new_b21<2>(new_element, command);
-    else if(is_equal(element_id, "B21EL")) new_b21<1>(new_element, command);
-    else if(is_equal(element_id, "B21H")) new_b21h(new_element, command);
-    else if(is_equal(element_id, "B31")) new_b31<false>(new_element, command);
-    else if(is_equal(element_id, "B31OS")) new_b31<true>(new_element, command);
-    else if(is_equal(element_id, "C3D4")) new_c3d4(new_element, command);
-    else if(is_equal(element_id, "C3D8")) new_c3d8<false>(new_element, command);
-    else if(is_equal(element_id, "C3D8I")) new_c3d8i(new_element, command);
-    else if(is_equal(element_id, "C3D8R")) new_c3d8<true>(new_element, command);
-    else if(is_equal(element_id, "C3D20")) new_c3d20(new_element, command);
-    else if(is_equal(element_id, "CAX3")) new_cax3(new_element, command);
-    else if(is_equal(element_id, "CAX4")) new_cax4(new_element, command);
-    else if(is_equal(element_id, "CAX8")) new_cax8(new_element, command);
-    else if(is_equal(element_id, "CIN3D8")) new_cin3d8(new_element, command);
-    else if(is_equal(element_id, "CINP4")) new_cinp4(new_element, command);
-    else if(is_equal(element_id, "Contact2D")) new_contact2d(new_element, command);
-    else if(is_equal(element_id, "Contact3D")) new_contact3d(new_element, command);
-    else if(is_equal(element_id, "CP3")) new_cp3(new_element, command);
-    else if(is_equal(element_id, "CP4")) new_cp4<false>(new_element, command);
-    else if(is_equal(element_id, "CP4I")) new_cp4i(new_element, command);
-    else if(is_equal(element_id, "CP4R")) new_cp4<true>(new_element, command);
-    else if(is_equal(element_id, "CP5")) new_cp5(new_element, command);
-    else if(is_equal(element_id, "CP6")) new_cp6(new_element, command);
-    else if(is_equal(element_id, "CP7")) new_cp7(new_element, command);
-    else if(is_equal(element_id, "CP8")) new_cp8(new_element, command);
-    else if(is_equal(element_id, "CPE8")) new_cpe8(new_element, command);
-    else if(is_equal(element_id, "CPE8R")) new_cpe8r(new_element, command);
-    else if(is_equal(element_id, "CPS8")) new_cp8(new_element, command);
-    else if(is_equal(element_id, "CSMQ4")) new_csmq<4>(new_element, command);
-    else if(is_equal(element_id, "CSMQ5")) new_csmq<5>(new_element, command);
-    else if(is_equal(element_id, "CSMQ6")) new_csmq<6>(new_element, command);
-    else if(is_equal(element_id, "CSMQ7")) new_csmq<7>(new_element, command);
-    else if(is_equal(element_id, "CSMQ8")) new_csmq<8>(new_element, command);
-    else if(is_equal(element_id, "CSMT3")) new_csmt3(new_element, command);
-    else if(is_equal(element_id, "CSMT6")) new_csmt6(new_element, command);
-    else if(is_equal(element_id, "Damper01")) new_damper01<2>(new_element, command);
-    else if(is_equal(element_id, "Damper02")) new_damper02<2>(new_element, command);
-    else if(is_equal(element_id, "Damper03")) new_damper01<3>(new_element, command);
-    else if(is_equal(element_id, "Damper04")) new_damper02<3>(new_element, command);
-    else if(is_equal(element_id, "Damper05")) new_damper05<2>(new_element, command);
-    else if(is_equal(element_id, "Damper06")) new_damper05<3>(new_element, command);
-    else if(is_equal(element_id, "DC3D4")) new_dc3d4<false>(new_element, command);
-    else if(is_equal(element_id, "DC3D4M")) new_dc3d4<true>(new_element, command);
-    else if(is_equal(element_id, "DC3D8")) new_dc3d8<false>(new_element, command);
-    else if(is_equal(element_id, "DC3D8M")) new_dc3d8<true>(new_element, command);
-    else if(is_equal(element_id, "DCP3")) new_dcp3<false>(new_element, command);
-    else if(is_equal(element_id, "DCP3M")) new_dcp3<true>(new_element, command);
-    else if(is_equal(element_id, "DCP4")) new_dcp4<false>(new_element, command);
-    else if(is_equal(element_id, "DCP4M")) new_dcp4<true>(new_element, command);
-    else if(is_equal(element_id, "DKT3")) new_dkt3(new_element, command);
-    else if(is_equal(element_id, "DKT4")) new_dkt4(new_element, command);
-    else if(is_equal(element_id, "DKTS3")) new_dkts3(new_element, command);
-    else if(is_equal(element_id, "EB21")) new_eb21(new_element, command);
-    else if(is_equal(element_id, "EB31OS")) new_eb31os(new_element, command);
-    else if(is_equal(element_id, "Embedded2D")) new_embedded<2u>(new_element, command);
-    else if(is_equal(element_id, "Embedded3D")) new_embedded<3u>(new_element, command);
-    else if(is_equal(element_id, "F21")) new_f21(new_element, command);
-    else if(is_equal(element_id, "F21H")) new_f21h(new_element, command);
-    else if(is_equal(element_id, "F31")) new_f31(new_element, command);
-    else if(is_equal(element_id, "GCMQ")) new_gcmq(new_element, command);
-    else if(is_equal(element_id, "GCMQG")) new_gcmq<false, 'G'>(new_element, command);
-    else if(is_equal(element_id, "GCMQI")) new_gcmq<false, 'I'>(new_element, command);
-    else if(is_equal(element_id, "GCMQL")) new_gcmq<false, 'L'>(new_element, command);
-    else if(is_equal(element_id, "GQ12")) new_gq12(new_element, command);
-    else if(is_equal(element_id, "Joint")) new_joint(new_element, command);
-    else if(is_equal(element_id, "Mass")) new_mass<3>(new_element, command);
-    else if(is_equal(element_id, "Mass2D")) new_mass<2>(new_element, command);
-    else if(is_equal(element_id, "Mass3D")) new_mass<3>(new_element, command);
-    else if(is_equal(element_id, "MassPoint2D")) new_masspoint<2>(new_element, command);
-    else if(is_equal(element_id, "MassPoint3D")) new_masspoint<3>(new_element, command);
-    else if(is_equal(element_id, "Mindlin")) new_mindlin(new_element, command);
-    else if(is_equal(element_id, "MVLEM")) new_mvlem(new_element, command);
-    else if(is_equal(element_id, "NMB21")) new_nmb21<0>(new_element, command);
-    else if(is_equal(element_id, "NMB21EH")) new_nmb21<2>(new_element, command);
-    else if(is_equal(element_id, "NMB21EL")) new_nmb21<1>(new_element, command);
-    else if(is_equal(element_id, "NMB31")) new_nmb31(new_element, command);
-    else if(is_equal(element_id, "NonlocalC3D8")) new_nonlocalc3d8(new_element, command);
-    else if(is_equal(element_id, "NonlocalCP4")) new_nonlocalcp4(new_element, command);
-    else if(is_equal(element_id, "PatchCube")) new_patchcube(new_element, command);
-    else if(is_equal(element_id, "PatchQuad")) new_patchquad(new_element, command);
-    else if(is_equal(element_id, "PCPE4DC")) new_pcpedc<4>(new_element, command);
-    else if(is_equal(element_id, "PCPE4UC")) new_pcpeuc<4>(new_element, command);
-    else if(is_equal(element_id, "PCPE8DC")) new_pcpedc<8>(new_element, command);
-    else if(is_equal(element_id, "PCPE8UC")) new_pcpeuc<8>(new_element, command);
-    else if(is_equal(element_id, "PS")) new_ps(new_element, command);
-    else if(is_equal(element_id, "QE2")) new_qe2(new_element, command);
-    else if(is_equal(element_id, "S4")) new_s4(new_element, command);
-    else if(is_equal(element_id, "SGCMQG")) new_gcmq<true, 'G'>(new_element, command);
-    else if(is_equal(element_id, "SGCMQI")) new_gcmq<true, 'I'>(new_element, command);
-    else if(is_equal(element_id, "SGCMQL")) new_gcmq<true, 'L'>(new_element, command);
-    else if(is_equal(element_id, "SGCMS")) new_sgcms(new_element, command);
-    else if(is_equal(element_id, "SingleSection2D")) new_singlesection<SingleSection2D>(new_element, command);
-    else if(is_equal(element_id, "SingleSection3D")) new_singlesection<SingleSection3D>(new_element, command);
-    else if(is_equal(element_id, "SphericalParticle2D")) new_sphericalparticle<2u>(new_element, command);
-    else if(is_equal(element_id, "SphericalParticle3D")) new_sphericalparticle<3u>(new_element, command);
-    else if(is_equal(element_id, "Spring01")) new_spring01(new_element, command);
-    else if(is_equal(element_id, "Spring02")) new_spring02(new_element, command);
-    else if(is_equal(element_id, "T2D2")) new_t2d2(new_element, command);
-    else if(is_equal(element_id, "T2D2S")) new_t2d2s(new_element, command);
-    else if(is_equal(element_id, "T3D2")) new_t3d2(new_element, command);
-    else if(is_equal(element_id, "T3D2S")) new_t3d2s(new_element, command);
-    else if(is_equal(element_id, "Tie")) new_tie(new_element, command);
-    else if(is_equal(element_id, "TranslationConnector2D")) new_translationconnector<2u>(new_element, command);
-    else if(is_equal(element_id, "TranslationConnector3D")) new_translationconnector<3u>(new_element, command);
+    static const TokenRegistry<void (*)(unique_ptr<Element>&, std::istringstream&)> registry{
+        {"Allman", new_allman},
+        {"B21", new_b21<0>},
+        {"B21EH", new_b21<2>},
+        {"B21EL", new_b21<1>},
+        {"B21H", new_b21h},
+        {"B31", new_b31<false>},
+        {"B31OS", new_b31<true>},
+        {"C3D4", new_c3d4},
+        {"C3D8", new_c3d8<false>},
+        {"C3D8I", new_c3d8i},
+        {"C3D8R", new_c3d8<true>},
+        {"C3D20", new_c3d20},
+        {"CAX3", new_cax3},
+        {"CAX4", new_cax4},
+        {"CAX8", new_cax8},
+        {"CIN3D8", new_cin3d8},
+        {"CINP4", new_cinp4},
+        {"Contact2D", new_contact2d},
+        {"Contact3D", new_contact3d},
+        {"CP3", new_cp3},
+        {"CP4", new_cp4<false>},
+        {"CP4I", new_cp4i},
+        {"CP4R", new_cp4<true>},
+        {"CP5", new_cp5},
+        {"CP6", new_cp6},
+        {"CP7", new_cp7},
+        {"CP8", new_cp8},
+        {"CPE8", new_cpe8},
+        {"CPE8R", new_cpe8r},
+        {"CPS8", new_cp8},
+        {"CSMQ4", new_csmq<4>},
+        {"CSMQ5", new_csmq<5>},
+        {"CSMQ6", new_csmq<6>},
+        {"CSMQ7", new_csmq<7>},
+        {"CSMQ8", new_csmq<8>},
+        {"CSMT3", new_csmt3},
+        {"CSMT6", new_csmt6},
+        {"Damper01", new_damper01<2>},
+        {"Damper02", new_damper02<2>},
+        {"Damper03", new_damper01<3>},
+        {"Damper04", new_damper02<3>},
+        {"Damper05", new_damper05<2>},
+        {"Damper06", new_damper05<3>},
+        {"DC3D4", new_dc3d4<false>},
+        {"DC3D4M", new_dc3d4<true>},
+        {"DC3D8", new_dc3d8<false>},
+        {"DC3D8M", new_dc3d8<true>},
+        {"DCP3", new_dcp3<false>},
+        {"DCP3M", new_dcp3<true>},
+        {"DCP4", new_dcp4<false>},
+        {"DCP4M", new_dcp4<true>},
+        {"DKT3", new_dkt3},
+        {"DKT4", new_dkt4},
+        {"DKTS3", new_dkts3},
+        {"EB21", new_eb21},
+        {"EB31OS", new_eb31os},
+        {"Embedded2D", new_embedded<2u>},
+        {"Embedded3D", new_embedded<3u>},
+        {"F21", new_f21},
+        {"F21H", new_f21h},
+        {"F31", new_f31},
+        {"GCMQ", new_gcmq},
+        {"GCMQG", new_gcmq<false, 'G'>},
+        {"GCMQI", new_gcmq<false, 'I'>},
+        {"GCMQL", new_gcmq<false, 'L'>},
+        {"GQ12", new_gq12},
+        {"Joint", new_joint},
+        {"Mass", new_mass<3>},
+        {"Mass2D", new_mass<2>},
+        {"Mass3D", new_mass<3>},
+        {"MassPoint2D", new_masspoint<2>},
+        {"MassPoint3D", new_masspoint<3>},
+        {"Mindlin", new_mindlin},
+        {"MVLEM", new_mvlem},
+        {"NMB21", new_nmb21<0>},
+        {"NMB21EH", new_nmb21<2>},
+        {"NMB21EL", new_nmb21<1>},
+        {"NMB31", new_nmb31},
+        {"NonlocalC3D8", new_nonlocalc3d8},
+        {"NonlocalCP4", new_nonlocalcp4},
+        {"PatchCube", new_patchcube},
+        {"PatchQuad", new_patchquad},
+        {"PCPE4DC", new_pcpedc<4>},
+        {"PCPE4UC", new_pcpeuc<4>},
+        {"PCPE8DC", new_pcpedc<8>},
+        {"PCPE8UC", new_pcpeuc<8>},
+        {"PS", new_ps},
+        {"QE2", new_qe2},
+        {"S4", new_s4},
+        {"SGCMQG", new_gcmq<true, 'G'>},
+        {"SGCMQI", new_gcmq<true, 'I'>},
+        {"SGCMQL", new_gcmq<true, 'L'>},
+        {"SGCMS", new_sgcms},
+        {"SingleSection2D", new_singlesection<SingleSection2D>},
+        {"SingleSection3D", new_singlesection<SingleSection3D>},
+        {"SphericalParticle2D", new_sphericalparticle<2u>},
+        {"SphericalParticle3D", new_sphericalparticle<3u>},
+        {"Spring01", new_spring01},
+        {"Spring02", new_spring02},
+        {"T2D2", new_t2d2},
+        {"T2D2S", new_t2d2s},
+        {"T3D2", new_t3d2},
+        {"T3D2S", new_t3d2s},
+        {"Tie", new_tie},
+        {"TranslationConnector2D", new_translationconnector<2u>},
+        {"TranslationConnector3D", new_translationconnector<3u>},
+    };
+
+    if(const auto factory = registry.fetch(element_id); nullptr != factory) factory(new_element, command);
     else external_module::object(new_element, domain, element_id, command);
 
     if(nullptr == new_element || !domain->insert(std::move(new_element)))
@@ -2731,14 +2735,18 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream
 
     unique_ptr<Modifier> new_modifier = nullptr;
 
-    if(is_equal(modifier_type, "LumpedSimple")) new_lumped_simple(new_modifier, command);
-    else if(is_equal(modifier_type, "LumpedScale")) new_lumped_scale(new_modifier, command);
-    else if(is_equal(modifier_type, "Rayleigh")) new_rayleigh_modifier(new_modifier, command);
-    else if(is_equal(modifier_type, "ElementalLee")) new_elemental_lee(new_modifier, command);
-    else if(is_equal(modifier_type, "LinearViscosity")) new_linear_viscosity(new_modifier, command);
-    else if(is_equal(modifier_type, "ElementalModal")) new_elemental_modal(new_modifier, command);
-    else if(is_equal(modifier_type, "ElementalNonviscous")) new_elemental_nonviscous<false>(new_modifier, command);
-    else if(is_equal(modifier_type, "ElementalNonviscousGroup")) new_elemental_nonviscous<true>(new_modifier, command);
+    static const TokenRegistry<void (*)(unique_ptr<Modifier>&, std::istringstream&)> registry{
+        {"LumpedSimple", new_lumped_simple},
+        {"LumpedScale", new_lumped_scale},
+        {"Rayleigh", new_rayleigh_modifier},
+        {"ElementalLee", new_elemental_lee},
+        {"LinearViscosity", new_linear_viscosity},
+        {"ElementalModal", new_elemental_modal},
+        {"ElementalNonviscous", new_elemental_nonviscous<false>},
+        {"ElementalNonviscousGroup", new_elemental_nonviscous<true>},
+    };
+
+    if(const auto factory = registry.fetch(modifier_type); nullptr != factory) factory(new_modifier, command);
     else {
         // check if the library is already loaded
         auto code = false;
@@ -2774,10 +2782,14 @@ int create_new_orientation(const shared_ptr<DomainBase>& domain, std::istringstr
 
     unique_ptr<Orientation> new_orientation = nullptr;
 
-    if(is_equal(file_type, "B3DL")) new_orientation_object<B3DL>(new_orientation, command);
-    else if(is_equal(file_type, "B3DC")) new_orientation_object<B3DC>(new_orientation, command);
-    else if(is_equal(file_type, "B3DOSL")) new_orientation_object<B3DOSL>(new_orientation, command);
-    else if(is_equal(file_type, "B3DOSC")) new_orientation_object<B3DOSC>(new_orientation, command);
+    static const TokenRegistry<void (*)(unique_ptr<Orientation>&, std::istringstream&)> registry{
+        {"B3DL", new_orientation_object<B3DL>},
+        {"B3DC", new_orientation_object<B3DC>},
+        {"B3DOSL", new_orientation_object<B3DOSL>},
+        {"B3DOSC", new_orientation_object<B3DOSC>},
+    };
+
+    if(const auto factory = registry.fetch(file_type); nullptr != factory) factory(new_orientation, command);
 
     if(nullptr == new_orientation || !domain->insert(std::move(new_orientation)))
         suanpan_error("Fail to create new orientation via \"{}\".\n", command.str());

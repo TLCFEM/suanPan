@@ -19,7 +19,7 @@
 
 #include <Domain/DomainBase.h>
 #include <Toolbox/Expression.h>
-#include <Toolbox/utility.h>
+#include <Toolbox/TokenRegistry.h>
 
 int check_file(std::string& expression) {
     if(!fs::exists(expression)) return SUANPAN_SUCCESS;
@@ -104,8 +104,12 @@ int create_new_expression(const shared_ptr<DomainBase>& domain, std::istringstre
 
     unique_ptr<Expression> new_expression = nullptr;
 
-    if(is_equal(expression_type, "SimpleScalar")) new_simplescalar(new_expression, command);
-    else if(is_equal(expression_type, "SimpleVector")) new_simplevector(new_expression, command);
+    static const TokenRegistry<void (*)(unique_ptr<Expression>&, std::istringstream&)> registry{
+        {"SimpleScalar", new_simplescalar},
+        {"SimpleVector", new_simplevector},
+    };
+
+    if(const auto factory = registry.fetch(expression_type); nullptr != factory) factory(new_expression, command);
 
     if(nullptr == new_expression || !domain->insert(std::move(new_expression)))
         suanpan_error("Fail to create new expression via \"{}\".\n", command.str());

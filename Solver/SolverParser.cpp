@@ -20,7 +20,7 @@
 #include <Domain/DomainBase.h>
 #include <Solver/Solver>
 #include <Step/Step.h>
-#include <Toolbox/utility.h>
+#include <Toolbox/TokenRegistry.h>
 
 namespace {
     //
@@ -601,30 +601,37 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
 
     unique_ptr<Integrator> new_integrator = nullptr;
 
-    if(is_equal(integrator_type, "Newmark")) new_newmark(new_integrator, command);
-    else if(is_equal(integrator_type, "RayleighNewmark")) new_rayleigh_newmark(new_integrator, command);
-    else if(is_equal(integrator_type, "LeeNewmark")) new_lee_newmark(new_integrator, command);
-    else if(is_equal(integrator_type, "LeeNewmarkIterative")) new_lee_newmark_iterative(new_integrator, command);
-    else if(is_equal(integrator_type, "LeeElementalNewmark")) new_lee_elemental_newmark(new_integrator, command);
-    else if(is_equal(integrator_type, "LeeNewmarkFullTrial")) new_lee_newmark_full<LeeNewmarkBase::StiffnessType::TRIAL>(new_integrator, command);
-    else if(is_equal_any(integrator_type, "LeeNewmarkFullCurrent", "LeeNewmarkFull")) new_lee_newmark_full<LeeNewmarkBase::StiffnessType::CURRENT>(new_integrator, command);
-    else if(is_equal(integrator_type, "LeeNewmarkFullInitial")) new_lee_newmark_full<LeeNewmarkBase::StiffnessType::INITIAL>(new_integrator, command);
-    else if(is_equal(integrator_type, "WilsonPenzienNewmark")) new_wilson_penzien_newmark(new_integrator, command);
-    else if(is_equal(integrator_type, "NonviscousNewmark")) new_nonviscous_newmark(new_integrator, command);
-    else if(is_equal(integrator_type, "UDDNewmark")) new_udd_newmark(new_integrator, command);
-    else if(is_equal(integrator_type, "UDANewmark")) new_uda_newmark(new_integrator, command);
-    else if(is_equal_any(integrator_type, "GeneralizedAlpha", "GeneralisedAlpha")) new_generalized_alpha(new_integrator, command);
-    else if(is_equal(integrator_type, "GSSSSU0")) new_gssss<GSSSSU0>(new_integrator, command);
-    else if(is_equal(integrator_type, "GSSSSV0")) new_gssss<GSSSSV0>(new_integrator, command);
-    else if(is_equal(integrator_type, "GSSSSOptimal")) new_radius_integrator<GSSSSOptimal>(new_integrator, command);
-    else if(is_equal(integrator_type, "OALTS")) new_radius_integrator<OALTS>(new_integrator, command);
-    else if(is_equal(integrator_type, "BatheTwoStep")) new_bathe_two_step(new_integrator, command);
-    else if(is_equal(integrator_type, "Tchamwa")) new_radius_integrator<Tchamwa>(new_integrator, command);
-    else if(is_equal(integrator_type, "BatheExplicit")) new_radius_integrator<BatheExplicit>(new_integrator, command);
-    else if(is_equal(integrator_type, "ICL")) new_icl(new_integrator, command);
-    else if(is_equal(integrator_type, "GSSE")) new_radius_integrator<GSSE>(new_integrator, command);
-    else if(is_equal(integrator_type, "WAT2")) new_wat2(new_integrator, command);
-    else if(is_equal_any(integrator_type, "GeneralizedAlphaExplicit", "GeneralisedAlphaExplicit")) new_radius_integrator<GeneralizedAlphaExplicit>(new_integrator, command);
+    static const TokenRegistry<void (*)(unique_ptr<Integrator>&, std::istringstream&)> registry{
+        {"Newmark", new_newmark},
+        {"RayleighNewmark", new_rayleigh_newmark},
+        {"LeeNewmark", new_lee_newmark},
+        {"LeeNewmarkIterative", new_lee_newmark_iterative},
+        {"LeeElementalNewmark", new_lee_elemental_newmark},
+        {"LeeNewmarkFullTrial", new_lee_newmark_full<LeeNewmarkBase::StiffnessType::TRIAL>},
+        {"LeeNewmarkFullCurrent", new_lee_newmark_full<LeeNewmarkBase::StiffnessType::CURRENT>},
+        {"LeeNewmarkFull", new_lee_newmark_full<LeeNewmarkBase::StiffnessType::CURRENT>},
+        {"LeeNewmarkFullInitial", new_lee_newmark_full<LeeNewmarkBase::StiffnessType::INITIAL>},
+        {"WilsonPenzienNewmark", new_wilson_penzien_newmark},
+        {"NonviscousNewmark", new_nonviscous_newmark},
+        {"UDDNewmark", new_udd_newmark},
+        {"UDANewmark", new_uda_newmark},
+        {"GeneralizedAlpha", new_generalized_alpha},
+        {"GeneralisedAlpha", new_generalized_alpha},
+        {"GSSSSU0", new_gssss<GSSSSU0>},
+        {"GSSSSV0", new_gssss<GSSSSV0>},
+        {"GSSSSOptimal", new_radius_integrator<GSSSSOptimal>},
+        {"OALTS", new_radius_integrator<OALTS>},
+        {"BatheTwoStep", new_bathe_two_step},
+        {"Tchamwa", new_radius_integrator<Tchamwa>},
+        {"BatheExplicit", new_radius_integrator<BatheExplicit>},
+        {"ICL", new_icl},
+        {"GSSE", new_radius_integrator<GSSE>},
+        {"WAT2", new_wat2},
+        {"GeneralizedAlphaExplicit", new_radius_integrator<GeneralizedAlphaExplicit>},
+        {"GeneralisedAlphaExplicit", new_radius_integrator<GeneralizedAlphaExplicit>},
+    };
+
+    if(const auto factory = registry.fetch(integrator_type); nullptr != factory) factory(new_integrator, command);
 
     if(nullptr == new_integrator) {
         suanpan_error("Fail to create new integrator via \"{}\".\n", command.str());
@@ -653,15 +660,21 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, std::istringstream& 
 
     unique_ptr<Solver> new_solver = nullptr;
 
-    if(is_equal(solver_type, "Newton")) new_newton(new_solver, command);
-    else if(is_equal_any(solver_type, "modifiedNewton", "mNewton")) new_modified_newton(new_solver, command);
-    else if(is_equal(solver_type, "AICN")) new_aicn(new_solver, command);
-    else if(is_equal(solver_type, "BFGS")) new_bfgs(new_solver, command);
-    else if(is_equal(solver_type, "LBFGS")) new_lbfgs(new_solver, command);
-    else if(is_equal(solver_type, "FEAST")) new_feast<false>(new_solver, command);
-    else if(is_equal(solver_type, "QuadraticFEAST")) new_feast<true>(new_solver, command);
-    else if(is_equal_any(solver_type, "DisplacementControl", "MPDC")) new_mpdc(new_solver, command);
-    else if(is_equal(solver_type, "Ramm")) new_ramm(new_solver, command);
+    static const TokenRegistry<void (*)(unique_ptr<Solver>&, std::istringstream&)> registry{
+        {"Newton", new_newton},
+        {"modifiedNewton", new_modified_newton},
+        {"mNewton", new_modified_newton},
+        {"AICN", new_aicn},
+        {"BFGS", new_bfgs},
+        {"LBFGS", new_lbfgs},
+        {"FEAST", new_feast<false>},
+        {"QuadraticFEAST", new_feast<true>},
+        {"DisplacementControl", new_mpdc},
+        {"MPDC", new_mpdc},
+        {"Ramm", new_ramm},
+    };
+
+    if(const auto factory = registry.fetch(solver_type); nullptr != factory) factory(new_solver, command);
 
     if(nullptr == new_solver) {
         suanpan_error("Fail to create new solver via \"{}\".\n", command.str());

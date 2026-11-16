@@ -22,7 +22,7 @@
 #include <Domain/Group/ElementGroup.h>
 #include <Domain/Group/GroupGroup.h>
 #include <Domain/Group/NodeGroup.h>
-#include <Toolbox/utility.h>
+#include <Toolbox/TokenRegistry.h>
 
 void new_nodegroup(unique_ptr<Group>& return_obj, std::istringstream& command) {
     unsigned tag;
@@ -182,14 +182,18 @@ int create_new_group(const shared_ptr<DomainBase>& domain, std::istringstream& c
 
     unique_ptr<Group> new_group = nullptr;
 
-    if(is_equal(group_id, "nodegroup")) new_nodegroup(new_group, command);
-    else if(is_equal(group_id, "customnodegroup")) new_customnodegroup(new_group, command);
-    else if(is_equal(group_id, "elementgroup")) new_elementgroup(new_group, command);
-    else if(is_equal(group_id, "groupgroup")) new_groupgroup(new_group, command);
-    else if(is_equal(group_id, "generate")) new_generate(new_group, command);
-    else if(is_equal(group_id, "generatebyrule")) new_generatebyrule(new_group, command);
-    else if(is_equal(group_id, "generatebypoint")) new_generatebypoint(new_group, command);
-    else if(is_equal(group_id, "generatebyplane")) new_generatebyplane(new_group, command);
+    static const TokenRegistry<void (*)(unique_ptr<Group>&, std::istringstream&)> registry{
+        {"nodegroup", new_nodegroup},
+        {"customnodegroup", new_customnodegroup},
+        {"elementgroup", new_elementgroup},
+        {"groupgroup", new_groupgroup},
+        {"generate", new_generate},
+        {"generatebyrule", new_generatebyrule},
+        {"generatebypoint", new_generatebypoint},
+        {"generatebyplane", new_generatebyplane},
+    };
+
+    if(const auto factory = registry.fetch(group_id); nullptr != factory) factory(new_group, command);
 
     if(new_group == nullptr || !domain->insert(std::move(new_group)))
         suanpan_error("Fail to create new group via \"{}\".\n", command.str());

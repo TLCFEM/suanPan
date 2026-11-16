@@ -23,7 +23,7 @@
 #include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Material/Material>
-#include <Toolbox/utility.h>
+#include <Toolbox/TokenRegistry.h>
 
 namespace {
     void new_afc01(unique_ptr<Material>& return_obj, std::istringstream& command) {
@@ -3682,143 +3682,145 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
 
     unique_ptr<Material> new_material = nullptr;
 
-    if(is_equal(material_id, "AbaqusCDP")) new_tablecdp<true>(new_material, command);
-    else if(is_equal_any(material_id, "AFC", "AFC01")) new_afc01(new_material, command);
-    else if(is_equal_any(material_id, "AFC02", "AFCS")) new_afc02(new_material, command);
-    else if(is_equal_any(material_id, "AFC03", "AFCN")) new_afc03(new_material, command);
-    else if(is_equal(material_id, "AFCO1D")) new_armstrongfrederick1d<true>(new_material, command);
-    else if(is_equal(material_id, "ArmstrongFrederick")) new_armstrongfrederick(new_material, command);
-    else if(is_equal(material_id, "ArmstrongFrederick1D")) new_armstrongfrederick1d<false>(new_material, command);
-    else if(is_equal(material_id, "AsymmElastic1D")) new_asymmelastic1d(new_material, command);
-    else if(is_equal(material_id, "Axisymmetric")) new_axisymmetric(new_material, command);
-    else if(is_equal(material_id, "AxisymmetricElastic")) new_axisymmetricelastic(new_material, command);
-    else if(is_equal(material_id, "Balloon")) new_balloon(new_material, command);
-    else if(is_equal(material_id, "Balloon1D")) new_balloon1d(new_material, command);
-    else if(is_equal(material_id, "Bilinear1D")) new_bilinear1d(new_material, command);
-    else if(is_equal(material_id, "BilinearCC")) new_bilinearcc(new_material, command);
-    else if(is_equal(material_id, "BilinearDP")) new_bilineardp(new_material, command);
-    else if(is_equal(material_id, "BilinearElastic1D")) new_bilinearelastic1d(new_material, command);
-    else if(is_equal(material_id, "BilinearHoffman")) new_bilinearorthotropic<true>(new_material, command);
-    else if(is_equal(material_id, "BilinearJ2")) new_bilinearj2(new_material, command);
-    else if(is_equal(material_id, "NonlocalBilinearJ2")) new_nonlocalbilinearj2(new_material, command);
-    else if(is_equal(material_id, "BilinearMises1D")) new_bilinearmises1d(new_material, command);
-    else if(is_equal(material_id, "BilinearOO")) new_bilinearoo(new_material, command);
-    else if(is_equal(material_id, "BilinearPeric")) new_bilinearperic(new_material, command);
-    else if(is_equal(material_id, "BilinearPO")) new_bilinearpo(new_material, command);
-    else if(is_equal(material_id, "BilinearTsaiWu")) new_bilinearorthotropic<false>(new_material, command);
-    else if(is_equal(material_id, "BilinearViscosity")) new_bilinearviscosity(new_material, command);
-    else if(is_equal(material_id, "BlatzKo")) new_blatzko(new_material, command);
-    else if(is_equal(material_id, "BoucWen")) new_boucwen(new_material, command);
-    else if(is_equal(material_id, "BWBN")) new_bwbn(new_material, command);
-    else if(is_equal(material_id, "CDP")) new_cdp<true>(new_material, command);
-    else if(if_startswith(material_id, "CDPM2")) {
-        if(is_equal_any(material_id, "CDPM2", "CDPM2ISO")) new_cdpm2<CDPM2::DamageType::ISOTROPIC>(new_material, command);
-        else if(is_equal(material_id, "CDPM2ANISO")) new_cdpm2<CDPM2::DamageType::ANISOTROPIC>(new_material, command);
-        else if(is_equal(material_id, "CDPM2NO")) new_cdpm2<CDPM2::DamageType::NODAMAGE>(new_material, command);
-    }
-    else if(if_startswith(material_id, "Concrete")) {
-        if(is_equal(material_id, "Concrete21")) new_concrete21(new_material, command);
-        else if(is_equal(material_id, "Concrete22")) new_concrete22(new_material, command);
-        else if(is_equal(material_id, "ConcreteCM")) new_concretecm(new_material, command);
-        else if(is_equal(material_id, "ConcreteExp")) new_concreteexp(new_material, command);
-        else if(is_equal(material_id, "ConcreteK4")) new_concretek4(new_material, command);
-        else if(is_equal(material_id, "ConcreteTable")) new_concretetable(new_material, command);
-        else if(is_equal(material_id, "ConcreteTsai")) new_concretetsai(new_material, command);
-    }
-    else if(is_equal(material_id, "CoulombFriction")) new_coulombfriction(new_material, command);
-    else if(is_equal(material_id, "CustomCC")) new_customcc(new_material, command);
-    else if(is_equal(material_id, "CustomCDP")) new_customcdp(new_material, command);
-    else if(is_equal(material_id, "CustomDP")) new_customdp(new_material, command);
-    else if(is_equal(material_id, "CustomElastic1D")) new_customelastic1d(new_material, command);
-    else if(is_equal(material_id, "CustomGurson")) new_customgurson(new_material, command);
-    else if(is_equal(material_id, "CustomGurson1D")) new_customgurson1d(new_material, command);
-    else if(is_equal(material_id, "CustomHoffman")) new_customorthotropic<true>(new_material, command);
-    else if(is_equal(material_id, "CustomJ2")) new_customj2(new_material, command);
-    else if(is_equal(material_id, "CustomMises1D")) new_custommises1d(new_material, command);
-    else if(is_equal(material_id, "CustomStrainDegradation")) new_customdegradation<true>(new_material, command);
-    else if(is_equal(material_id, "CustomStressDegradation")) new_customdegradation<false>(new_material, command);
-    else if(is_equal(material_id, "CustomTsaiWu")) new_customorthotropic<false>(new_material, command);
-    else if(is_equal(material_id, "CustomViscosity")) new_customviscosity(new_material, command);
-    else if(is_equal(material_id, "DafaliasManzari")) new_dafaliasmanzari(new_material, command);
-    else if(is_equal(material_id, "Dhakal")) new_dhakal(new_material, command);
-    else if(is_equal(material_id, "DuncanSelig")) new_duncanselig(new_material, command);
-    else if(is_equal(material_id, "Elastic1D")) new_elastic1d(new_material, command);
-    else if(is_equal(material_id, "Elastic2D")) new_elastic2d(new_material, command);
-    else if(is_equal_any(material_id, "Elastic3D", "IsotropicElastic3D")) new_isotropicelastic3d(new_material, command);
-    else if(is_equal_any(material_id, "NonlocalElastic3D", "NonlocalIsotropicElastic3D")) new_nonlocalisotropicelastic3d(new_material, command);
-    else if(is_equal(material_id, "ElasticOS")) new_elasticos(new_material, command);
-    else if(is_equal(material_id, "ExpCC")) new_expcc(new_material, command);
-    else if(is_equal(material_id, "ExpDP")) new_expdp(new_material, command);
-    else if(is_equal(material_id, "ExpGurson")) new_expgurson(new_material, command);
-    else if(is_equal(material_id, "ExpGurson1D")) new_expgurson1d(new_material, command);
-    else if(is_equal(material_id, "ExpHoffman")) new_exporthotropic<true>(new_material, command);
-    else if(is_equal(material_id, "ExpJ2")) new_expj2(new_material, command);
-    else if(is_equal(material_id, "ExpMises1D")) new_expmises1d(new_material, command);
-    else if(is_equal(material_id, "ExpTsaiWu")) new_exporthotropic<false>(new_material, command);
-    else if(is_equal(material_id, "Flag01")) new_flag01(new_material, command);
-    else if(is_equal(material_id, "Flag02")) new_flag02(new_material, command);
-    else if(is_equal(material_id, "Fluid")) new_fluid(new_material, command);
-    else if(is_equal(material_id, "Gap01")) new_gap01(new_material, command);
-    else if(is_equal(material_id, "Kelvin")) new_kelvin(new_material, command);
-    else if(is_equal(material_id, "Laminated")) new_laminated(new_material, command);
-    else if(is_equal(material_id, "LinearDamage")) new_lineardamage(new_material, command);
-    else if(is_equal(material_id, "Maxwell")) new_maxwell(new_material, command);
-    else if(is_equal(material_id, "MooneyRivlin")) new_mooneyrivlin(new_material, command);
-    else if(is_equal(material_id, "MPF")) new_mpf(new_material, command);
-    else if(is_equal(material_id, "MultilinearElastic1D")) new_multilinearelastic1d(new_material, command);
-    else if(is_equal(material_id, "MultilinearJ2")) new_multilinearj2(new_material, command);
-    else if(is_equal(material_id, "MultilinearMises1D")) new_multilinearmises1d(new_material, command);
-    else if(is_equal(material_id, "MultilinearOO")) new_multilinearoo(new_material, command);
-    else if(is_equal(material_id, "MultilinearPO")) new_multilinearpo(new_material, command);
-    else if(is_equal(material_id, "MultiSubloading1D")) new_multisubloading1d(new_material, command);
-    else if(is_equal(material_id, "NLE1D01")) new_nle1d01(new_material, command);
-    else if(is_equal(material_id, "NLE3D01")) new_nle3d01(new_material, command);
-    else if(is_equal(material_id, "Nonviscous01")) new_nonviscous01(new_material, command);
-    else if(is_equal(material_id, "OrthotropicElastic3D")) new_orthotropicelastic3d(new_material, command);
-    else if(is_equal(material_id, "OS146")) new_wrapper<OS146>(new_material, command);
-    else if(is_equal(material_id, "OS146S")) new_os146s(new_material, command);
-    else if(is_equal(material_id, "ParabolicCC")) new_paraboliccc(new_material, command);
-    else if(is_equal(material_id, "Parallel")) new_parallel(new_material, command);
-    else if(is_equal(material_id, "PlaneStrain")) new_planestrain<0>(new_material, command);
-    else if(is_equal(material_id, "PlaneStress")) new_wrapper<PlaneStress>(new_material, command);
-    else if(is_equal(material_id, "PlaneSymmetric13")) new_planestrain<1>(new_material, command);
-    else if(is_equal(material_id, "PlaneSymmetric23")) new_planestrain<2>(new_material, command);
-    else if(is_equal(material_id, "PolyElastic1D")) new_polyelastic1d(new_material, command);
-    else if(is_equal(material_id, "PolyJ2")) new_polyj2(new_material, command);
-    else if(is_equal(material_id, "Prestrain")) new_prestrain(new_material, command);
-    else if(is_equal(material_id, "RambergOsgood")) new_rambergosgood(new_material, command);
-    else if(is_equal(material_id, "Rebar2D")) new_rebar2d(new_material, command);
-    else if(is_equal(material_id, "Rebar3D")) new_rebar3d(new_material, command);
-    else if(is_equal(material_id, "Rotation2D")) new_rotation2d(new_material, command);
-    else if(is_equal(material_id, "Rotation3D")) new_rotation3d(new_material, command);
-    else if(is_equal(material_id, "Sequential")) new_sequential(new_material, command);
-    else if(is_equal(material_id, "SimpleSand")) new_simplesand(new_material, command);
-    else if(is_equal(material_id, "Sinh1D")) new_sinh1d(new_material, command);
-    else if(is_equal(material_id, "SlipLock")) new_sliplock(new_material, command);
-    else if(is_equal(material_id, "Stacked")) new_stacked(new_material, command);
-    else if(is_equal(material_id, "SteelBRB")) new_steelbrb(new_material, command);
-    else if(if_startswith(material_id, "Subloading")) {
-        if(is_equal(material_id, "Subloading")) new_subloading(new_material, command);
-        else if(is_equal(material_id, "Subloading1D")) new_subloading1d(new_material, command);
-        else if(is_equal(material_id, "SubloadingViscous1D")) new_subloadingviscous1d(new_material, command);
-    }
-    else if(is_equal(material_id, "Substepping")) new_substepping(new_material, command);
-    else if(is_equal(material_id, "TableCDP")) new_tablecdp<false>(new_material, command);
-    else if(is_equal(material_id, "TableGurson")) new_tablegurson(new_material, command);
-    else if(is_equal(material_id, "Tanh1D")) new_tanh1d(new_material, command);
-    else if(is_equal(material_id, "TimberPD")) new_timberpd(new_material, command);
-    else if(is_equal(material_id, "TrilinearStrainDegradation")) new_trilinearstraindegradation(new_material, command);
-    else if(is_equal(material_id, "Trivial")) new_trivial(new_material, command);
-    else if(is_equal(material_id, "Uniaxial")) new_wrapper<Uniaxial>(new_material, command);
-    else if(is_equal(material_id, "VAFCRP")) new_vafcrp(new_material, command);
-    else if(is_equal(material_id, "VAFCRP1D")) new_vafcrp1d(new_material, command);
-    else if(is_equal(material_id, "Viscosity01")) new_viscosity01(new_material, command);
-    else if(is_equal(material_id, "Viscosity02")) new_viscosity02(new_material, command);
-    else if(is_equal(material_id, "Yeoh")) new_yeoh(new_material, command);
-    else if(if_startswith(material_id, "YLD0418P")) {
-        if(is_equal(material_id, "YLD0418P")) new_yld0418p<false>(new_material, command);
-        else if(is_equal(material_id, "YLD0418PISO")) new_yld0418p<true>(new_material, command);
-    }
+    static const TokenRegistry<void (*)(unique_ptr<Material>&, std::istringstream&)> registry{
+        {"AbaqusCDP", new_tablecdp<true>},
+        {"AFC", new_afc01},
+        {"AFC01", new_afc01},
+        {"AFC02", new_afc02},
+        {"AFCS", new_afc02},
+        {"AFC03", new_afc03},
+        {"AFCN", new_afc03},
+        {"AFCO1D", new_armstrongfrederick1d<true>},
+        {"ArmstrongFrederick", new_armstrongfrederick},
+        {"ArmstrongFrederick1D", new_armstrongfrederick1d<false>},
+        {"AsymmElastic1D", new_asymmelastic1d},
+        {"Axisymmetric", new_axisymmetric},
+        {"AxisymmetricElastic", new_axisymmetricelastic},
+        {"Balloon", new_balloon},
+        {"Balloon1D", new_balloon1d},
+        {"Bilinear1D", new_bilinear1d},
+        {"BilinearCC", new_bilinearcc},
+        {"BilinearDP", new_bilineardp},
+        {"BilinearElastic1D", new_bilinearelastic1d},
+        {"BilinearHoffman", new_bilinearorthotropic<true>},
+        {"BilinearJ2", new_bilinearj2},
+        {"NonlocalBilinearJ2", new_nonlocalbilinearj2},
+        {"BilinearMises1D", new_bilinearmises1d},
+        {"BilinearOO", new_bilinearoo},
+        {"BilinearPeric", new_bilinearperic},
+        {"BilinearPO", new_bilinearpo},
+        {"BilinearTsaiWu", new_bilinearorthotropic<false>},
+        {"BilinearViscosity", new_bilinearviscosity},
+        {"BlatzKo", new_blatzko},
+        {"BoucWen", new_boucwen},
+        {"BWBN", new_bwbn},
+        {"CDP", new_cdp<true>},
+        {"CDPM2", new_cdpm2<CDPM2::DamageType::ISOTROPIC>},
+        {"CDPM2ISO", new_cdpm2<CDPM2::DamageType::ISOTROPIC>},
+        {"CDPM2ANISO", new_cdpm2<CDPM2::DamageType::ANISOTROPIC>},
+        {"CDPM2NO", new_cdpm2<CDPM2::DamageType::NODAMAGE>},
+        {"Concrete21", new_concrete21},
+        {"Concrete22", new_concrete22},
+        {"ConcreteCM", new_concretecm},
+        {"ConcreteExp", new_concreteexp},
+        {"ConcreteK4", new_concretek4},
+        {"ConcreteTable", new_concretetable},
+        {"ConcreteTsai", new_concretetsai},
+        {"CoulombFriction", new_coulombfriction},
+        {"CustomCC", new_customcc},
+        {"CustomCDP", new_customcdp},
+        {"CustomDP", new_customdp},
+        {"CustomElastic1D", new_customelastic1d},
+        {"CustomGurson", new_customgurson},
+        {"CustomGurson1D", new_customgurson1d},
+        {"CustomHoffman", new_customorthotropic<true>},
+        {"CustomJ2", new_customj2},
+        {"CustomMises1D", new_custommises1d},
+        {"CustomStrainDegradation", new_customdegradation<true>},
+        {"CustomStressDegradation", new_customdegradation<false>},
+        {"CustomTsaiWu", new_customorthotropic<false>},
+        {"CustomViscosity", new_customviscosity},
+        {"DafaliasManzari", new_dafaliasmanzari},
+        {"Dhakal", new_dhakal},
+        {"DuncanSelig", new_duncanselig},
+        {"Elastic1D", new_elastic1d},
+        {"Elastic2D", new_elastic2d},
+        {"Elastic3D", new_isotropicelastic3d},
+        {"IsotropicElastic3D", new_isotropicelastic3d},
+        {"NonlocalElastic3D", new_nonlocalisotropicelastic3d},
+        {"NonlocalIsotropicElastic3D", new_nonlocalisotropicelastic3d},
+        {"ElasticOS", new_elasticos},
+        {"ExpCC", new_expcc},
+        {"ExpDP", new_expdp},
+        {"ExpGurson", new_expgurson},
+        {"ExpGurson1D", new_expgurson1d},
+        {"ExpHoffman", new_exporthotropic<true>},
+        {"ExpJ2", new_expj2},
+        {"ExpMises1D", new_expmises1d},
+        {"ExpTsaiWu", new_exporthotropic<false>},
+        {"Flag01", new_flag01},
+        {"Flag02", new_flag02},
+        {"Fluid", new_fluid},
+        {"Gap01", new_gap01},
+        {"Kelvin", new_kelvin},
+        {"Laminated", new_laminated},
+        {"LinearDamage", new_lineardamage},
+        {"Maxwell", new_maxwell},
+        {"MooneyRivlin", new_mooneyrivlin},
+        {"MPF", new_mpf},
+        {"MultilinearElastic1D", new_multilinearelastic1d},
+        {"MultilinearJ2", new_multilinearj2},
+        {"MultilinearMises1D", new_multilinearmises1d},
+        {"MultilinearOO", new_multilinearoo},
+        {"MultilinearPO", new_multilinearpo},
+        {"MultiSubloading1D", new_multisubloading1d},
+        {"NLE1D01", new_nle1d01},
+        {"NLE3D01", new_nle3d01},
+        {"Nonviscous01", new_nonviscous01},
+        {"OrthotropicElastic3D", new_orthotropicelastic3d},
+        {"OS146", new_wrapper<OS146>},
+        {"OS146S", new_os146s},
+        {"ParabolicCC", new_paraboliccc},
+        {"Parallel", new_parallel},
+        {"PlaneStrain", new_planestrain<0>},
+        {"PlaneStress", new_wrapper<PlaneStress>},
+        {"PlaneSymmetric13", new_planestrain<1>},
+        {"PlaneSymmetric23", new_planestrain<2>},
+        {"PolyElastic1D", new_polyelastic1d},
+        {"PolyJ2", new_polyj2},
+        {"Prestrain", new_prestrain},
+        {"RambergOsgood", new_rambergosgood},
+        {"Rebar2D", new_rebar2d},
+        {"Rebar3D", new_rebar3d},
+        {"Rotation2D", new_rotation2d},
+        {"Rotation3D", new_rotation3d},
+        {"Sequential", new_sequential},
+        {"SimpleSand", new_simplesand},
+        {"Sinh1D", new_sinh1d},
+        {"SlipLock", new_sliplock},
+        {"Stacked", new_stacked},
+        {"SteelBRB", new_steelbrb},
+        {"Subloading", new_subloading},
+        {"Subloading1D", new_subloading1d},
+        {"SubloadingViscous1D", new_subloadingviscous1d},
+        {"Substepping", new_substepping},
+        {"TableCDP", new_tablecdp<false>},
+        {"TableGurson", new_tablegurson},
+        {"Tanh1D", new_tanh1d},
+        {"TimberPD", new_timberpd},
+        {"TrilinearStrainDegradation", new_trilinearstraindegradation},
+        {"Trivial", new_trivial},
+        {"Uniaxial", new_wrapper<Uniaxial>},
+        {"VAFCRP", new_vafcrp},
+        {"VAFCRP1D", new_vafcrp1d},
+        {"Viscosity01", new_viscosity01},
+        {"Viscosity02", new_viscosity02},
+        {"Yeoh", new_yeoh},
+        {"YLD0418P", new_yld0418p<false>},
+        {"YLD0418PISO", new_yld0418p<true>},
+    };
+
+    if(const auto factory = registry.fetch(material_id); nullptr != factory) factory(new_material, command);
     else external_module::object(new_material, domain, material_id, command);
 
     if(nullptr == new_material || !domain->insert(std::move(new_material)))

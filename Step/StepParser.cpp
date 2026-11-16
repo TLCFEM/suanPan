@@ -19,7 +19,7 @@
 
 #include <Domain/DomainBase.h>
 #include <Step/Step>
-#include <Toolbox/utility.h>
+#include <Toolbox/TokenRegistry.h>
 
 namespace {
     void new_frequency(unique_ptr<Step>& return_obj, std::istringstream& command) {
@@ -106,13 +106,20 @@ int create_new_step(const shared_ptr<DomainBase>& domain, std::istringstream& co
 
     unique_ptr<Step> new_step = nullptr;
 
-    if(is_equal(step_type, "Frequency")) new_frequency(new_step, command);
-    else if(is_equal_any(step_type, "Buckling", "Buckle")) new_buckle(new_step, command);
-    else if(is_equal_any(step_type, "Optimization", "Optimisation")) new_time_step<Optimization>(new_step, command);
-    else if(is_equal(step_type, "Static")) new_time_step<Static>(new_step, command);
-    else if(is_equal_any(step_type, "Dynamic", "ImplicitDynamic")) new_dynamic<Integrator::Type::Implicit>(new_step, command);
-    else if(is_equal(step_type, "ExplicitDynamic")) new_dynamic<Integrator::Type::Explicit>(new_step, command);
-    else if(is_equal(step_type, "ArcLength")) new_arclength(new_step, command);
+    static const TokenRegistry<void (*)(unique_ptr<Step>&, std::istringstream&)> registry{
+        {"Frequency", new_frequency},
+        {"Buckling", new_buckle},
+        {"Buckle", new_buckle},
+        {"Optimization", new_time_step<Optimization>},
+        {"Optimisation", new_time_step<Optimization>},
+        {"Static", new_time_step<Static>},
+        {"Dynamic", new_dynamic<Integrator::Type::Implicit>},
+        {"ImplicitDynamic", new_dynamic<Integrator::Type::Implicit>},
+        {"ExplicitDynamic", new_dynamic<Integrator::Type::Explicit>},
+        {"ArcLength", new_arclength},
+    };
+
+    if(const auto factory = registry.fetch(step_type); nullptr != factory) factory(new_step, command);
 
     if(nullptr == new_step) {
         suanpan_error("Fail to create new step via \"{}\".\n", command.str());

@@ -21,6 +21,7 @@
 
 #include <Domain/ExternalModule.h>
 #include <Load/Load>
+#include <Toolbox/TokenRegistry.h>
 #include <Toolbox/resampling.h>
 
 namespace {
@@ -448,20 +449,32 @@ int create_new_load(const shared_ptr<DomainBase>& domain, std::istringstream& co
 
     unique_ptr<Load> new_load = nullptr;
 
-    if(is_equal(load_id, "Acceleration")) new_acceleration(new_load, command);
-    else if(is_equal(load_id, "BodyForce")) new_bodyforce<false>(new_load, command);
-    else if(is_equal(load_id, "Cload")) new_cload<false>(new_load, command);
-    else if(is_equal_any(load_id, "Disp", "Displacement", "DispLoad")) new_displacement<false>(new_load, command);
-    else if(is_equal(load_id, "GroupBodyForce")) new_bodyforce<true>(new_load, command);
-    else if(is_equal(load_id, "GroupCload")) new_cload<true>(new_load, command);
-    else if(is_equal_any(load_id, "GroupDisp", "GroupDisplacement", "GroupDispLoad")) new_displacement<true>(new_load, command);
-    else if(is_equal(load_id, "LineUDL2D")) new_lineudl<2>(new_load, command);
-    else if(is_equal(load_id, "LineUDL3D")) new_lineudl<3>(new_load, command);
-    else if(is_equal_any(load_id, "ReferenceLoad", "RefLoad", "RefForce")) new_refload<false>(new_load, command);
-    else if(is_equal_any(load_id, "GroupReferenceLoad", "GroupRefLoad", "GroupRefForce")) new_refload<true>(new_load, command);
-    else if(is_equal(load_id, "SupportAcceleration")) new_supportmotion<2>(new_load, command);
-    else if(is_equal(load_id, "SupportDisplacement")) new_supportmotion<0>(new_load, command);
-    else if(is_equal(load_id, "SupportVelocity")) new_supportmotion<1>(new_load, command);
+    static const TokenRegistry<void (*)(unique_ptr<Load>&, std::istringstream&)> registry{
+        {"Acceleration", new_acceleration},
+        {"BodyForce", new_bodyforce<false>},
+        {"Cload", new_cload<false>},
+        {"Disp", new_displacement<false>},
+        {"Displacement", new_displacement<false>},
+        {"DispLoad", new_displacement<false>},
+        {"GroupBodyForce", new_bodyforce<true>},
+        {"GroupCload", new_cload<true>},
+        {"GroupDisp", new_displacement<true>},
+        {"GroupDisplacement", new_displacement<true>},
+        {"GroupDispLoad", new_displacement<true>},
+        {"LineUDL2D", new_lineudl<2>},
+        {"LineUDL3D", new_lineudl<3>},
+        {"ReferenceLoad", new_refload<false>},
+        {"RefLoad", new_refload<false>},
+        {"RefForce", new_refload<false>},
+        {"GroupReferenceLoad", new_refload<true>},
+        {"GroupRefLoad", new_refload<true>},
+        {"GroupRefForce", new_refload<true>},
+        {"SupportAcceleration", new_supportmotion<2>},
+        {"SupportDisplacement", new_supportmotion<0>},
+        {"SupportVelocity", new_supportmotion<1>},
+    };
+
+    if(const auto factory = registry.fetch(load_id); nullptr != factory) factory(new_load, command);
     else external_module::object(new_load, domain, load_id, command);
 
     if(new_load != nullptr) new_load->set_start_step(domain->get_current_step_tag());
@@ -481,18 +494,22 @@ int create_new_amplitude(const shared_ptr<DomainBase>& domain, std::istringstrea
 
     unique_ptr<Amplitude> new_amplitude = nullptr;
 
-    if(is_equal(amplitude_type, "Constant")) new_tag_amplitude<Constant>(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Ramp")) new_tag_amplitude<Ramp>(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Tabular")) new_tabular_amplitude(new_amplitude, command);
-    else if(is_equal(amplitude_type, "TabularSpline")) new_tabular_spline_amplitude(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Decay")) new_decay_amplitude(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Linear")) new_linear_amplitude(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Combine")) new_combine_amplitude(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Custom")) new_custom_amplitude(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Modulated")) new_trigonometric_amplitude<Modulated>(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Sine")) new_trigonometric_amplitude<Sine>(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Cosine")) new_trigonometric_amplitude<Cosine>(new_amplitude, command);
-    else if(is_equal(amplitude_type, "NZStrongMotion")) new_nz_strong_motion(new_amplitude, command);
+    static const TokenRegistry<void (*)(unique_ptr<Amplitude>&, std::istringstream&)> registry{
+        {"Constant", new_tag_amplitude<Constant>},
+        {"Ramp", new_tag_amplitude<Ramp>},
+        {"Tabular", new_tabular_amplitude},
+        {"TabularSpline", new_tabular_spline_amplitude},
+        {"Decay", new_decay_amplitude},
+        {"Linear", new_linear_amplitude},
+        {"Combine", new_combine_amplitude},
+        {"Custom", new_custom_amplitude},
+        {"Modulated", new_trigonometric_amplitude<Modulated>},
+        {"Sine", new_trigonometric_amplitude<Sine>},
+        {"Cosine", new_trigonometric_amplitude<Cosine>},
+        {"NZStrongMotion", new_nz_strong_motion},
+    };
+
+    if(const auto factory = registry.fetch(amplitude_type); nullptr != factory) factory(new_amplitude, command);
 
     if(nullptr == new_amplitude || !domain->insert(std::move(new_amplitude))) suanpan_error("Fail to create new amplitude via \"{}\".\n", command.str());
 

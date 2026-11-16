@@ -20,7 +20,7 @@
 #include <Domain/ConditionalModifier.h>
 #include <Domain/DomainBase.h>
 #include <Recorder/Recorder>
-#include <Toolbox/utility.h>
+#include <Toolbox/TokenRegistry.h>
 
 namespace {
     struct RecorderArguments {
@@ -137,19 +137,23 @@ namespace {
 
         unique_ptr<Recorder> new_recorder = nullptr;
 
-        if(is_equal(object_type, "Eigen")) new_eigen_recorder(new_recorder, command, tag, use_hdf5);
-        else if(is_equal(object_type, "Modal")) new_modal_recorder(new_recorder, command, tag, use_hdf5);
-        else if(is_equal(object_type, "ModalForce")) new_modal_force_recorder(new_recorder, command, tag, use_hdf5);
-        else if(is_equal(object_type, "Frame")) new_frame_recorder(new_recorder, command, tag, use_hdf5);
-        else if(is_equal(object_type, "Visualisation")) new_visualisation_recorder(new_recorder, command, tag, use_hdf5);
-        else if(is_equal(object_type, "Node")) new_tag_recorder<NodeRecorder>(new_recorder, command, tag, use_hdf5);
-        else if(is_equal(object_type, "GroupNode")) new_tag_recorder<GroupNodeRecorder>(new_recorder, command, tag, use_hdf5);
-        else if(is_equal(object_type, "Sum")) new_tag_recorder<SumRecorder>(new_recorder, command, tag, use_hdf5);
-        else if(is_equal(object_type, "GroupSum")) new_tag_recorder<GroupSumRecorder>(new_recorder, command, tag, use_hdf5);
-        else if(is_equal(object_type, "Element")) new_tag_recorder<ElementRecorder>(new_recorder, command, tag, use_hdf5);
-        else if(is_equal(object_type, "GroupElement")) new_tag_recorder<GroupElementRecorder>(new_recorder, command, tag, use_hdf5);
-        else if(is_equal(object_type, "Amplitude")) new_amplitude_recorder(new_recorder, command, tag, use_hdf5);
-        else if(is_equal(object_type, "Global")) new_global_recorder(new_recorder, command, tag, use_hdf5);
+        static const TokenRegistry<void (*)(unique_ptr<Recorder>&, std::istringstream&, unsigned, bool)> registry{
+            {"Eigen", new_eigen_recorder},
+            {"Modal", new_modal_recorder},
+            {"ModalForce", new_modal_force_recorder},
+            {"Frame", new_frame_recorder},
+            {"Visualisation", new_visualisation_recorder},
+            {"Node", new_tag_recorder<NodeRecorder>},
+            {"GroupNode", new_tag_recorder<GroupNodeRecorder>},
+            {"Sum", new_tag_recorder<SumRecorder>},
+            {"GroupSum", new_tag_recorder<GroupSumRecorder>},
+            {"Element", new_tag_recorder<ElementRecorder>},
+            {"GroupElement", new_tag_recorder<GroupElementRecorder>},
+            {"Amplitude", new_amplitude_recorder},
+            {"Global", new_global_recorder},
+        };
+
+        if(const auto factory = registry.fetch(object_type); nullptr != factory) factory(new_recorder, command, tag, use_hdf5);
 
         if(nullptr == new_recorder || !domain->insert(std::move(new_recorder))) suanpan_error("Fail to create new recorder via \"{}\".\n", command.str());
 

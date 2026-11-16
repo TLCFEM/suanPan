@@ -124,9 +124,11 @@ namespace suanpan {
     std::string to_lower(const std::string&);
     std::string to_upper(std::string&&);
     std::string to_lower(std::string&&);
+    std::string to_upper(std::string_view);
+    std::string to_lower(std::string_view);
 
     namespace expression {
-        std::vector<std::pair<std::string, unsigned>> split(std::string_view variable_string);
+        std::vector<std::pair<std::string, unsigned>> split(std::string_view);
     } // namespace expression
 } // namespace suanpan
 
