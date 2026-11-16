@@ -1451,6 +1451,7 @@ namespace {
             suanpan_error("A valid tag is required.\n");
             return;
         }
+
         vec para_pool{2E2, .3, 1., 1., 0., 1., 0., 0.};
         if(!get_optional_input(command, para_pool)) {
             suanpan_error("A valid parameter is required.\n");
@@ -1476,6 +1477,7 @@ namespace {
             suanpan_error("A valid tag is required.\n");
             return;
         }
+
         vec para_pool{2E2, .3, 1., 1., 0., 1., 0., 0.};
         if(!get_optional_input(command, para_pool)) {
             suanpan_error("A valid parameter is required.\n");
@@ -1905,6 +1907,7 @@ namespace {
             suanpan_error("A valid tag is required.\n");
             return;
         }
+
         std::string matrix = "false";
         if(!command.eof() && !get_input(command, matrix)) {
             suanpan_error("A valid algorithm switch is required.\n");
@@ -2327,6 +2330,7 @@ namespace {
             suanpan_error("A valid tag is required.\n");
             return;
         }
+
         double magnitude;
         if(!get_input(command, magnitude)) {
             suanpan_error("A valid magnitude is required.\n");
@@ -2943,6 +2947,7 @@ namespace {
             suanpan_error("A valid tag is required.\n");
             return;
         }
+
         return_obj = std::make_unique<CustomViscosity>(tag, expression_tag);
     }
 
@@ -3012,7 +3017,13 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
     std::string material_id;
     if(!get_input(command, material_id)) {
         suanpan_error("A valid material type is required.\n");
-        return 0;
+        return SUANPAN_SUCCESS;
+    }
+
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return SUANPAN_SUCCESS;
     }
 
     unique_ptr<Material> new_material = nullptr;
@@ -3155,19 +3166,11 @@ int create_new_material(const shared_ptr<DomainBase>& domain, std::istringstream
         {"YLD0418PISO", new_yld0418p<true>},
     };
 
-    if(const auto factory = registry.fetch(material_id); nullptr != factory) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return 0;
-        }
-
-        factory(new_material, command, tag);
-    }
+    if(const auto factory = registry.fetch(material_id); nullptr != factory) factory(new_material, command, tag);
     else external_module::object(new_material, domain, material_id, command);
 
     if(nullptr == new_material || !domain->insert(std::move(new_material)))
         suanpan_error("Fail to create new material via \"{}\".\n", command.str());
 
-    return 0;
+    return SUANPAN_SUCCESS;
 }

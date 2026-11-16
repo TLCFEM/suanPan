@@ -495,12 +495,7 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
 
     if(const auto factory = registry.fetch(integrator_type); nullptr != factory) factory(new_integrator, command, tag);
 
-    if(nullptr == new_integrator) {
-        suanpan_error("Fail to create new integrator via \"{}\".\n", command.str());
-        return SUANPAN_SUCCESS;
-    }
-
-    if(!domain->insert(std::move(new_integrator))) {
+    if(nullptr == new_integrator || !domain->insert(std::move(new_integrator))) {
         suanpan_error("Fail to create new integrator via \"{}\".\n", command.str());
         return SUANPAN_SUCCESS;
     }
@@ -542,12 +537,7 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, std::istringstream& 
 
     if(const auto factory = registry.fetch(solver_type); nullptr != factory) factory(new_solver, command, tag);
 
-    if(nullptr == new_solver) {
-        suanpan_error("Fail to create new solver via \"{}\".\n", command.str());
-        return SUANPAN_SUCCESS;
-    }
-
-    if(!domain->insert(std::move(new_solver))) {
+    if(nullptr == new_solver || !domain->insert(std::move(new_solver))) {
         suanpan_error("Fail to create new solver via \"{}\".\n", command.str());
         return SUANPAN_SUCCESS;
     }

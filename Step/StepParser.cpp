@@ -97,13 +97,12 @@ int create_new_step(const shared_ptr<DomainBase>& domain, std::istringstream& co
 
     if(const auto factory = registry.fetch(step_type); nullptr != factory) factory(new_step, command, tag);
 
-    if(nullptr == new_step) {
+    if(nullptr == new_step || !domain->insert(std::move(new_step))) {
         suanpan_error("Fail to create new step via \"{}\".\n", command.str());
         return SUANPAN_SUCCESS;
     }
 
-    if(domain->insert(std::move(new_step))) domain->set_current_step_tag(tag);
-    else suanpan_error("Fail to create new step via \"{}\".\n", command.str());
+    domain->set_current_step_tag(tag);
 
     return SUANPAN_SUCCESS;
 }

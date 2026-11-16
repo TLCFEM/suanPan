@@ -111,12 +111,7 @@ int create_new_converger(const shared_ptr<DomainBase>& domain, std::istringstrea
 
     if(const auto factory = registry.fetch(converger_id); nullptr != factory) factory(new_converger, command, tag);
 
-    if(nullptr == new_converger) {
-        suanpan_error("Fail to create new converger via \"{}\".\n", command.str());
-        return SUANPAN_SUCCESS;
-    }
-
-    if(!domain->insert(std::move(new_converger))) {
+    if(nullptr == new_converger || !domain->insert(std::move(new_converger))) {
         suanpan_error("Fail to create new converger via \"{}\".\n", command.str());
         return SUANPAN_SUCCESS;
     }

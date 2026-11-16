@@ -440,6 +440,12 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
         return SUANPAN_SUCCESS;
     }
 
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
     unique_ptr<Constraint> new_constraint = nullptr;
 
     static const TokenRegistry<void (*)(unique_ptr<Constraint>&, std::istringstream&, unsigned)> registry{
@@ -490,15 +496,7 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
         {"Sleeve3D", new_sleeve<3u>},
     };
 
-    if(const auto factory = registry.fetch(constraint_id); nullptr != factory) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        factory(new_constraint, command, tag);
-    }
+    if(const auto factory = registry.fetch(constraint_id); nullptr != factory) factory(new_constraint, command, tag);
     else external_module::object(new_constraint, domain, constraint_id, command);
 
     if(new_constraint) new_constraint->set_start_step(domain->get_current_step_tag());

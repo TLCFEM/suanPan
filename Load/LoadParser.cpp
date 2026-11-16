@@ -351,6 +351,12 @@ int create_new_load(const shared_ptr<DomainBase>& domain, std::istringstream& co
         return SUANPAN_SUCCESS;
     }
 
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
     unique_ptr<Load> new_load = nullptr;
 
     static const TokenRegistry<void (*)(unique_ptr<Load>&, std::istringstream&, unsigned)> registry{
@@ -378,15 +384,7 @@ int create_new_load(const shared_ptr<DomainBase>& domain, std::istringstream& co
         {"SupportVelocity", new_supportmotion<1>},
     };
 
-    if(const auto factory = registry.fetch(load_id); nullptr != factory) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        factory(new_load, command, tag);
-    }
+    if(const auto factory = registry.fetch(load_id); nullptr != factory) factory(new_load, command, tag);
     else external_module::object(new_load, domain, load_id, command);
 
     if(new_load != nullptr) new_load->set_start_step(domain->get_current_step_tag());

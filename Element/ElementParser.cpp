@@ -2067,6 +2067,7 @@ namespace {
             suanpan_error("A valid tag is required.\n");
             return;
         }
+
         const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
 
         const vec m_imag{m_i}, s_imag{s_i};
@@ -2105,6 +2106,12 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     std::string element_id;
     if(!get_input(command, element_id)) {
         suanpan_error("A valid element type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
         return SUANPAN_SUCCESS;
     }
 
@@ -2219,15 +2226,7 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
         {"TranslationConnector3D", new_translationconnector<3u>},
     };
 
-    if(const auto factory = registry.fetch(element_id); nullptr != factory) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        factory(new_element, command, tag);
-    }
+    if(const auto factory = registry.fetch(element_id); nullptr != factory) factory(new_element, command, tag);
     else external_module::object(new_element, domain, element_id, command);
 
     if(nullptr == new_element || !domain->insert(std::move(new_element)))
@@ -2260,6 +2259,12 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream
         return SUANPAN_SUCCESS;
     }
 
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
     unique_ptr<Modifier> new_modifier = nullptr;
 
     static const TokenRegistry<void (*)(unique_ptr<Modifier>&, std::istringstream&, unsigned)> registry{
@@ -2273,15 +2278,7 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream
         {"ElementalNonviscousGroup", new_elemental_nonviscous<true>},
     };
 
-    if(const auto factory = registry.fetch(modifier_type); nullptr != factory) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        factory(new_modifier, command, tag);
-    }
+    if(const auto factory = registry.fetch(modifier_type); nullptr != factory) factory(new_modifier, command, tag);
     else {
         // check if the library is already loaded
         auto code = false;
