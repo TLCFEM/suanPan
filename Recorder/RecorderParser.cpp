@@ -22,70 +22,72 @@
 #include <Recorder/Recorder>
 #include <Toolbox/utility.h>
 
-static int process_recorder_command(const shared_ptr<DomainBase>& domain, std::istringstream& command, const unsigned tag, const bool use_hdf5) {
-    std::string object_type;
-    if(!get_input(command, object_type)) {
-        suanpan_error("A valid object type is required.\n");
-        return SUANPAN_SUCCESS;
+namespace {
+    struct RecorderArguments {
+        OutputType variable_token{OutputType::NL};
+        unsigned interval{1u};
+    };
+
+    template<bool with_variable = true> bool get_recorder_arguments(std::istringstream& command, RecorderArguments& arguments) {
+        if constexpr(with_variable) {
+            std::string variable_type;
+            if(!get_input(command, variable_type)) {
+                suanpan_error("A valid recorder type is required.\n");
+                return false;
+            }
+            arguments.variable_token = to_token(std::move(variable_type));
+        }
+
+        while(true)
+            if(const auto peek_value = command.peek(); is_equal_any(peek_value, ' ', '\t')) command.ignore();
+            else break;
+
+        if(is_equal_any(command.peek(), 'e', 'i')) {
+            [[maybe_unused]] const auto tmp_string = get_input<std::string>(command);
+            if(!get_input(command, arguments.interval)) return false;
+        }
+
+        return true;
     }
 
-    if(is_equal(object_type, "Eigen")) {
-        if(!domain->insert(std::make_shared<EigenRecorder>(tag, use_hdf5)))
-            suanpan_error("Fail to create new eigen recorder.\n");
-        return SUANPAN_SUCCESS;
+    void new_eigen_recorder(unique_ptr<Recorder>& return_obj, std::istringstream&, const unsigned tag, const bool use_hdf5) {
+        return_obj = std::make_unique<EigenRecorder>(tag, use_hdf5);
     }
 
-    if(is_equal(object_type, "Modal")) {
+    void new_modal_recorder(unique_ptr<Recorder>& return_obj, std::istringstream& command, const unsigned tag, const bool use_hdf5) {
         std::vector<Node::DOF> dof_pool;
         for(const auto& token : get_remaining<std::string>(command)) {
             const auto dof = parse_dof(token);
             if(dof.empty()) {
                 suanpan_error("A valid dof identifier is required.\n");
-                return SUANPAN_SUCCESS;
+                return;
             }
             dof_pool.insert(dof_pool.end(), dof.cbegin(), dof.cend());
         }
 
         if(dof_pool.empty()) {
             suanpan_error("At least one dof identifier is required.\n");
-            return SUANPAN_SUCCESS;
+            return;
         }
 
-        if(!domain->insert(std::make_shared<ModalRecorder>(tag, std::move(dof_pool), use_hdf5)))
-            suanpan_error("Fail to create new modal recorder.\n");
-        return SUANPAN_SUCCESS;
+        return_obj = std::make_unique<ModalRecorder>(tag, std::move(dof_pool), use_hdf5);
     }
 
-    if(is_equal(object_type, "ModalForce")) {
-        if(!domain->insert(std::make_shared<ModalForceRecorder>(tag, use_hdf5)))
-            suanpan_error("Fail to create new modal force recorder.\n");
-        return SUANPAN_SUCCESS;
+    void new_modal_force_recorder(unique_ptr<Recorder>& return_obj, std::istringstream&, const unsigned tag, const bool use_hdf5) {
+        return_obj = std::make_unique<ModalForceRecorder>(tag, use_hdf5);
     }
 
-    std::string variable_type;
-    if(!is_equal(object_type, "Amplitude") && !get_input(command, variable_type)) {
-        suanpan_error("A valid recorder type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-    const auto variable_token = to_token(std::move(variable_type));
+    void new_frame_recorder(unique_ptr<Recorder>& return_obj, std::istringstream& command, const unsigned tag, const bool) {
+        RecorderArguments arguments;
+        if(!get_recorder_arguments(command, arguments)) return;
 
-    while(true)
-        if(const auto peek_value = command.peek(); is_equal(peek_value, '\t') || is_equal(peek_value, ' ')) command.ignore();
-        else break;
-
-    auto interval = 1u;
-    if(is_equal(command.peek(), 'e') || is_equal(command.peek(), 'i')) {
-        std::string tmp_string;
-        get_input(command, tmp_string);
-        if(!get_input(command, interval)) return SUANPAN_SUCCESS;
+        return_obj = std::make_unique<FrameRecorder>(tag, arguments.variable_token, arguments.interval);
     }
 
-    if(is_equal(object_type, "Frame")) {
-        if(!domain->insert(std::make_shared<FrameRecorder>(tag, variable_token, interval)))
-            suanpan_error("Fail to create new frame recorder.\n");
-        return SUANPAN_SUCCESS;
-    }
-    if(is_equal(object_type, "Visualisation")) {
+    void new_visualisation_recorder(unique_ptr<Recorder>& return_obj, std::istringstream& command, const unsigned tag, const bool) {
+        RecorderArguments arguments;
+        if(!get_recorder_arguments(command, arguments)) return;
+
         std::string para;
         auto width = 6u;
         auto scale = 1.;
@@ -96,39 +98,64 @@ static int process_recorder_command(const shared_ptr<DomainBase>& domain, std::i
             else if(is_equal(para, "Scale")) {
                 if(!get_input(command, scale)) suanpan_error("A valid scale is required, using unity.\n");
             }
-        if(!domain->insert(std::make_shared<VisualisationRecorder>(tag, variable_token, interval, width, scale)))
-            suanpan_error("Fail to create new visualisation recorder.\n");
+
+        return_obj = std::make_unique<VisualisationRecorder>(tag, arguments.variable_token, arguments.interval, width, scale);
 #ifndef SUANPAN_VTK
         suanpan_warning("Visualisation recorders have no effect as the required VTK support is not available.\n");
 #endif
+    }
+
+    template<typename T> void new_tag_recorder(unique_ptr<Recorder>& return_obj, std::istringstream& command, const unsigned tag, const bool use_hdf5) {
+        RecorderArguments arguments;
+        if(!get_recorder_arguments(command, arguments)) return;
+
+        return_obj = std::make_unique<T>(tag, uvec(get_remaining<uword>(command)), arguments.variable_token, arguments.interval, use_hdf5);
+    }
+
+    void new_amplitude_recorder(unique_ptr<Recorder>& return_obj, std::istringstream& command, const unsigned tag, const bool use_hdf5) {
+        RecorderArguments arguments;
+        if(!get_recorder_arguments<false>(command, arguments)) return;
+
+        return_obj = std::make_unique<AmplitudeRecorder>(tag, uvec(get_remaining<uword>(command)), OutputType::AMP, arguments.interval, use_hdf5);
+    }
+
+    void new_global_recorder(unique_ptr<Recorder>& return_obj, std::istringstream& command, const unsigned tag, const bool use_hdf5) {
+        RecorderArguments arguments;
+        if(!get_recorder_arguments(command, arguments)) return;
+
+        if(OutputType::K == arguments.variable_token) return_obj = std::make_unique<GlobalStiffnessRecorder>(tag, arguments.interval, use_hdf5);
+        else if(OutputType::M == arguments.variable_token) return_obj = std::make_unique<GlobalMassRecorder>(tag, arguments.interval, use_hdf5);
+        else return_obj = std::make_unique<GlobalRecorder>(tag, arguments.variable_token, arguments.interval, use_hdf5);
+    }
+
+    int dispatch_new_recorder(const shared_ptr<DomainBase>& domain, std::istringstream& command, const unsigned tag, const bool use_hdf5) {
+        std::string object_type;
+        if(!get_input(command, object_type)) {
+            suanpan_error("A valid object type is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        unique_ptr<Recorder> new_recorder = nullptr;
+
+        if(is_equal(object_type, "Eigen")) new_eigen_recorder(new_recorder, command, tag, use_hdf5);
+        else if(is_equal(object_type, "Modal")) new_modal_recorder(new_recorder, command, tag, use_hdf5);
+        else if(is_equal(object_type, "ModalForce")) new_modal_force_recorder(new_recorder, command, tag, use_hdf5);
+        else if(is_equal(object_type, "Frame")) new_frame_recorder(new_recorder, command, tag, use_hdf5);
+        else if(is_equal(object_type, "Visualisation")) new_visualisation_recorder(new_recorder, command, tag, use_hdf5);
+        else if(is_equal(object_type, "Node")) new_tag_recorder<NodeRecorder>(new_recorder, command, tag, use_hdf5);
+        else if(is_equal(object_type, "GroupNode")) new_tag_recorder<GroupNodeRecorder>(new_recorder, command, tag, use_hdf5);
+        else if(is_equal(object_type, "Sum")) new_tag_recorder<SumRecorder>(new_recorder, command, tag, use_hdf5);
+        else if(is_equal(object_type, "GroupSum")) new_tag_recorder<GroupSumRecorder>(new_recorder, command, tag, use_hdf5);
+        else if(is_equal(object_type, "Element")) new_tag_recorder<ElementRecorder>(new_recorder, command, tag, use_hdf5);
+        else if(is_equal(object_type, "GroupElement")) new_tag_recorder<GroupElementRecorder>(new_recorder, command, tag, use_hdf5);
+        else if(is_equal(object_type, "Amplitude")) new_amplitude_recorder(new_recorder, command, tag, use_hdf5);
+        else if(is_equal(object_type, "Global")) new_global_recorder(new_recorder, command, tag, use_hdf5);
+
+        if(nullptr == new_recorder || !domain->insert(std::move(new_recorder))) suanpan_error("Fail to create new recorder via \"{}\".\n", command.str());
+
         return SUANPAN_SUCCESS;
     }
-
-    if(const auto object_tag = get_remaining<uword>(command); is_equal(object_type, "Node") && !domain->insert(std::make_shared<NodeRecorder>(tag, uvec(object_tag), variable_token, interval, use_hdf5)))
-        suanpan_error("Fail to create new node recorder.\n");
-    else if(is_equal(object_type, "GroupNode") && !domain->insert(std::make_shared<GroupNodeRecorder>(tag, uvec(object_tag), variable_token, interval, use_hdf5)))
-        suanpan_error("Fail to create new group node recorder.\n");
-    else if(is_equal(object_type, "Sum") && !domain->insert(std::make_shared<SumRecorder>(tag, uvec(object_tag), variable_token, interval, use_hdf5)))
-        suanpan_error("Fail to create new summation recorder.\n");
-    else if(is_equal(object_type, "GroupSum") && !domain->insert(std::make_shared<GroupSumRecorder>(tag, uvec(object_tag), variable_token, interval, use_hdf5)))
-        suanpan_error("Fail to create new group summation recorder.\n");
-    else if(is_equal(object_type, "Element") && !domain->insert(std::make_shared<ElementRecorder>(tag, uvec(object_tag), variable_token, interval, use_hdf5)))
-        suanpan_error("Fail to create new element recorder.\n");
-    else if(is_equal(object_type, "GroupElement") && !domain->insert(std::make_shared<GroupElementRecorder>(tag, uvec(object_tag), variable_token, interval, use_hdf5)))
-        suanpan_error("Fail to create new group element recorder.\n");
-    else if(is_equal(object_type, "Amplitude") && !domain->insert(std::make_shared<AmplitudeRecorder>(tag, uvec(object_tag), OutputType::AMP, interval, use_hdf5)))
-        suanpan_error("Fail to create new amplitude recorder.\n");
-    else if(is_equal(object_type, "Global")) {
-        bool flag;
-        if(OutputType::K == variable_token) flag = domain->insert(std::make_shared<GlobalStiffnessRecorder>(tag, interval, use_hdf5));
-        else if(OutputType::M == variable_token) flag = domain->insert(std::make_shared<GlobalMassRecorder>(tag, interval, use_hdf5));
-        else flag = domain->insert(std::make_shared<GlobalRecorder>(tag, variable_token, interval, use_hdf5));
-        if(!flag)
-            suanpan_error("Fail to create new global recorder.\n");
-    }
-
-    return SUANPAN_SUCCESS;
-}
+} // namespace
 
 int create_new_recorder(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     unsigned tag;
@@ -143,7 +170,7 @@ int create_new_recorder(const shared_ptr<DomainBase>& domain, std::istringstream
         return SUANPAN_SUCCESS;
     }
 
-    return process_recorder_command(domain, command, tag, if_startswith(file_type, "hdf"));
+    return dispatch_new_recorder(domain, command, tag, if_startswith(file_type, "hdf"));
 }
 
 int create_new_recorder(const shared_ptr<DomainBase>& domain, std::istringstream& command, const bool use_hdf5) {
@@ -153,5 +180,5 @@ int create_new_recorder(const shared_ptr<DomainBase>& domain, std::istringstream
         return SUANPAN_SUCCESS;
     }
 
-    return process_recorder_command(domain, command, tag, use_hdf5);
+    return dispatch_new_recorder(domain, command, tag, use_hdf5);
 }
