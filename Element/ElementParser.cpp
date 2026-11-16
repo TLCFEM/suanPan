@@ -25,6 +25,10 @@
 #include <Toolbox/utility.h>
 
 namespace {
+    //
+    // elements
+    //
+
     void new_allman(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -2414,6 +2418,7 @@ namespace {
 
         return_obj = std::make_unique<PatchCube>(tag, std::move(knot_x), std::move(knot_y), std::move(knot_z), std::move(node_tag), static_cast<unsigned>(material_tag));
     }
+
     void new_global_mass(unique_ptr<Element>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -2447,6 +2452,10 @@ namespace {
 
         return_obj = std::make_unique<Mass3D>(tag, node, magnitude, uvec(dof_tag));
     }
+
+    //
+    // modifiers
+    //
 
     void new_lumped_simple(unique_ptr<Modifier>& return_obj, std::istringstream& command) {
         unsigned tag;
@@ -2541,7 +2550,7 @@ namespace {
 
         const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
 
-        auto m_imag = vec{m_i}, s_imag = vec{s_i};
+        const vec m_imag{m_i}, s_imag{s_i};
         if(accu(m_imag) + accu(s_imag) > 1E-10) {
             suanpan_error("Parameters should be conjugate pairs.\n");
             return;
@@ -2557,6 +2566,10 @@ namespace {
         if constexpr(group) return_obj = std::make_unique<ElementalNonviscousGroup>(tag, std::move(m), std::move(s), ele_tag);
         else return_obj = std::make_unique<ElementalNonviscous>(tag, std::move(m), std::move(s), uvec{ele_tag});
     }
+
+    //
+    // orientations
+    //
 
     template<typename T> void new_orientation_object(unique_ptr<Orientation>& return_obj, std::istringstream& command) {
         unsigned tag;
@@ -2574,80 +2587,6 @@ namespace {
         return_obj = std::make_unique<T>(tag, std::move(xyz));
     }
 } // namespace
-
-int create_new_mass(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
-    unique_ptr<Element> new_mass = nullptr;
-
-    new_global_mass(new_mass, command);
-
-    if(nullptr == new_mass || !domain->insert(std::move(new_mass)))
-        suanpan_error("Fail to create new mass via \"{}\".\n", command.str());
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
-    std::string modifier_type;
-    if(!get_input(command, modifier_type)) {
-        suanpan_error("A valid modifier type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unique_ptr<Modifier> new_modifier = nullptr;
-
-    if(is_equal(modifier_type, "LumpedSimple")) new_lumped_simple(new_modifier, command);
-    else if(is_equal(modifier_type, "LumpedScale")) new_lumped_scale(new_modifier, command);
-    else if(is_equal(modifier_type, "Rayleigh")) new_rayleigh_modifier(new_modifier, command);
-    else if(is_equal(modifier_type, "ElementalLee")) new_elemental_lee(new_modifier, command);
-    else if(is_equal(modifier_type, "LinearViscosity")) new_linear_viscosity(new_modifier, command);
-    else if(is_equal(modifier_type, "ElementalModal")) new_elemental_modal(new_modifier, command);
-    else if(is_equal(modifier_type, "ElementalNonviscous")) new_elemental_nonviscous<false>(new_modifier, command);
-    else if(is_equal(modifier_type, "ElementalNonviscousGroup")) new_elemental_nonviscous<true>(new_modifier, command);
-    else {
-        // check if the library is already loaded
-        auto code = false;
-        for(const auto& I : domain->get_external_module_pool())
-            if(is_equal(I->library_name, modifier_type) || I->locate_cpp_module(modifier_type)) {
-                code = true;
-                break;
-            }
-
-        // not loaded then try load it
-        if(!code && domain->insert(std::make_shared<ExternalModule>(modifier_type))) code = true;
-
-        // if loaded find corresponding function
-        if(code)
-            for(const auto& I : domain->get_external_module_pool()) {
-                if(I->locate_cpp_module(modifier_type)) I->new_object(new_modifier, command);
-                if(new_modifier != nullptr) break;
-            }
-    }
-
-    if(nullptr == new_modifier || !domain->insert(std::move(new_modifier)))
-        suanpan_error("Fail to create new modifier via \"{}\".\n", command.str());
-
-    return SUANPAN_SUCCESS;
-}
-
-int create_new_orientation(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
-    std::string file_type;
-    if(!get_input(command, file_type)) {
-        suanpan_error("A valid type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unique_ptr<Orientation> new_orientation = nullptr;
-
-    if(is_equal(file_type, "B3DL")) new_orientation_object<B3DL>(new_orientation, command);
-    else if(is_equal(file_type, "B3DC")) new_orientation_object<B3DC>(new_orientation, command);
-    else if(is_equal(file_type, "B3DOSL")) new_orientation_object<B3DOSL>(new_orientation, command);
-    else if(is_equal(file_type, "B3DOSC")) new_orientation_object<B3DOSC>(new_orientation, command);
-
-    if(nullptr == new_orientation || !domain->insert(std::move(new_orientation)))
-        suanpan_error("Fail to create new orientation via \"{}\".\n", command.str());
-
-    return SUANPAN_SUCCESS;
-}
 
 int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string element_id;
@@ -2769,5 +2708,79 @@ int create_new_element(const shared_ptr<DomainBase>& domain, std::istringstream&
     if(nullptr == new_element || !domain->insert(std::move(new_element)))
         suanpan_error("Fail to create new element via \"{}\".\n", command.str());
 
-    return 0;
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_mass(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    unique_ptr<Element> new_mass = nullptr;
+
+    new_global_mass(new_mass, command);
+
+    if(nullptr == new_mass || !domain->insert(std::move(new_mass)))
+        suanpan_error("Fail to create new mass via \"{}\".\n", command.str());
+
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    std::string modifier_type;
+    if(!get_input(command, modifier_type)) {
+        suanpan_error("A valid modifier type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unique_ptr<Modifier> new_modifier = nullptr;
+
+    if(is_equal(modifier_type, "LumpedSimple")) new_lumped_simple(new_modifier, command);
+    else if(is_equal(modifier_type, "LumpedScale")) new_lumped_scale(new_modifier, command);
+    else if(is_equal(modifier_type, "Rayleigh")) new_rayleigh_modifier(new_modifier, command);
+    else if(is_equal(modifier_type, "ElementalLee")) new_elemental_lee(new_modifier, command);
+    else if(is_equal(modifier_type, "LinearViscosity")) new_linear_viscosity(new_modifier, command);
+    else if(is_equal(modifier_type, "ElementalModal")) new_elemental_modal(new_modifier, command);
+    else if(is_equal(modifier_type, "ElementalNonviscous")) new_elemental_nonviscous<false>(new_modifier, command);
+    else if(is_equal(modifier_type, "ElementalNonviscousGroup")) new_elemental_nonviscous<true>(new_modifier, command);
+    else {
+        // check if the library is already loaded
+        auto code = false;
+        for(const auto& I : domain->get_external_module_pool())
+            if(is_equal(I->library_name, modifier_type) || I->locate_cpp_module(modifier_type)) {
+                code = true;
+                break;
+            }
+
+        // not loaded then try load it
+        if(!code && domain->insert(std::make_shared<ExternalModule>(modifier_type))) code = true;
+
+        // if loaded find corresponding function
+        if(code)
+            for(const auto& I : domain->get_external_module_pool()) {
+                if(I->locate_cpp_module(modifier_type)) I->new_object(new_modifier, command);
+                if(new_modifier != nullptr) break;
+            }
+    }
+
+    if(nullptr == new_modifier || !domain->insert(std::move(new_modifier)))
+        suanpan_error("Fail to create new modifier via \"{}\".\n", command.str());
+
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_orientation(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    std::string file_type;
+    if(!get_input(command, file_type)) {
+        suanpan_error("A valid type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unique_ptr<Orientation> new_orientation = nullptr;
+
+    if(is_equal(file_type, "B3DL")) new_orientation_object<B3DL>(new_orientation, command);
+    else if(is_equal(file_type, "B3DC")) new_orientation_object<B3DC>(new_orientation, command);
+    else if(is_equal(file_type, "B3DOSL")) new_orientation_object<B3DOSL>(new_orientation, command);
+    else if(is_equal(file_type, "B3DOSC")) new_orientation_object<B3DOSC>(new_orientation, command);
+
+    if(nullptr == new_orientation || !domain->insert(std::move(new_orientation)))
+        suanpan_error("Fail to create new orientation via \"{}\".\n", command.str());
+
+    return SUANPAN_SUCCESS;
 }

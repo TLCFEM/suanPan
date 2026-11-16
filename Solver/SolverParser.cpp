@@ -23,6 +23,10 @@
 #include <Toolbox/utility.h>
 
 namespace {
+    //
+    // integrators
+    //
+
     bool get_newmark_parameters(std::istringstream& command, double& alpha, double& beta) {
         alpha = .25;
         beta = .5;
@@ -306,7 +310,7 @@ namespace {
 
         const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
 
-        auto m_imag = vec{m_i}, s_imag = vec{s_i};
+        const vec m_imag{m_i}, s_imag{s_i};
         if(accu(m_imag) + accu(s_imag) > 1E-12) {
             suanpan_error("Parameters should be conjugate pairs.\n");
             return;
@@ -334,7 +338,7 @@ namespace {
 
         const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
 
-        vec m_real{m_r}, s_real{s_r}, m_imag{m_i}, s_imag{s_i};
+        const vec m_real{m_r}, s_real{s_r}, m_imag{m_i}, s_imag{s_i};
         if(accu(m_imag) + accu(s_imag) > 1E-12) {
             suanpan_error("Parameters should be conjugate pairs.\n");
             return;
@@ -360,7 +364,7 @@ namespace {
 
         const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
 
-        vec m_real{m_r}, s_real{s_r}, m_imag{m_i}, s_imag{s_i};
+        const vec m_real{m_r}, s_real{s_r}, m_imag{m_i}, s_imag{s_i};
         if(accu(m_imag) + accu(s_imag) > 1E-12) {
             suanpan_error("Parameters should be conjugate pairs.\n");
             return;
@@ -381,9 +385,7 @@ namespace {
             return;
         }
 
-        const auto pool = get_remaining<double>(command);
-
-        if(pool.empty()) return_obj = std::make_unique<GeneralizedAlpha>(tag, .5);
+        if(const auto pool = get_remaining<double>(command); pool.empty()) return_obj = std::make_unique<GeneralizedAlpha>(tag, .5);
         else if(1 == pool.size()) return_obj = std::make_unique<GeneralizedAlpha>(tag, suanpan::clamp_unit(pool[0]));
         else if(2 == pool.size()) return_obj = std::make_unique<GeneralizedAlpha>(tag, pool[0], pool[1]);
     }
@@ -474,61 +476,11 @@ namespace {
 
         return_obj = std::make_unique<WAT2>(tag, suanpan::clamp_unit(para));
     }
-} // namespace
 
-int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
-    std::string integrator_type;
-    if(!get_input(command, integrator_type)) {
-        suanpan_error("A valid integrator type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
+    //
+    // solvers
+    //
 
-    unique_ptr<Integrator> new_integrator = nullptr;
-
-    if(is_equal(integrator_type, "Newmark")) new_newmark(new_integrator, command);
-    else if(is_equal(integrator_type, "RayleighNewmark")) new_rayleigh_newmark(new_integrator, command);
-    else if(is_equal(integrator_type, "LeeNewmark")) new_lee_newmark(new_integrator, command);
-    else if(is_equal(integrator_type, "LeeNewmarkIterative")) new_lee_newmark_iterative(new_integrator, command);
-    else if(is_equal(integrator_type, "LeeElementalNewmark")) new_lee_elemental_newmark(new_integrator, command);
-    else if(is_equal(integrator_type, "LeeNewmarkFullTrial")) new_lee_newmark_full<LeeNewmarkBase::StiffnessType::TRIAL>(new_integrator, command);
-    else if(is_equal_any(integrator_type, "LeeNewmarkFullCurrent", "LeeNewmarkFull")) new_lee_newmark_full<LeeNewmarkBase::StiffnessType::CURRENT>(new_integrator, command);
-    else if(is_equal(integrator_type, "LeeNewmarkFullInitial")) new_lee_newmark_full<LeeNewmarkBase::StiffnessType::INITIAL>(new_integrator, command);
-    else if(is_equal(integrator_type, "WilsonPenzienNewmark")) new_wilson_penzien_newmark(new_integrator, command);
-    else if(is_equal(integrator_type, "NonviscousNewmark")) new_nonviscous_newmark(new_integrator, command);
-    else if(is_equal(integrator_type, "UDDNewmark")) new_udd_newmark(new_integrator, command);
-    else if(is_equal(integrator_type, "UDANewmark")) new_uda_newmark(new_integrator, command);
-    else if(is_equal_any(integrator_type, "GeneralizedAlpha", "GeneralisedAlpha")) new_generalized_alpha(new_integrator, command);
-    else if(is_equal(integrator_type, "GSSSSU0")) new_gssss<GSSSSU0>(new_integrator, command);
-    else if(is_equal(integrator_type, "GSSSSV0")) new_gssss<GSSSSV0>(new_integrator, command);
-    else if(is_equal(integrator_type, "GSSSSOptimal")) new_radius_integrator<GSSSSOptimal>(new_integrator, command);
-    else if(is_equal(integrator_type, "OALTS")) new_radius_integrator<OALTS>(new_integrator, command);
-    else if(is_equal(integrator_type, "BatheTwoStep")) new_bathe_two_step(new_integrator, command);
-    else if(is_equal(integrator_type, "Tchamwa")) new_radius_integrator<Tchamwa>(new_integrator, command);
-    else if(is_equal(integrator_type, "BatheExplicit")) new_radius_integrator<BatheExplicit>(new_integrator, command);
-    else if(is_equal(integrator_type, "ICL")) new_icl(new_integrator, command);
-    else if(is_equal(integrator_type, "GSSE")) new_radius_integrator<GSSE>(new_integrator, command);
-    else if(is_equal(integrator_type, "WAT2")) new_wat2(new_integrator, command);
-    else if(is_equal_any(integrator_type, "GeneralizedAlphaExplicit", "GeneralisedAlphaExplicit")) new_radius_integrator<GeneralizedAlphaExplicit>(new_integrator, command);
-
-    if(nullptr == new_integrator) {
-        suanpan_error("Fail to create new integrator via \"{}\".\n", command.str());
-        return SUANPAN_SUCCESS;
-    }
-
-    const auto tag = new_integrator->get_tag();
-
-    if(!domain->insert(std::move(new_integrator))) {
-        suanpan_error("Fail to create new integrator via \"{}\".\n", command.str());
-        return SUANPAN_SUCCESS;
-    }
-
-    if(0 != domain->get_current_step_tag()) domain->get_current_step()->set_integrator_tag(tag);
-    domain->set_current_integrator_tag(tag);
-
-    return SUANPAN_SUCCESS;
-}
-
-namespace {
     void new_newton(unique_ptr<Solver>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -639,6 +591,58 @@ namespace {
         return_obj = std::make_unique<Ramm>(tag);
     }
 } // namespace
+
+int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    std::string integrator_type;
+    if(!get_input(command, integrator_type)) {
+        suanpan_error("A valid integrator type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unique_ptr<Integrator> new_integrator = nullptr;
+
+    if(is_equal(integrator_type, "Newmark")) new_newmark(new_integrator, command);
+    else if(is_equal(integrator_type, "RayleighNewmark")) new_rayleigh_newmark(new_integrator, command);
+    else if(is_equal(integrator_type, "LeeNewmark")) new_lee_newmark(new_integrator, command);
+    else if(is_equal(integrator_type, "LeeNewmarkIterative")) new_lee_newmark_iterative(new_integrator, command);
+    else if(is_equal(integrator_type, "LeeElementalNewmark")) new_lee_elemental_newmark(new_integrator, command);
+    else if(is_equal(integrator_type, "LeeNewmarkFullTrial")) new_lee_newmark_full<LeeNewmarkBase::StiffnessType::TRIAL>(new_integrator, command);
+    else if(is_equal_any(integrator_type, "LeeNewmarkFullCurrent", "LeeNewmarkFull")) new_lee_newmark_full<LeeNewmarkBase::StiffnessType::CURRENT>(new_integrator, command);
+    else if(is_equal(integrator_type, "LeeNewmarkFullInitial")) new_lee_newmark_full<LeeNewmarkBase::StiffnessType::INITIAL>(new_integrator, command);
+    else if(is_equal(integrator_type, "WilsonPenzienNewmark")) new_wilson_penzien_newmark(new_integrator, command);
+    else if(is_equal(integrator_type, "NonviscousNewmark")) new_nonviscous_newmark(new_integrator, command);
+    else if(is_equal(integrator_type, "UDDNewmark")) new_udd_newmark(new_integrator, command);
+    else if(is_equal(integrator_type, "UDANewmark")) new_uda_newmark(new_integrator, command);
+    else if(is_equal_any(integrator_type, "GeneralizedAlpha", "GeneralisedAlpha")) new_generalized_alpha(new_integrator, command);
+    else if(is_equal(integrator_type, "GSSSSU0")) new_gssss<GSSSSU0>(new_integrator, command);
+    else if(is_equal(integrator_type, "GSSSSV0")) new_gssss<GSSSSV0>(new_integrator, command);
+    else if(is_equal(integrator_type, "GSSSSOptimal")) new_radius_integrator<GSSSSOptimal>(new_integrator, command);
+    else if(is_equal(integrator_type, "OALTS")) new_radius_integrator<OALTS>(new_integrator, command);
+    else if(is_equal(integrator_type, "BatheTwoStep")) new_bathe_two_step(new_integrator, command);
+    else if(is_equal(integrator_type, "Tchamwa")) new_radius_integrator<Tchamwa>(new_integrator, command);
+    else if(is_equal(integrator_type, "BatheExplicit")) new_radius_integrator<BatheExplicit>(new_integrator, command);
+    else if(is_equal(integrator_type, "ICL")) new_icl(new_integrator, command);
+    else if(is_equal(integrator_type, "GSSE")) new_radius_integrator<GSSE>(new_integrator, command);
+    else if(is_equal(integrator_type, "WAT2")) new_wat2(new_integrator, command);
+    else if(is_equal_any(integrator_type, "GeneralizedAlphaExplicit", "GeneralisedAlphaExplicit")) new_radius_integrator<GeneralizedAlphaExplicit>(new_integrator, command);
+
+    if(nullptr == new_integrator) {
+        suanpan_error("Fail to create new integrator via \"{}\".\n", command.str());
+        return SUANPAN_SUCCESS;
+    }
+
+    const auto tag = new_integrator->get_tag();
+
+    if(!domain->insert(std::move(new_integrator))) {
+        suanpan_error("Fail to create new integrator via \"{}\".\n", command.str());
+        return SUANPAN_SUCCESS;
+    }
+
+    if(0 != domain->get_current_step_tag()) domain->get_current_step()->set_integrator_tag(tag);
+    domain->set_current_integrator_tag(tag);
+
+    return SUANPAN_SUCCESS;
+}
 
 int create_new_solver(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string solver_type;

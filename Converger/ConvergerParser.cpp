@@ -46,19 +46,19 @@ namespace {
             return;
         }
 
-        auto tolerance = 1E-6;
+        auto tolerance{1E-6};
         if(!command.eof() && !get_input(command, tolerance)) {
             suanpan_error("A valid tolerance is required.\n");
             return;
         }
 
-        auto max_iteration = 10;
+        auto max_iteration{10u};
         if(!command.eof() && !get_input(command, max_iteration)) {
             suanpan_error("A valid maximum iteration is required.\n");
             return;
         }
 
-        std::string print_flag = "false";
+        std::string print_flag{"false"};
         if(!command.eof() && !get_input(command, print_flag)) {
             suanpan_error("A valid print flag is required.\n");
             return;
@@ -74,13 +74,13 @@ namespace {
             return;
         }
 
-        auto max_iteration = 10;
+        auto max_iteration{10u};
         if(!command.eof() && !get_input(command, max_iteration)) {
             suanpan_error("A valid maximum iteration is required.\n");
             return;
         }
 
-        std::string print_flag = "false";
+        std::string print_flag{"false"};
         if(!command.eof() && !get_input(command, print_flag)) {
             suanpan_error("A valid print flag is required.\n");
             return;

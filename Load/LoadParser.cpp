@@ -24,6 +24,10 @@
 #include <Toolbox/resampling.h>
 
 namespace {
+    //
+    // loads
+    //
+
     void new_acceleration(unique_ptr<Load>& return_obj, std::istringstream& command) {
         unsigned load_id;
         if(!get_input(command, load_id)) {
@@ -267,9 +271,11 @@ namespace {
         else if(1 == flag) return_obj = std::make_unique<SupportVelocity>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
         else return_obj = std::make_unique<SupportAcceleration>(load_id, magnitude, get_remaining<uword>(command), std::move(dof_pool), amplitude_id);
     }
-} // namespace
 
-namespace {
+    //
+    // amplitudes
+    //
+
     template<typename T> void new_tag_amplitude(unique_ptr<Amplitude>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -433,33 +439,6 @@ namespace {
     }
 } // namespace
 
-int create_new_amplitude(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
-    std::string amplitude_type;
-    if(!get_input(command, amplitude_type)) {
-        suanpan_error("A valid amplitude type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unique_ptr<Amplitude> new_amplitude = nullptr;
-
-    if(is_equal(amplitude_type, "Constant")) new_tag_amplitude<Constant>(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Ramp")) new_tag_amplitude<Ramp>(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Tabular")) new_tabular_amplitude(new_amplitude, command);
-    else if(is_equal(amplitude_type, "TabularSpline")) new_tabular_spline_amplitude(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Decay")) new_decay_amplitude(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Linear")) new_linear_amplitude(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Combine")) new_combine_amplitude(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Custom")) new_custom_amplitude(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Modulated")) new_trigonometric_amplitude<Modulated>(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Sine")) new_trigonometric_amplitude<Sine>(new_amplitude, command);
-    else if(is_equal(amplitude_type, "Cosine")) new_trigonometric_amplitude<Cosine>(new_amplitude, command);
-    else if(is_equal(amplitude_type, "NZStrongMotion")) new_nz_strong_motion(new_amplitude, command);
-
-    if(nullptr == new_amplitude || !domain->insert(std::move(new_amplitude))) suanpan_error("Fail to create new amplitude via \"{}\".\n", command.str());
-
-    return SUANPAN_SUCCESS;
-}
-
 int create_new_load(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string load_id;
     if(!get_input(command, load_id)) {
@@ -489,6 +468,33 @@ int create_new_load(const shared_ptr<DomainBase>& domain, std::istringstream& co
 
     if(new_load == nullptr || !domain->insert(std::move(new_load)))
         suanpan_error("Fail to create new load via \"{}\".\n", command.str());
+
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_amplitude(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    std::string amplitude_type;
+    if(!get_input(command, amplitude_type)) {
+        suanpan_error("A valid amplitude type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unique_ptr<Amplitude> new_amplitude = nullptr;
+
+    if(is_equal(amplitude_type, "Constant")) new_tag_amplitude<Constant>(new_amplitude, command);
+    else if(is_equal(amplitude_type, "Ramp")) new_tag_amplitude<Ramp>(new_amplitude, command);
+    else if(is_equal(amplitude_type, "Tabular")) new_tabular_amplitude(new_amplitude, command);
+    else if(is_equal(amplitude_type, "TabularSpline")) new_tabular_spline_amplitude(new_amplitude, command);
+    else if(is_equal(amplitude_type, "Decay")) new_decay_amplitude(new_amplitude, command);
+    else if(is_equal(amplitude_type, "Linear")) new_linear_amplitude(new_amplitude, command);
+    else if(is_equal(amplitude_type, "Combine")) new_combine_amplitude(new_amplitude, command);
+    else if(is_equal(amplitude_type, "Custom")) new_custom_amplitude(new_amplitude, command);
+    else if(is_equal(amplitude_type, "Modulated")) new_trigonometric_amplitude<Modulated>(new_amplitude, command);
+    else if(is_equal(amplitude_type, "Sine")) new_trigonometric_amplitude<Sine>(new_amplitude, command);
+    else if(is_equal(amplitude_type, "Cosine")) new_trigonometric_amplitude<Cosine>(new_amplitude, command);
+    else if(is_equal(amplitude_type, "NZStrongMotion")) new_nz_strong_motion(new_amplitude, command);
+
+    if(nullptr == new_amplitude || !domain->insert(std::move(new_amplitude))) suanpan_error("Fail to create new amplitude via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }

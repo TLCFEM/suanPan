@@ -23,6 +23,10 @@
 #include <Recorder/OutputType.h>
 
 namespace {
+    //
+    // constraints
+    //
+
     template<bool penalty, bool group> void new_bc(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned bc_id;
         if(!get_input(command, bc_id)) {
@@ -409,9 +413,11 @@ namespace {
             suanpan_error("A valid number of parameters is required.\n");
         }
     }
-} // namespace
 
-namespace {
+    //
+    // criteria
+    //
+
     template<typename T> void new_logic_criterion(unique_ptr<Criterion>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -525,35 +531,11 @@ namespace {
 
         return_obj = std::make_unique<T>(tag, node, dof_pool[0], limit);
     }
-} // namespace
 
-int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
-    std::string criterion_type;
-    if(!get_input(command, criterion_type)) {
-        suanpan_error("A valid criterion type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
+    //
+    // interaction
+    //
 
-    unique_ptr<Criterion> new_criterion = nullptr;
-
-    if(is_equal_any(criterion_type, "LogicAll", "LogicCriterionAll")) new_logic_criterion<LogicCriterionAll>(new_criterion, command);
-    else if(is_equal_any(criterion_type, "LogicAny", "LogicCriterionAny")) new_logic_criterion<LogicCriterionAny>(new_criterion, command);
-    else if(is_equal(criterion_type, "StrainEnergyEvolution")) new_strain_energy_evolution(new_criterion, command);
-    else if(is_equal(criterion_type, "MaxHistory")) new_history_criterion<MaxHistory>(new_criterion, command);
-    else if(is_equal(criterion_type, "MinHistory")) new_history_criterion<MinHistory>(new_criterion, command);
-    else if(is_equal(criterion_type, "MaxDisplacement")) new_displacement_criterion<MaxDisplacement>(new_criterion, command);
-    else if(is_equal(criterion_type, "MinDisplacement")) new_displacement_criterion<MinDisplacement>(new_criterion, command);
-    else if(is_equal(criterion_type, "MaxResistance")) new_displacement_criterion<MaxResistance>(new_criterion, command);
-    else if(is_equal(criterion_type, "MinResistance")) new_displacement_criterion<MinResistance>(new_criterion, command);
-
-    if(new_criterion) new_criterion->set_start_step(domain->get_current_step_tag());
-
-    if(nullptr == new_criterion || !domain->insert(std::move(new_criterion))) suanpan_error("Fail to create new criterion via \"{}\".\n", command.str());
-
-    return SUANPAN_SUCCESS;
-}
-
-namespace {
     void new_hertzian(unique_ptr<Interaction>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
@@ -580,23 +562,6 @@ namespace {
         return_obj = std::make_unique<FixedParticle>(tag, multiplier, get_remaining_as_set<unsigned>(command));
     }
 } // namespace
-
-int create_new_interaction(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
-    std::string interaction_type;
-    if(!get_input(command, interaction_type)) {
-        suanpan_error("A valid interaction type is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    unique_ptr<Interaction> new_interaction = nullptr;
-
-    if(is_equal(interaction_type, "Hertzian")) new_hertzian(new_interaction, command);
-    else if(is_equal(interaction_type, "FixedParticle")) new_fixed_particle(new_interaction, command);
-
-    if(nullptr == new_interaction || !domain->insert(std::move(new_interaction))) suanpan_error("Fail to create new interaction via \"{}\".\n", command.str());
-
-    return SUANPAN_SUCCESS;
-}
 
 int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
     std::string constraint_id;
@@ -643,6 +608,49 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
     if(new_constraint) new_constraint->set_start_step(domain->get_current_step_tag());
 
     if(!new_constraint || !domain->insert(std::move(new_constraint))) suanpan_error("Fail to create new constraint via \"{}\".\n", command.str());
+
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    std::string criterion_type;
+    if(!get_input(command, criterion_type)) {
+        suanpan_error("A valid criterion type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unique_ptr<Criterion> new_criterion = nullptr;
+
+    if(is_equal_any(criterion_type, "LogicAll", "LogicCriterionAll")) new_logic_criterion<LogicCriterionAll>(new_criterion, command);
+    else if(is_equal_any(criterion_type, "LogicAny", "LogicCriterionAny")) new_logic_criterion<LogicCriterionAny>(new_criterion, command);
+    else if(is_equal(criterion_type, "StrainEnergyEvolution")) new_strain_energy_evolution(new_criterion, command);
+    else if(is_equal(criterion_type, "MaxHistory")) new_history_criterion<MaxHistory>(new_criterion, command);
+    else if(is_equal(criterion_type, "MinHistory")) new_history_criterion<MinHistory>(new_criterion, command);
+    else if(is_equal(criterion_type, "MaxDisplacement")) new_displacement_criterion<MaxDisplacement>(new_criterion, command);
+    else if(is_equal(criterion_type, "MinDisplacement")) new_displacement_criterion<MinDisplacement>(new_criterion, command);
+    else if(is_equal(criterion_type, "MaxResistance")) new_displacement_criterion<MaxResistance>(new_criterion, command);
+    else if(is_equal(criterion_type, "MinResistance")) new_displacement_criterion<MinResistance>(new_criterion, command);
+
+    if(new_criterion) new_criterion->set_start_step(domain->get_current_step_tag());
+
+    if(nullptr == new_criterion || !domain->insert(std::move(new_criterion))) suanpan_error("Fail to create new criterion via \"{}\".\n", command.str());
+
+    return SUANPAN_SUCCESS;
+}
+
+int create_new_interaction(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
+    std::string interaction_type;
+    if(!get_input(command, interaction_type)) {
+        suanpan_error("A valid interaction type is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
+    unique_ptr<Interaction> new_interaction = nullptr;
+
+    if(is_equal(interaction_type, "Hertzian")) new_hertzian(new_interaction, command);
+    else if(is_equal(interaction_type, "FixedParticle")) new_fixed_particle(new_interaction, command);
+
+    if(nullptr == new_interaction || !domain->insert(std::move(new_interaction))) suanpan_error("Fail to create new interaction via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }
