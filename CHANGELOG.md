@@ -6,6 +6,18 @@
 
 ## version 4.3.1
 
+1. add `ModalRecorder` for modal properties and `ModalForceRecorder` for nodal and elemental modal elastic forces [#395](https://github.com/TLCFEM/suanPan/pull/395) [#396](https://github.com/TLCFEM/suanPan/pull/396)
+2. merge distributed `HDF5` recorder outputs into a single file and remove per-rank files after successful combination [#397](https://github.com/TLCFEM/suanPan/pull/397)
+3. (**breaking**) pass the object tag as an additional argument to C++ external module creation functions, update module signatures accordingly
+4. improve convergence and robustness of `DafaliasManzari` and `SimpleSand` models with backtracking line search, tension handling and pressure regularization [#400](https://github.com/TLCFEM/suanPan/pull/400) [#401](https://github.com/TLCFEM/suanPan/pull/401) [#402](https://github.com/TLCFEM/suanPan/pull/402)
+5. fix non-deviatoric plastic correction in `YLD0418P` return mapping [#399](https://github.com/TLCFEM/suanPan/pull/399)
+6. regularize `DuncanSelig` moduli beyond failure to prevent local iteration oscillation
+7. fix body force matrix formulation in `SGCMQ` element
+8. stabilize return mapping by limiting the hardening increment in `CDPM2` and guarding the plastic multiplier in `NonlinearCamClay`
+9. refactor command parsers with token registries, factory functions and centralized tag extraction, with improved error handling [#406](https://github.com/TLCFEM/suanPan/pull/406) [#407](https://github.com/TLCFEM/suanPan/pull/407) [#409](https://github.com/TLCFEM/suanPan/pull/409) [#410](https://github.com/TLCFEM/suanPan/pull/410)
+10. use an RAII wrapper for `HDF5` handling and remove the `hdf5_hl` dependency [#398](https://github.com/TLCFEM/suanPan/pull/398)
+11. update `VTK` to version `9.7.2`
+
 ## version 4.3
 
 1. fix the tangent stiffness matrix formulation in GCMQ element [#389](https://github.com/TLCFEM/suanPan/pull/389)
