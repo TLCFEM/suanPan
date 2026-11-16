@@ -45,26 +45,14 @@ namespace {
         return true;
     }
 
-    void new_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         double alpha, beta;
         if(!get_newmark_parameters(command, alpha, beta)) return;
 
         return_obj = std::make_unique<Newmark>(tag, alpha, beta);
     }
 
-    void new_rayleigh_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_rayleigh_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         double alpha, beta;
         if(!get_newmark_parameters(command, alpha, beta)) return;
 
@@ -81,13 +69,7 @@ namespace {
         return_obj = std::make_unique<RayleighNewmark>(tag, alpha, beta, p(0), p(1), p(2), p(3));
     }
 
-    void new_lee_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_lee_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         double alpha, beta;
         if(!get_newmark_parameters(command, alpha, beta)) return;
 
@@ -96,13 +78,7 @@ namespace {
         return_obj = std::make_unique<LeeNewmark>(tag, damping_coef, frequency, alpha, beta);
     }
 
-    void new_lee_newmark_iterative(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_lee_newmark_iterative(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         double alpha, beta;
         if(!get_newmark_parameters(command, alpha, beta)) return;
 
@@ -183,13 +159,7 @@ namespace {
         return_obj = std::make_unique<LeeNewmarkIterative>(tag, std::move(modes), alpha, beta);
     }
 
-    void new_lee_elemental_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_lee_elemental_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         double alpha, beta;
         if(!get_newmark_parameters(command, alpha, beta)) return;
 
@@ -198,13 +168,7 @@ namespace {
         return_obj = std::make_unique<LeeElementalNewmark>(tag, damping_coef, frequency, alpha, beta);
     }
 
-    template<LeeNewmarkBase::StiffnessType stiffness_type> void new_lee_newmark_full(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<LeeNewmarkBase::StiffnessType stiffness_type> void new_lee_newmark_full(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         double alpha, beta;
         if(!get_newmark_parameters(command, alpha, beta)) return;
 
@@ -285,26 +249,14 @@ namespace {
         return_obj = std::make_unique<LeeNewmarkFull>(tag, std::move(modes), alpha, beta, stiffness_type);
     }
 
-    void new_wilson_penzien_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_wilson_penzien_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         double alpha, beta;
         if(!get_newmark_parameters(command, alpha, beta)) return;
 
         return_obj = std::make_unique<WilsonPenzienNewmark>(tag, get_remaining<double>(command), alpha, beta);
     }
 
-    void new_nonviscous_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_nonviscous_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         double alpha, beta;
         if(!get_newmark_parameters(command, alpha, beta)) return;
 
@@ -326,13 +278,7 @@ namespace {
         return_obj = std::make_unique<NonviscousNewmark>(tag, alpha, beta, std::move(m), std::move(s));
     }
 
-    void new_udd_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_udd_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         double alpha, beta;
         if(!get_newmark_parameters(command, alpha, beta)) return;
 
@@ -352,13 +298,7 @@ namespace {
         return_obj = std::make_unique<UDDNewmark>(tag, alpha, beta, cx_vec{m_real, m_imag}, cx_vec{s_real, s_imag});
     }
 
-    void new_uda_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_uda_newmark(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         double alpha, beta;
         if(!get_newmark_parameters(command, alpha, beta)) return;
 
@@ -378,25 +318,13 @@ namespace {
         return_obj = std::make_unique<UDANewmark>(tag, alpha, beta, cx_vec{m_real, m_imag}, cx_vec{s_real, s_imag});
     }
 
-    void new_generalized_alpha(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_generalized_alpha(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         if(const auto pool = get_remaining<double>(command); pool.empty()) return_obj = std::make_unique<GeneralizedAlpha>(tag, .5);
         else if(1 == pool.size()) return_obj = std::make_unique<GeneralizedAlpha>(tag, suanpan::clamp_unit(pool[0]));
         else if(2 == pool.size()) return_obj = std::make_unique<GeneralizedAlpha>(tag, pool[0], pool[1]);
     }
 
-    template<typename T> void new_gssss(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<typename T> void new_gssss(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         vec pool(3);
         if(!get_input(command, pool)) {
             suanpan_error("A valid spectral radius is required.\n");
@@ -406,13 +334,7 @@ namespace {
         return_obj = std::make_unique<T>(tag, std::move(pool));
     }
 
-    template<typename T> void new_radius_integrator(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<typename T> void new_radius_integrator(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         auto radius = .5;
         if(!get_optional_input(command, radius)) {
             suanpan_error("A valid damping radius is required.\n");
@@ -422,13 +344,7 @@ namespace {
         return_obj = std::make_unique<T>(tag, suanpan::clamp_unit(radius));
     }
 
-    void new_bathe_two_step(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_bathe_two_step(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         auto radius = 0.;
         if(!get_optional_input(command, radius)) {
             suanpan_error("A valid damping radius is required.\n");
@@ -445,13 +361,7 @@ namespace {
         return_obj = std::make_unique<BatheTwoStep>(tag, suanpan::clamp_unit(radius), gamma);
     }
 
-    void new_icl(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_icl(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         auto radius = .5;
         if(!get_optional_input(command, radius)) {
             suanpan_error("A valid damping radius is required.\n");
@@ -461,13 +371,7 @@ namespace {
         return_obj = std::make_unique<ICL>(tag, suanpan::clamp(radius, .5, 1.));
     }
 
-    void new_wat2(unique_ptr<Integrator>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_wat2(unique_ptr<Integrator>& return_obj, std::istringstream& command, const unsigned tag) {
         auto para = 1. / 3.;
         if(!get_optional_input(command, para)) {
             suanpan_error("A valid parameter is required.\n");
@@ -481,33 +385,15 @@ namespace {
     // solvers
     //
 
-    void new_newton(unique_ptr<Solver>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_newton(unique_ptr<Solver>& return_obj, std::istringstream& command, const unsigned tag) {
         return_obj = std::make_unique<Newton>(tag);
     }
 
-    void new_modified_newton(unique_ptr<Solver>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_modified_newton(unique_ptr<Solver>& return_obj, std::istringstream& command, const unsigned tag) {
         return_obj = std::make_unique<Newton>(tag, true);
     }
 
-    void new_aicn(unique_ptr<Solver>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_aicn(unique_ptr<Solver>& return_obj, std::istringstream& command, const unsigned tag) {
         auto length = 1.;
         if(!command.eof() && !get_input(command, length)) {
             suanpan_error("A valid length is required.\n");
@@ -517,23 +403,11 @@ namespace {
         return_obj = std::make_unique<AICN>(tag, length);
     }
 
-    void new_bfgs(unique_ptr<Solver>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_bfgs(unique_ptr<Solver>& return_obj, std::istringstream& command, const unsigned tag) {
         return_obj = std::make_unique<BFGS>(tag);
     }
 
-    void new_lbfgs(unique_ptr<Solver>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_lbfgs(unique_ptr<Solver>& return_obj, std::istringstream& command, const unsigned tag) {
         auto max_history = 20;
         if(!command.eof() && !get_input(command, max_history)) {
             suanpan_error("A valid maximum step number is required.\n");
@@ -543,13 +417,7 @@ namespace {
         return_obj = std::make_unique<BFGS>(tag, max_history);
     }
 
-    template<bool quadratic> void new_feast(unique_ptr<Solver>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<bool quadratic> void new_feast(unique_ptr<Solver>& return_obj, std::istringstream& command, const unsigned tag) {
         unsigned eigen_number;
         if(!get_input(command, eigen_number)) {
             suanpan_error("A valid number of frequencies is required.\n");
@@ -571,23 +439,11 @@ namespace {
         return_obj = std::make_unique<FEAST>(tag, eigen_number, centre, radius, quadratic);
     }
 
-    void new_mpdc(unique_ptr<Solver>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_mpdc(unique_ptr<Solver>& return_obj, std::istringstream& command, const unsigned tag) {
         return_obj = std::make_unique<MPDC>(tag);
     }
 
-    void new_ramm(unique_ptr<Solver>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_ramm(unique_ptr<Solver>& return_obj, std::istringstream& command, const unsigned tag) {
         return_obj = std::make_unique<Ramm>(tag);
     }
 } // namespace
@@ -599,9 +455,15 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
         return SUANPAN_SUCCESS;
     }
 
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
     unique_ptr<Integrator> new_integrator = nullptr;
 
-    static const TokenRegistry<void (*)(unique_ptr<Integrator>&, std::istringstream&)> registry{
+    static const TokenRegistry<void (*)(unique_ptr<Integrator>&, std::istringstream&, unsigned)> registry{
         {"Newmark", new_newmark},
         {"RayleighNewmark", new_rayleigh_newmark},
         {"LeeNewmark", new_lee_newmark},
@@ -631,16 +493,9 @@ int create_new_integrator(const shared_ptr<DomainBase>& domain, std::istringstre
         {"GeneralisedAlphaExplicit", new_radius_integrator<GeneralizedAlphaExplicit>},
     };
 
-    if(const auto factory = registry.fetch(integrator_type); nullptr != factory) factory(new_integrator, command);
+    if(const auto factory = registry.fetch(integrator_type); nullptr != factory) factory(new_integrator, command, tag);
 
-    if(nullptr == new_integrator) {
-        suanpan_error("Fail to create new integrator via \"{}\".\n", command.str());
-        return SUANPAN_SUCCESS;
-    }
-
-    const auto tag = new_integrator->get_tag();
-
-    if(!domain->insert(std::move(new_integrator))) {
+    if(nullptr == new_integrator || !domain->insert(std::move(new_integrator))) {
         suanpan_error("Fail to create new integrator via \"{}\".\n", command.str());
         return SUANPAN_SUCCESS;
     }
@@ -658,9 +513,15 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, std::istringstream& 
         return SUANPAN_SUCCESS;
     }
 
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
     unique_ptr<Solver> new_solver = nullptr;
 
-    static const TokenRegistry<void (*)(unique_ptr<Solver>&, std::istringstream&)> registry{
+    static const TokenRegistry<void (*)(unique_ptr<Solver>&, std::istringstream&, unsigned)> registry{
         {"Newton", new_newton},
         {"modifiedNewton", new_modified_newton},
         {"mNewton", new_modified_newton},
@@ -674,16 +535,9 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, std::istringstream& 
         {"Ramm", new_ramm},
     };
 
-    if(const auto factory = registry.fetch(solver_type); nullptr != factory) factory(new_solver, command);
+    if(const auto factory = registry.fetch(solver_type); nullptr != factory) factory(new_solver, command, tag);
 
-    if(nullptr == new_solver) {
-        suanpan_error("Fail to create new solver via \"{}\".\n", command.str());
-        return SUANPAN_SUCCESS;
-    }
-
-    const auto tag = new_solver->get_tag();
-
-    if(!domain->insert(std::move(new_solver))) {
+    if(nullptr == new_solver || !domain->insert(std::move(new_solver))) {
         suanpan_error("Fail to create new solver via \"{}\".\n", command.str());
         return SUANPAN_SUCCESS;
     }

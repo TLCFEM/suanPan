@@ -37,13 +37,7 @@ int check_file(std::string& expression) {
     return SUANPAN_SUCCESS;
 }
 
-void new_simplescalar(unique_ptr<Expression>& return_obj, std::istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid expression tag is required.\n");
-        return;
-    }
-
+void new_simplescalar(unique_ptr<Expression>& return_obj, std::istringstream& command, const unsigned tag) {
     std::string variable_list;
     if(!get_input(command, variable_list)) {
         suanpan_error("A valid vertical bar separated variable list is required.\n");
@@ -66,13 +60,7 @@ void new_simplescalar(unique_ptr<Expression>& return_obj, std::istringstream& co
     }
 }
 
-void new_simplevector(unique_ptr<Expression>& return_obj, std::istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid expression tag is required.\n");
-        return;
-    }
-
+void new_simplevector(unique_ptr<Expression>& return_obj, std::istringstream& command, const unsigned tag) {
     std::string input_list, output_list;
     if(!get_input(command, input_list, output_list)) {
         suanpan_error("A valid vertical bar separated variable list is required.\n");
@@ -102,14 +90,20 @@ int create_new_expression(const shared_ptr<DomainBase>& domain, std::istringstre
         return SUANPAN_SUCCESS;
     }
 
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid expression tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
     unique_ptr<Expression> new_expression = nullptr;
 
-    static const TokenRegistry<void (*)(unique_ptr<Expression>&, std::istringstream&)> registry{
+    static const TokenRegistry<void (*)(unique_ptr<Expression>&, std::istringstream&, unsigned)> registry{
         {"SimpleScalar", new_simplescalar},
         {"SimpleVector", new_simplevector},
     };
 
-    if(const auto factory = registry.fetch(expression_type); nullptr != factory) factory(new_expression, command);
+    if(const auto factory = registry.fetch(expression_type); nullptr != factory) factory(new_expression, command, tag);
 
     if(nullptr == new_expression || !domain->insert(std::move(new_expression)))
         suanpan_error("Fail to create new expression via \"{}\".\n", command.str());
