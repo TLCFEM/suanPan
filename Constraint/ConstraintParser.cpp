@@ -23,7 +23,7 @@
 #include <Recorder/OutputType.h>
 
 namespace {
-    void new_bc(unique_ptr<Constraint>& return_obj, std::istringstream& command, const bool penalty, const bool group) {
+    template<bool penalty, bool group> void new_bc(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned bc_id;
         if(!get_input(command, bc_id)) {
             suanpan_error("A valid tag is required.\n");
@@ -265,7 +265,7 @@ namespace {
             return_obj = std::make_unique<MolecularDynamics3D>(tag, get_remaining<uword>(command));
     }
 
-    void new_particlecollision(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned dim) {
+    template<unsigned dim> void new_particlecollision(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -287,7 +287,7 @@ namespace {
         2 == dim ? return_obj = std::make_unique<ParticleCollision2D>(tag, space, alpha) : return_obj = std::make_unique<ParticleCollision3D>(tag, space, alpha);
     }
 
-    void new_ljpotential(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned) {
+    void new_ljpotential(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -309,7 +309,7 @@ namespace {
         return_obj = std::make_unique<LJPotential2D>(tag, space, alpha);
     }
 
-    void new_linearspring(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned) {
+    void new_linearspring(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -331,7 +331,7 @@ namespace {
         return_obj = std::make_unique<LinearSpring2D>(tag, space, alpha);
     }
 
-    void new_rigidwall(unique_ptr<Constraint>& return_obj, std::istringstream& command, const bool finite, const bool penalty) {
+    template<bool finite, bool penalty> void new_rigidwall(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -374,7 +374,7 @@ namespace {
         }
     }
 
-    void new_restitutionwall(unique_ptr<Constraint>& return_obj, std::istringstream& command, const bool finite) {
+    template<bool finite> void new_restitutionwall(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
         unsigned tag;
         if(!get_input(command, tag)) {
             suanpan_error("A valid tag is required.\n");
@@ -579,17 +579,17 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
 
     if(is_equal(constraint_id, "Embed2D")) new_embed<2u>(new_constraint, command);
     else if(is_equal(constraint_id, "Embed3D")) new_embed<3u>(new_constraint, command);
-    else if(is_equal_any(constraint_id, "FiniteRestitutionWall", "FiniteRestitutionWallPenalty")) new_restitutionwall(new_constraint, command, true);
-    else if(is_equal_any(constraint_id, "FiniteRigidWall", "FiniteRigidWallPenalty")) new_rigidwall(new_constraint, command, true, true);
-    else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall(new_constraint, command, true, false);
-    else if(is_equal_any(constraint_id, "Fix", "PenaltyBC")) new_bc(new_constraint, command, true, false);
-    else if(is_equal_any(constraint_id, "Fix2", "MultiplierBC")) new_bc(new_constraint, command, false, false);
+    else if(is_equal_any(constraint_id, "FiniteRestitutionWall", "FiniteRestitutionWallPenalty")) new_restitutionwall<true>(new_constraint, command);
+    else if(is_equal_any(constraint_id, "FiniteRigidWall", "FiniteRigidWallPenalty")) new_rigidwall<true, true>(new_constraint, command);
+    else if(is_equal(constraint_id, "FiniteRigidWallMultiplier")) new_rigidwall<true, false>(new_constraint, command);
+    else if(is_equal_any(constraint_id, "Fix", "PenaltyBC")) new_bc<true, false>(new_constraint, command);
+    else if(is_equal_any(constraint_id, "Fix2", "MultiplierBC")) new_bc<false, false>(new_constraint, command);
     else if(is_equal_any(constraint_id, "FixedLength2D", "R2D2")) new_fixedlength<2u>(new_constraint, command);
     else if(is_equal_any(constraint_id, "FixedLength3D", "R3D2")) new_fixedlength<3u>(new_constraint, command);
-    else if(is_equal(constraint_id, "GroupMultiplierBC")) new_bc(new_constraint, command, false, true);
-    else if(is_equal(constraint_id, "GroupPenaltyBC")) new_bc(new_constraint, command, true, true);
-    else if(is_equal(constraint_id, "LinearSpring2D")) new_linearspring(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "LJPotential2D")) new_ljpotential(new_constraint, command, 2);
+    else if(is_equal(constraint_id, "GroupMultiplierBC")) new_bc<false, true>(new_constraint, command);
+    else if(is_equal(constraint_id, "GroupPenaltyBC")) new_bc<true, true>(new_constraint, command);
+    else if(is_equal(constraint_id, "LinearSpring2D")) new_linearspring(new_constraint, command);
+    else if(is_equal(constraint_id, "LJPotential2D")) new_ljpotential(new_constraint, command);
     else if(is_equal_any(constraint_id, "MaximumForce2D", "MaxForce2D")) new_maxforce<2u>(new_constraint, command);
     else if(is_equal_any(constraint_id, "MaximumForce3D", "MaxForce3D")) new_maxforce<3u>(new_constraint, command);
     else if(is_equal_any(constraint_id, "MaximumGap2D", "MaxGap2D")) new_maximumgap<2u>(new_constraint, command);
@@ -601,11 +601,11 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
     else if(is_equal(constraint_id, "NodeLine")) new_nodeline(new_constraint, command);
     else if(is_equal(constraint_id, "MolecularDynamics2D")) new_moleculardynamics<2u>(new_constraint, command);
     else if(is_equal(constraint_id, "MolecularDynamics3D")) new_moleculardynamics<3u>(new_constraint, command);
-    else if(is_equal(constraint_id, "ParticleCollision2D")) new_particlecollision(new_constraint, command, 2);
-    else if(is_equal(constraint_id, "ParticleCollision3D")) new_particlecollision(new_constraint, command, 3);
-    else if(is_equal_any(constraint_id, "RestitutionWall", "RestitutionWallPenalty")) new_restitutionwall(new_constraint, command, false);
-    else if(is_equal_any(constraint_id, "RigidWall", "RigidWallPenalty")) new_rigidwall(new_constraint, command, false, true);
-    else if(is_equal(constraint_id, "RigidWallMultiplier")) new_rigidwall(new_constraint, command, false, false);
+    else if(is_equal(constraint_id, "ParticleCollision2D")) new_particlecollision<2>(new_constraint, command);
+    else if(is_equal(constraint_id, "ParticleCollision3D")) new_particlecollision<3>(new_constraint, command);
+    else if(is_equal_any(constraint_id, "RestitutionWall", "RestitutionWallPenalty")) new_restitutionwall<false>(new_constraint, command);
+    else if(is_equal_any(constraint_id, "RigidWall", "RigidWallPenalty")) new_rigidwall<false, true>(new_constraint, command);
+    else if(is_equal(constraint_id, "RigidWallMultiplier")) new_rigidwall<false, false>(new_constraint, command);
     else if(is_equal(constraint_id, "Sleeve2D")) new_sleeve<2u>(new_constraint, command);
     else if(is_equal(constraint_id, "Sleeve3D")) new_sleeve<3u>(new_constraint, command);
     else external_module::object(new_constraint, domain, constraint_id, command);
