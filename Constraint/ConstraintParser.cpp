@@ -28,13 +28,7 @@ namespace {
     // constraints
     //
 
-    template<bool penalty, bool group> void new_bc(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned bc_id;
-        if(!get_input(command, bc_id)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<bool penalty, bool group> void new_bc(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         std::string dof_token;
         if(!get_input(command, dof_token)) {
             suanpan_error("A valid dof identifier is required.\n");
@@ -54,22 +48,16 @@ namespace {
         }
 
         if constexpr(penalty) {
-            if constexpr(group) return_obj = std::make_unique<GroupPenaltyBC>(bc_id, uvec(obj_tag), std::move(dof_pool));
-            else return_obj = std::make_unique<PenaltyBC>(bc_id, uvec(obj_tag), std::move(dof_pool));
+            if constexpr(group) return_obj = std::make_unique<GroupPenaltyBC>(tag, uvec(obj_tag), std::move(dof_pool));
+            else return_obj = std::make_unique<PenaltyBC>(tag, uvec(obj_tag), std::move(dof_pool));
         }
         else {
-            if constexpr(group) return_obj = std::make_unique<GroupMultiplierBC>(bc_id, uvec(obj_tag), std::move(dof_pool));
-            else return_obj = std::make_unique<MultiplierBC>(bc_id, uvec(obj_tag), std::move(dof_pool));
+            if constexpr(group) return_obj = std::make_unique<GroupMultiplierBC>(tag, uvec(obj_tag), std::move(dof_pool));
+            else return_obj = std::make_unique<MultiplierBC>(tag, uvec(obj_tag), std::move(dof_pool));
         }
     }
 
-    template<unsigned dof> void new_fixedlength(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<unsigned dof> void new_fixedlength(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         uword node_i, node_j;
         if(!get_input(command, node_i) || !get_input(command, node_j)) {
             suanpan_error("Two valid nodes are required.\n");
@@ -79,13 +67,7 @@ namespace {
         return_obj = std::make_unique<FixedLength<dof>>(tag, uvec{node_i, node_j});
     }
 
-    template<unsigned dof> void new_maxforce(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<unsigned dof> void new_maxforce(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         uword node_i, node_j;
         if(!get_input(command, node_i) || !get_input(command, node_j)) {
             suanpan_error("Two valid nodes are required.\n");
@@ -101,13 +83,7 @@ namespace {
         return_obj = std::make_unique<MaxForce<dof>>(tag, max_force, uvec{node_i, node_j});
     }
 
-    template<unsigned dof> void new_minimumgap(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<unsigned dof> void new_minimumgap(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         uword node_i, node_j;
         if(!get_input(command, node_i) || !get_input(command, node_j)) {
             suanpan_error("Two valid nodes are required.\n");
@@ -123,13 +99,7 @@ namespace {
         return_obj = std::make_unique<MinimumGap<dof>>(tag, gap, uvec{node_i, node_j});
     }
 
-    template<unsigned dof> void new_maximumgap(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<unsigned dof> void new_maximumgap(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         uword node_i, node_j;
         if(!get_input(command, node_i) || !get_input(command, node_j)) {
             suanpan_error("Two valid nodes are required.\n");
@@ -145,13 +115,7 @@ namespace {
         return_obj = std::make_unique<MaximumGap<dof>>(tag, gap, uvec{node_i, node_j});
     }
 
-    template<unsigned dof> void new_sleeve(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<unsigned dof> void new_sleeve(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         uword node_i, node_j;
         if(!get_input(command, node_i) || !get_input(command, node_j)) {
             suanpan_error("Two valid nodes are required.\n");
@@ -171,13 +135,7 @@ namespace {
         return_obj = std::make_unique<Sleeve<dof>>(tag, min_gap, max_gap, uvec{node_i, node_j});
     }
 
-    template<unsigned dof> void new_embed(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<unsigned dof> void new_embed(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         unsigned element_tag;
         if(!get_input(command, element_tag)) {
             suanpan_error("A valid element tag is required.\n");
@@ -193,13 +151,7 @@ namespace {
         return_obj = std::make_unique<Embed<dof>>(tag, element_tag, node_tag);
     }
 
-    void new_mpc(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_mpc(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         unsigned amplitude;
         if(!get_input(command, amplitude)) {
             suanpan_error("A valid amplitude tag is required.\n");
@@ -225,13 +177,7 @@ namespace {
         return_obj = std::make_unique<MPC>(tag, amplitude, magnitude, std::move(pack));
     }
 
-    void new_nodeline(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_nodeline(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         uvec node_tag(3);
         if(!get_input(command, node_tag)) {
             suanpan_error("A valid node tag is required.\n");
@@ -241,13 +187,7 @@ namespace {
         return_obj = std::make_unique<NodeLine>(tag, 0, std::move(node_tag));
     }
 
-    void new_nodefacet(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_nodefacet(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         uvec node_tag(4);
         if(!get_input(command, node_tag)) {
             suanpan_error("A valid node tag is required.\n");
@@ -257,26 +197,14 @@ namespace {
         return_obj = std::make_unique<NodeFacet>(tag, 0, std::move(node_tag));
     }
 
-    template<unsigned DIM> void new_moleculardynamics(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<unsigned DIM> void new_moleculardynamics(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         if constexpr(2 == DIM)
             return_obj = std::make_unique<MolecularDynamics2D>(tag, get_remaining<uword>(command));
         else
             return_obj = std::make_unique<MolecularDynamics3D>(tag, get_remaining<uword>(command));
     }
 
-    template<unsigned dim> void new_particlecollision(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<unsigned dim> void new_particlecollision(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         auto space = 1.;
         if(!command.eof() && !get_input(command, space)) {
             suanpan_error("A valid spacing is required.\n");
@@ -293,13 +221,7 @@ namespace {
         else return_obj = std::make_unique<ParticleCollision3D>(tag, space, alpha);
     }
 
-    void new_ljpotential(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_ljpotential(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         auto space = 1.;
         if(!command.eof() && !get_input(command, space)) {
             suanpan_error("A valid spacing is required.\n");
@@ -315,13 +237,7 @@ namespace {
         return_obj = std::make_unique<LJPotential2D>(tag, space, alpha);
     }
 
-    void new_linearspring(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_linearspring(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         auto space = 1.;
         if(!command.eof() && !get_input(command, space)) {
             suanpan_error("A valid spacing is required.\n");
@@ -337,13 +253,7 @@ namespace {
         return_obj = std::make_unique<LinearSpring2D>(tag, space, alpha);
     }
 
-    template<bool finite, bool penalty> void new_rigidwall(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<bool finite, bool penalty> void new_rigidwall(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         auto p = get_remaining<double>(command);
         if(2 == p.size() || 4 == p.size() || 6 == p.size() || 9 == p.size()) p.emplace_back(1E4);
 
@@ -380,13 +290,7 @@ namespace {
         }
     }
 
-    template<bool finite> void new_restitutionwall(unique_ptr<Constraint>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<bool finite> void new_restitutionwall(unique_ptr<Constraint>& return_obj, std::istringstream& command, const unsigned tag) {
         auto p = get_remaining<double>(command);
         if(3 == p.size() || 5 == p.size() || 7 == p.size() || 10 == p.size()) p.emplace_back(1E4);
 
@@ -420,13 +324,7 @@ namespace {
     // criteria
     //
 
-    template<typename T> void new_logic_criterion(unique_ptr<Criterion>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<typename T> void new_logic_criterion(unique_ptr<Criterion>& return_obj, std::istringstream& command, const unsigned tag) {
         auto tags = get_remaining<unsigned>(command);
         if(tags.empty()) {
             suanpan_error("At least one valid tag is required.\n");
@@ -436,13 +334,7 @@ namespace {
         return_obj = std::make_unique<T>(tag, std::move(tags));
     }
 
-    void new_strain_energy_evolution(unique_ptr<Criterion>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_strain_energy_evolution(unique_ptr<Criterion>& return_obj, std::istringstream& command, const unsigned tag) {
         unsigned incre_level, final_level;
         if(!get_input(command, incre_level, final_level)) {
             suanpan_error("A valid level is required.\n");
@@ -478,13 +370,7 @@ namespace {
         return_obj = std::make_unique<StrainEnergyEvolution>(tag, incre_level, final_level, weight, iteration, reactivation, propagation, tolerance);
     }
 
-    template<typename T> void new_history_criterion(unique_ptr<Criterion>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<typename T> void new_history_criterion(unique_ptr<Criterion>& return_obj, std::istringstream& command, const unsigned tag) {
         std::string type;
         if(!get_input(command, type)) {
             suanpan_error("A valid type is required.\n");
@@ -500,13 +386,7 @@ namespace {
         return_obj = std::make_unique<T>(tag, to_token(std::move(type)), limit, get_remaining<uword>(command));
     }
 
-    template<typename T> void new_displacement_criterion(unique_ptr<Criterion>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<typename T> void new_displacement_criterion(unique_ptr<Criterion>& return_obj, std::istringstream& command, const unsigned tag) {
         unsigned node;
         if(!get_input(command, node)) {
             suanpan_error("A valid node tag is required.\n");
@@ -538,23 +418,11 @@ namespace {
     // interaction
     //
 
-    void new_hertzian(unique_ptr<Interaction>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_hertzian(unique_ptr<Interaction>& return_obj, std::istringstream& command, const unsigned tag) {
         return_obj = std::make_unique<Hertzian>(tag);
     }
 
-    void new_fixed_particle(unique_ptr<Interaction>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_fixed_particle(unique_ptr<Interaction>& return_obj, std::istringstream& command, const unsigned tag) {
         double multiplier;
         if(!get_input(command, multiplier)) {
             suanpan_error("A valid multiplier is required.\n");
@@ -574,7 +442,7 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
 
     unique_ptr<Constraint> new_constraint = nullptr;
 
-    static const TokenRegistry<void (*)(unique_ptr<Constraint>&, std::istringstream&)> registry{
+    static const TokenRegistry<void (*)(unique_ptr<Constraint>&, std::istringstream&, unsigned)> registry{
         {"Embed2D", new_embed<2u>},
         {"Embed3D", new_embed<3u>},
         {"FiniteRestitutionWall", new_restitutionwall<true>},
@@ -622,7 +490,15 @@ int create_new_constraint(const shared_ptr<DomainBase>& domain, std::istringstre
         {"Sleeve3D", new_sleeve<3u>},
     };
 
-    if(const auto factory = registry.fetch(constraint_id); nullptr != factory) factory(new_constraint, command);
+    if(const auto factory = registry.fetch(constraint_id); nullptr != factory) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return SUANPAN_SUCCESS;
+        }
+
+        factory(new_constraint, command, tag);
+    }
     else external_module::object(new_constraint, domain, constraint_id, command);
 
     if(new_constraint) new_constraint->set_start_step(domain->get_current_step_tag());
@@ -639,9 +515,15 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
         return SUANPAN_SUCCESS;
     }
 
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
     unique_ptr<Criterion> new_criterion = nullptr;
 
-    static const TokenRegistry<void (*)(unique_ptr<Criterion>&, std::istringstream&)> registry{
+    static const TokenRegistry<void (*)(unique_ptr<Criterion>&, std::istringstream&, unsigned)> registry{
         {"LogicAll", new_logic_criterion<LogicCriterionAll>},
         {"LogicCriterionAll", new_logic_criterion<LogicCriterionAll>},
         {"LogicAny", new_logic_criterion<LogicCriterionAny>},
@@ -655,7 +537,7 @@ int create_new_criterion(const shared_ptr<DomainBase>& domain, std::istringstrea
         {"MinResistance", new_displacement_criterion<MinResistance>},
     };
 
-    if(const auto factory = registry.fetch(criterion_type); nullptr != factory) factory(new_criterion, command);
+    if(const auto factory = registry.fetch(criterion_type); nullptr != factory) factory(new_criterion, command, tag);
 
     if(new_criterion) new_criterion->set_start_step(domain->get_current_step_tag());
 
@@ -671,14 +553,20 @@ int create_new_interaction(const shared_ptr<DomainBase>& domain, std::istringstr
         return SUANPAN_SUCCESS;
     }
 
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
     unique_ptr<Interaction> new_interaction = nullptr;
 
-    static const TokenRegistry<void (*)(unique_ptr<Interaction>&, std::istringstream&)> registry{
+    static const TokenRegistry<void (*)(unique_ptr<Interaction>&, std::istringstream&, unsigned)> registry{
         {"Hertzian", new_hertzian},
         {"FixedParticle", new_fixed_particle},
     };
 
-    if(const auto factory = registry.fetch(interaction_type); nullptr != factory) factory(new_interaction, command);
+    if(const auto factory = registry.fetch(interaction_type); nullptr != factory) factory(new_interaction, command, tag);
 
     if(nullptr == new_interaction || !domain->insert(std::move(new_interaction))) suanpan_error("Fail to create new interaction via \"{}\".\n", command.str());
 

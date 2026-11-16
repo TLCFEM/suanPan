@@ -23,13 +23,7 @@
 #include <Toolbox/TokenRegistry.h>
 
 namespace {
-    template<typename T> void new_logic_converger(unique_ptr<Converger>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<typename T> void new_logic_converger(unique_ptr<Converger>& return_obj, std::istringstream& command, const unsigned tag) {
         unsigned tag_a, tag_b;
         if(!get_input(command, tag_a, tag_b)) {
             suanpan_error("A valid tag is required.\n");
@@ -39,13 +33,7 @@ namespace {
         return_obj = std::make_unique<T>(tag, tag_a, tag_b);
     }
 
-    template<typename T> void new_default_converger(unique_ptr<Converger>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<typename T> void new_default_converger(unique_ptr<Converger>& return_obj, std::istringstream& command, const unsigned tag) {
         auto tolerance{1E-6};
         if(!command.eof() && !get_input(command, tolerance)) {
             suanpan_error("A valid tolerance is required.\n");
@@ -67,13 +55,7 @@ namespace {
         return_obj = std::make_unique<T>(tag, tolerance, max_iteration, is_true(print_flag));
     }
 
-    void new_fixed_number(unique_ptr<Converger>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_fixed_number(unique_ptr<Converger>& return_obj, std::istringstream& command, const unsigned tag) {
         auto max_iteration{10u};
         if(!command.eof() && !get_input(command, max_iteration)) {
             suanpan_error("A valid maximum iteration is required.\n");
@@ -97,9 +79,15 @@ int create_new_converger(const shared_ptr<DomainBase>& domain, std::istringstrea
         return SUANPAN_SUCCESS;
     }
 
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
     unique_ptr<Converger> new_converger = nullptr;
 
-    static const TokenRegistry<void (*)(unique_ptr<Converger>&, std::istringstream&)> registry{
+    static const TokenRegistry<void (*)(unique_ptr<Converger>&, std::istringstream&, unsigned)> registry{
         {"LogicAND", new_logic_converger<LogicConvergerAND>},
         {"LogicConvergerAND", new_logic_converger<LogicConvergerAND>},
         {"LogicOR", new_logic_converger<LogicConvergerOR>},
@@ -121,14 +109,12 @@ int create_new_converger(const shared_ptr<DomainBase>& domain, std::istringstrea
         {"FixedNumber", new_fixed_number},
     };
 
-    if(const auto factory = registry.fetch(converger_id); nullptr != factory) factory(new_converger, command);
+    if(const auto factory = registry.fetch(converger_id); nullptr != factory) factory(new_converger, command, tag);
 
     if(nullptr == new_converger) {
         suanpan_error("Fail to create new converger via \"{}\".\n", command.str());
         return SUANPAN_SUCCESS;
     }
-
-    const auto tag = new_converger->get_tag();
 
     if(!domain->insert(std::move(new_converger))) {
         suanpan_error("Fail to create new converger via \"{}\".\n", command.str());

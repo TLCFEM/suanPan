@@ -22,13 +22,7 @@
 #include <Toolbox/TokenRegistry.h>
 
 namespace {
-    void new_frequency(unique_ptr<Step>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_frequency(unique_ptr<Step>& return_obj, std::istringstream& command, const unsigned tag) {
         auto eigen_number = 1;
         if(!command.eof() && !get_input(command, eigen_number)) {
             suanpan_error("A valid number of eigenvalues is required.\n");
@@ -44,23 +38,11 @@ namespace {
         return_obj = std::make_unique<Frequency>(tag, eigen_number, suanpan::to_upper(type));
     }
 
-    void new_buckle(unique_ptr<Step>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_buckle(unique_ptr<Step>& return_obj, std::istringstream& command, const unsigned tag) {
         return_obj = std::make_unique<Buckle>(tag);
     }
 
-    template<typename T> void new_time_step(unique_ptr<Step>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<typename T> void new_time_step(unique_ptr<Step>& return_obj, std::istringstream& command, const unsigned tag) {
         auto time = 1.;
         if(!command.eof() && !get_input(command, time)) {
             suanpan_error("A valid time period is required.\n");
@@ -70,13 +52,7 @@ namespace {
         return_obj = std::make_unique<T>(tag, time);
     }
 
-    template<Integrator::Type type> void new_dynamic(unique_ptr<Step>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    template<Integrator::Type type> void new_dynamic(unique_ptr<Step>& return_obj, std::istringstream& command, const unsigned tag) {
         auto time = 1.;
         if(!command.eof() && !get_input(command, time)) {
             suanpan_error("A valid time period is required.\n");
@@ -86,13 +62,7 @@ namespace {
         return_obj = std::make_unique<Dynamic>(tag, time, type);
     }
 
-    void new_arclength(unique_ptr<Step>& return_obj, std::istringstream& command) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return;
-        }
-
+    void new_arclength(unique_ptr<Step>& return_obj, std::istringstream& command, const unsigned tag) {
         return_obj = std::make_unique<ArcLength>(tag);
     }
 } // namespace
@@ -104,9 +74,15 @@ int create_new_step(const shared_ptr<DomainBase>& domain, std::istringstream& co
         return SUANPAN_SUCCESS;
     }
 
+    unsigned tag;
+    if(!get_input(command, tag)) {
+        suanpan_error("A valid tag is required.\n");
+        return SUANPAN_SUCCESS;
+    }
+
     unique_ptr<Step> new_step = nullptr;
 
-    static const TokenRegistry<void (*)(unique_ptr<Step>&, std::istringstream&)> registry{
+    static const TokenRegistry<void (*)(unique_ptr<Step>&, std::istringstream&, unsigned)> registry{
         {"Frequency", new_frequency},
         {"Buckling", new_buckle},
         {"Buckle", new_buckle},
@@ -119,14 +95,12 @@ int create_new_step(const shared_ptr<DomainBase>& domain, std::istringstream& co
         {"ArcLength", new_arclength},
     };
 
-    if(const auto factory = registry.fetch(step_type); nullptr != factory) factory(new_step, command);
+    if(const auto factory = registry.fetch(step_type); nullptr != factory) factory(new_step, command, tag);
 
     if(nullptr == new_step) {
         suanpan_error("Fail to create new step via \"{}\".\n", command.str());
         return SUANPAN_SUCCESS;
     }
-
-    const auto tag = new_step->get_tag();
 
     if(domain->insert(std::move(new_step))) domain->set_current_step_tag(tag);
     else suanpan_error("Fail to create new step via \"{}\".\n", command.str());
