@@ -2414,35 +2414,174 @@ namespace {
 
         return_obj = std::make_unique<PatchCube>(tag, std::move(knot_x), std::move(knot_y), std::move(knot_z), std::move(node_tag), static_cast<unsigned>(material_tag));
     }
+    void new_global_mass(unique_ptr<Element>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        unsigned node;
+        if(!get_input(command, node)) {
+            suanpan_error("A valid node tag is required.\n");
+            return;
+        }
+
+        double magnitude;
+        if(!get_input(command, magnitude)) {
+            suanpan_error("A valid magnitude is required.\n");
+            return;
+        }
+
+        const auto dof_tag = get_remaining<uword>(command);
+
+        if(dof_tag.empty()) {
+            suanpan_error("At least one dof is required.\n");
+            return;
+        }
+
+        if(*std::ranges::max_element(dof_tag) > 6) {
+            suanpan_error("At most six dofs are supported.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<Mass3D>(tag, node, magnitude, uvec(dof_tag));
+    }
+
+    void new_lumped_simple(unique_ptr<Modifier>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<LumpedSimple>(tag, get_remaining<uword>(command));
+    }
+
+    void new_lumped_scale(unique_ptr<Modifier>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<LumpedScale>(tag, get_remaining<uword>(command));
+    }
+
+    void new_rayleigh_modifier(unique_ptr<Modifier>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        double a, b, c, d;
+        if(!get_input(command, a, b, c, d)) {
+            suanpan_error("A valid value is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<Rayleigh>(tag, a, b, c, d, get_remaining<uword>(command));
+    }
+
+    void new_elemental_lee(unique_ptr<Modifier>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        double damping_ratio = .02;
+        if(!command.eof() && !get_input(command, damping_ratio)) {
+            suanpan_error("A valid damping ratio is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<ElementalLee>(tag, damping_ratio, get_remaining<uword>(command));
+    }
+
+    void new_linear_viscosity(unique_ptr<Modifier>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        double mu;
+        if(!get_input(command, mu)) {
+            suanpan_error("A valid value is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<LinearViscosity>(tag, mu, get_remaining<uword>(command));
+    }
+
+    void new_elemental_modal(unique_ptr<Modifier>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        double a, b;
+        if(!get_input(command, a, b)) {
+            suanpan_error("A valid value is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<ElementalModal>(tag, a, b, get_remaining<uword>(command));
+    }
+
+    template<bool group> void new_elemental_nonviscous(unique_ptr<Modifier>& return_obj, std::istringstream& command) {
+        unsigned tag, ele_tag;
+        if(!get_input(command, tag, ele_tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
+
+        auto m_imag = vec{m_i}, s_imag = vec{s_i};
+        if(accu(m_imag) + accu(s_imag) > 1E-10) {
+            suanpan_error("Parameters should be conjugate pairs.\n");
+            return;
+        }
+
+        auto m = cx_vec{vec{m_r}, m_imag}, s = cx_vec{vec{s_r}, s_imag};
+
+        if(const auto sum = accu(m % exp(-1E8 * s)); sum.real() * sum.real() + sum.imag() * sum.imag() > 1E-10) {
+            suanpan_error("The provided kernel does not converge to zero.\n");
+            return;
+        }
+
+        if constexpr(group) return_obj = std::make_unique<ElementalNonviscousGroup>(tag, std::move(m), std::move(s), ele_tag);
+        else return_obj = std::make_unique<ElementalNonviscous>(tag, std::move(m), std::move(s), uvec{ele_tag});
+    }
+
+    template<typename T> void new_orientation_object(unique_ptr<Orientation>& return_obj, std::istringstream& command) {
+        unsigned tag;
+        if(!get_input(command, tag)) {
+            suanpan_error("A valid tag is required.\n");
+            return;
+        }
+
+        vec xyz(3);
+        if(!get_input(command, xyz)) {
+            suanpan_error("A valid vector is required.\n");
+            return;
+        }
+
+        return_obj = std::make_unique<T>(tag, std::move(xyz));
+    }
 } // namespace
 
 int create_new_mass(const shared_ptr<DomainBase>& domain, std::istringstream& command) {
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
+    unique_ptr<Element> new_mass = nullptr;
 
-    unsigned node;
-    if(!get_input(command, node)) {
-        suanpan_error("A valid node tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
+    new_global_mass(new_mass, command);
 
-    double magnitude;
-    if(!get_input(command, magnitude)) {
-        suanpan_error("A valid magnitude is required.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    const auto dof_tag = get_remaining<uword>(command);
-
-    if(*std::ranges::max_element(dof_tag) > 6) {
-        suanpan_error("At most six dofs are supported.\n");
-        return SUANPAN_SUCCESS;
-    }
-
-    domain->insert(std::make_shared<Mass3D>(tag, node, magnitude, uvec(dof_tag)));
+    if(nullptr == new_mass || !domain->insert(std::move(new_mass)))
+        suanpan_error("Fail to create new mass via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }
@@ -2456,109 +2595,14 @@ int create_new_modifier(const shared_ptr<DomainBase>& domain, std::istringstream
 
     unique_ptr<Modifier> new_modifier = nullptr;
 
-    if(is_equal(modifier_type, "LumpedSimple")) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        new_modifier = std::make_unique<LumpedSimple>(tag, get_remaining<uword>(command));
-    }
-    else if(is_equal(modifier_type, "LumpedScale")) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        new_modifier = std::make_unique<LumpedScale>(tag, get_remaining<uword>(command));
-    }
-    else if(is_equal(modifier_type, "Rayleigh")) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        double a, b, c, d;
-        if(!get_input(command, a, b, c, d)) {
-            suanpan_error("A valid value is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        new_modifier = std::make_unique<Rayleigh>(tag, a, b, c, d, get_remaining<uword>(command));
-    }
-    else if(is_equal(modifier_type, "ElementalLee")) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        double damping_ratio = .02;
-        if(!command.eof() && !get_input(command, damping_ratio)) {
-            suanpan_error("A valid damping ratio is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        new_modifier = std::make_unique<ElementalLee>(tag, damping_ratio, get_remaining<uword>(command));
-    }
-    else if(is_equal(modifier_type, "LinearViscosity")) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        double mu;
-        if(!get_input(command, mu)) {
-            suanpan_error("A valid value is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        new_modifier = std::make_unique<LinearViscosity>(tag, mu, get_remaining<uword>(command));
-    }
-    else if(is_equal(modifier_type, "ElementalModal")) {
-        unsigned tag;
-        if(!get_input(command, tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        double a, b;
-        if(!get_input(command, a, b)) {
-            suanpan_error("A valid value is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        new_modifier = std::make_unique<ElementalModal>(tag, a, b, get_remaining<uword>(command));
-    }
-    else if(is_equal_any(modifier_type, "ElementalNonviscous", "ElementalNonviscousGroup")) {
-        unsigned tag, ele_tag;
-        if(!get_input(command, tag, ele_tag)) {
-            suanpan_error("A valid tag is required.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        const auto [m_r, m_i, s_r, s_i] = get_remaining<double, double, double, double>(command);
-
-        auto m_imag = vec{m_i}, s_imag = vec{s_i};
-        if(accu(m_imag) + accu(s_imag) > 1E-10) {
-            suanpan_error("Parameters should be conjugate pairs.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        auto m = cx_vec{vec{m_r}, m_imag}, s = cx_vec{vec{s_r}, s_imag};
-
-        if(const auto sum = accu(m % exp(-1E8 * s)); sum.real() * sum.real() + sum.imag() * sum.imag() > 1E-10) {
-            suanpan_error("The provided kernel does not converge to zero.\n");
-            return SUANPAN_SUCCESS;
-        }
-
-        if(is_equal(modifier_type, "ElementalNonviscous")) new_modifier = std::make_unique<ElementalNonviscous>(tag, std::move(m), std::move(s), uvec{ele_tag});
-        else new_modifier = std::make_unique<ElementalNonviscousGroup>(tag, std::move(m), std::move(s), ele_tag);
-    }
+    if(is_equal(modifier_type, "LumpedSimple")) new_lumped_simple(new_modifier, command);
+    else if(is_equal(modifier_type, "LumpedScale")) new_lumped_scale(new_modifier, command);
+    else if(is_equal(modifier_type, "Rayleigh")) new_rayleigh_modifier(new_modifier, command);
+    else if(is_equal(modifier_type, "ElementalLee")) new_elemental_lee(new_modifier, command);
+    else if(is_equal(modifier_type, "LinearViscosity")) new_linear_viscosity(new_modifier, command);
+    else if(is_equal(modifier_type, "ElementalModal")) new_elemental_modal(new_modifier, command);
+    else if(is_equal(modifier_type, "ElementalNonviscous")) new_elemental_nonviscous<false>(new_modifier, command);
+    else if(is_equal(modifier_type, "ElementalNonviscousGroup")) new_elemental_nonviscous<true>(new_modifier, command);
     else {
         // check if the library is already loaded
         auto code = false;
@@ -2592,22 +2636,15 @@ int create_new_orientation(const shared_ptr<DomainBase>& domain, std::istringstr
         return SUANPAN_SUCCESS;
     }
 
-    unsigned tag;
-    if(!get_input(command, tag)) {
-        suanpan_error("A valid tag is required.\n");
-        return SUANPAN_SUCCESS;
-    }
+    unique_ptr<Orientation> new_orientation = nullptr;
 
-    vec xyz(3);
-    if(!get_input(command, xyz)) {
-        suanpan_error("A valid vector is required.\n");
-        return SUANPAN_SUCCESS;
-    }
+    if(is_equal(file_type, "B3DL")) new_orientation_object<B3DL>(new_orientation, command);
+    else if(is_equal(file_type, "B3DC")) new_orientation_object<B3DC>(new_orientation, command);
+    else if(is_equal(file_type, "B3DOSL")) new_orientation_object<B3DOSL>(new_orientation, command);
+    else if(is_equal(file_type, "B3DOSC")) new_orientation_object<B3DOSC>(new_orientation, command);
 
-    if(is_equal(file_type, "B3DL")) domain->insert(std::make_shared<B3DL>(tag, std::move(xyz)));
-    else if(is_equal(file_type, "B3DC")) domain->insert(std::make_shared<B3DC>(tag, std::move(xyz)));
-    else if(is_equal(file_type, "B3DOSL")) domain->insert(std::make_shared<B3DOSL>(tag, std::move(xyz)));
-    else if(is_equal(file_type, "B3DOSC")) domain->insert(std::make_shared<B3DOSC>(tag, std::move(xyz)));
+    if(nullptr == new_orientation || !domain->insert(std::move(new_orientation)))
+        suanpan_error("Fail to create new orientation via \"{}\".\n", command.str());
 
     return SUANPAN_SUCCESS;
 }
