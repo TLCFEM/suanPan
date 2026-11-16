@@ -28,8 +28,8 @@ namespace {
         unsigned interval{1u};
     };
 
-    bool get_recorder_arguments(std::istringstream& command, RecorderArguments& arguments, const bool with_variable = true) {
-        if(with_variable) {
+    template<bool with_variable = true> bool get_recorder_arguments(std::istringstream& command, RecorderArguments& arguments) {
+        if constexpr(with_variable) {
             std::string variable_type;
             if(!get_input(command, variable_type)) {
                 suanpan_error("A valid recorder type is required.\n");
@@ -39,19 +39,18 @@ namespace {
         }
 
         while(true)
-            if(const auto peek_value = command.peek(); is_equal(peek_value, '\t') || is_equal(peek_value, ' ')) command.ignore();
+            if(const auto peek_value = command.peek(); is_equal_any(peek_value, ' ', '\t')) command.ignore();
             else break;
 
-        if(is_equal(command.peek(), 'e') || is_equal(command.peek(), 'i')) {
-            std::string tmp_string;
-            get_input(command, tmp_string);
+        if(is_equal_any(command.peek(), 'e', 'i')) {
+            [[maybe_unused]] const auto tmp_string = get_input<std::string>(command);
             if(!get_input(command, arguments.interval)) return false;
         }
 
         return true;
     }
 
-    void new_eigen_recorder(unique_ptr<Recorder>& return_obj, const unsigned tag, const bool use_hdf5) {
+    void new_eigen_recorder(unique_ptr<Recorder>& return_obj, std::istringstream&, const unsigned tag, const bool use_hdf5) {
         return_obj = std::make_unique<EigenRecorder>(tag, use_hdf5);
     }
 
@@ -74,18 +73,18 @@ namespace {
         return_obj = std::make_unique<ModalRecorder>(tag, std::move(dof_pool), use_hdf5);
     }
 
-    void new_modal_force_recorder(unique_ptr<Recorder>& return_obj, const unsigned tag, const bool use_hdf5) {
+    void new_modal_force_recorder(unique_ptr<Recorder>& return_obj, std::istringstream&, const unsigned tag, const bool use_hdf5) {
         return_obj = std::make_unique<ModalForceRecorder>(tag, use_hdf5);
     }
 
-    void new_frame_recorder(unique_ptr<Recorder>& return_obj, std::istringstream& command, const unsigned tag) {
+    void new_frame_recorder(unique_ptr<Recorder>& return_obj, std::istringstream& command, const unsigned tag, const bool) {
         RecorderArguments arguments;
         if(!get_recorder_arguments(command, arguments)) return;
 
         return_obj = std::make_unique<FrameRecorder>(tag, arguments.variable_token, arguments.interval);
     }
 
-    void new_visualisation_recorder(unique_ptr<Recorder>& return_obj, std::istringstream& command, const unsigned tag) {
+    void new_visualisation_recorder(unique_ptr<Recorder>& return_obj, std::istringstream& command, const unsigned tag, const bool) {
         RecorderArguments arguments;
         if(!get_recorder_arguments(command, arguments)) return;
 
@@ -115,7 +114,7 @@ namespace {
 
     void new_amplitude_recorder(unique_ptr<Recorder>& return_obj, std::istringstream& command, const unsigned tag, const bool use_hdf5) {
         RecorderArguments arguments;
-        if(!get_recorder_arguments(command, arguments, false)) return;
+        if(!get_recorder_arguments<false>(command, arguments)) return;
 
         return_obj = std::make_unique<AmplitudeRecorder>(tag, uvec(get_remaining<uword>(command)), OutputType::AMP, arguments.interval, use_hdf5);
     }
@@ -138,11 +137,11 @@ namespace {
 
         unique_ptr<Recorder> new_recorder = nullptr;
 
-        if(is_equal(object_type, "Eigen")) new_eigen_recorder(new_recorder, tag, use_hdf5);
+        if(is_equal(object_type, "Eigen")) new_eigen_recorder(new_recorder, command, tag, use_hdf5);
         else if(is_equal(object_type, "Modal")) new_modal_recorder(new_recorder, command, tag, use_hdf5);
-        else if(is_equal(object_type, "ModalForce")) new_modal_force_recorder(new_recorder, tag, use_hdf5);
-        else if(is_equal(object_type, "Frame")) new_frame_recorder(new_recorder, command, tag);
-        else if(is_equal(object_type, "Visualisation")) new_visualisation_recorder(new_recorder, command, tag);
+        else if(is_equal(object_type, "ModalForce")) new_modal_force_recorder(new_recorder, command, tag, use_hdf5);
+        else if(is_equal(object_type, "Frame")) new_frame_recorder(new_recorder, command, tag, use_hdf5);
+        else if(is_equal(object_type, "Visualisation")) new_visualisation_recorder(new_recorder, command, tag, use_hdf5);
         else if(is_equal(object_type, "Node")) new_tag_recorder<NodeRecorder>(new_recorder, command, tag, use_hdf5);
         else if(is_equal(object_type, "GroupNode")) new_tag_recorder<GroupNodeRecorder>(new_recorder, command, tag, use_hdf5);
         else if(is_equal(object_type, "Sum")) new_tag_recorder<SumRecorder>(new_recorder, command, tag, use_hdf5);
