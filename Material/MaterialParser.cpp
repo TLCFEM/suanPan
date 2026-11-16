@@ -24,7 +24,6 @@
 #include <Domain/ExternalModule.h>
 #include <Material/Material>
 #include <Toolbox/TokenRegistry.h>
-#include <Toolbox/utility.h>
 
 namespace {
     void new_afc01(unique_ptr<Material>& return_obj, std::istringstream& command) {

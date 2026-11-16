@@ -20,7 +20,6 @@
 #include <Domain/DomainBase.h>
 #include <Step/Step>
 #include <Toolbox/TokenRegistry.h>
-#include <Toolbox/utility.h>
 
 namespace {
     void new_frequency(unique_ptr<Step>& return_obj, std::istringstream& command) {

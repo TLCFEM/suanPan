@@ -21,7 +21,6 @@
 #include <Domain/DomainBase.h>
 #include <Step/Step.h>
 #include <Toolbox/TokenRegistry.h>
-#include <Toolbox/utility.h>
 
 namespace {
     template<typename T> void new_logic_converger(unique_ptr<Converger>& return_obj, std::istringstream& command) {

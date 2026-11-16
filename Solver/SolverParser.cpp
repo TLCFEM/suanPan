@@ -21,7 +21,6 @@
 #include <Solver/Solver>
 #include <Step/Step.h>
 #include <Toolbox/TokenRegistry.h>
-#include <Toolbox/utility.h>
 
 namespace {
     //

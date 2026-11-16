@@ -21,7 +21,6 @@
 #include <Domain/DomainBase.h>
 #include <Recorder/Recorder>
 #include <Toolbox/TokenRegistry.h>
-#include <Toolbox/utility.h>
 
 namespace {
     struct RecorderArguments {

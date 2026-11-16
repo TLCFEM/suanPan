@@ -20,7 +20,6 @@
 #include <Domain/DomainBase.h>
 #include <Toolbox/Expression.h>
 #include <Toolbox/TokenRegistry.h>
-#include <Toolbox/utility.h>
 
 int check_file(std::string& expression) {
     if(!fs::exists(expression)) return SUANPAN_SUCCESS;

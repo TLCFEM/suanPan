@@ -23,7 +23,6 @@
 #include <Domain/Group/GroupGroup.h>
 #include <Domain/Group/NodeGroup.h>
 #include <Toolbox/TokenRegistry.h>
-#include <Toolbox/utility.h>
 
 void new_nodegroup(unique_ptr<Group>& return_obj, std::istringstream& command) {
     unsigned tag;

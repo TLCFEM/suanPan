@@ -21,7 +21,6 @@
 #include <Domain/ExternalModule.h>
 #include <Section/Section>
 #include <Toolbox/TokenRegistry.h>
-#include <Toolbox/utility.h>
 
 namespace {
     void new_cell2d(unique_ptr<Section>& return_obj, std::istringstream& command) {

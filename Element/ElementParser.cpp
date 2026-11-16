@@ -23,7 +23,6 @@
 #include <Domain/ExternalModule.h>
 #include <Element/Element>
 #include <Toolbox/TokenRegistry.h>
-#include <Toolbox/utility.h>
 
 namespace {
     //
