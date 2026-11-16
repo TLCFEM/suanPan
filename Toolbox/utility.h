@@ -198,7 +198,7 @@ bool is_equal(std::string_view, std::string_view);
 
 template<typename... S> bool is_equal_any(std::string_view a, S... rest) { return (is_equal(a, rest) || ...); }
 
-template<typename... S> bool is_equal_any(char a, S... rest) { return (is_equal(a, rest) || ...); }
+template<typename... S> bool is_equal_any(int a, S... rest) { return (is_equal(a, rest) || ...); }
 
 bool if_startswith(std::string_view, std::string_view);
 
