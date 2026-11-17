@@ -34,7 +34,7 @@
 #include <Material/Material2D/Material2D.h>
 
 class DuncanSelig final : public Material2D {
-    static constexpr unsigned max_iteration = 20u;
+    static constexpr unsigned max_iteration = 30u;
     static constexpr double min_ratio = .1;
     static constexpr double min_degradation = .1;
 

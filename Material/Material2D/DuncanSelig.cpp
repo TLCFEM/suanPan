@@ -192,6 +192,19 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
     // between the two branches, freeze the branch determined at the predictor for this increment
     const auto plastic = dev(trial_stress) > trial_history(0);
 
+    const auto residual_norm = [&](const vec& t_stress) {
+        const auto moduli = plastic ? compute_plastic_moduli(t_stress) : compute_elastic_moduli(t_stress);
+        const auto elastic = std::get<0>(moduli);
+        const auto bulk = std::get<1>(moduli);
+
+        mat33 right(fill::zeros);
+        right(0, 0) = right(1, 1) = 3. * bulk * (3. * bulk + elastic);
+        right(0, 1) = right(1, 0) = 3. * bulk * (3. * bulk - elastic);
+        right(2, 2) = 3. * bulk * elastic;
+
+        return suanpan::inf_norm((9. * bulk - elastic) * (t_stress - current_stress) - right * incre_strain);
+    };
+
     auto counter = 0u;
     while(true) {
         if(max_iteration < ++counter) {
@@ -235,7 +248,17 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
             return SUANPAN_SUCCESS;
         }
 
-        trial_stress -= incre;
+        // backtracking line search on the residual norm to avoid divergence caused by the
+        // strong nonlinearity of the moduli, the consistent tangent is not affected
+        auto step = 1.;
+        vec3 candidate = trial_stress - incre;
+        const auto ref_residual = suanpan::inf_norm(residual);
+        while(step > 1E-3 && residual_norm(candidate) >= ref_residual) {
+            step *= .5;
+            candidate = trial_stress - step * incre;
+        }
+
+        trial_stress = candidate;
     }
 }
 
