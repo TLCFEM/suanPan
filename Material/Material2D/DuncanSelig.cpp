@@ -33,21 +33,6 @@ mat DuncanSelig::compute_stiffness(const double elastic, const double bulk) {
     return stiffness;
 }
 
-DuncanSelig::ds_tuple DuncanSelig::compute_principal_stress(const vec& t_stress) {
-    const auto radius = .5 * dev(t_stress);
-
-    static constexpr auto center_scale{-.5}; // this is correct as later the algorithm uses s3
-    const auto center = center_scale * (t_stress(0) + t_stress(1));
-    const rowvec3 dcds{center_scale, center_scale, 0.};
-
-    rowvec3 drds(fill::zeros);
-    // the gradient of the radius is not unique at a hydrostatic stress state, in which the
-    // deviatoric stress is dominated by floating-point round-off, use the isotropic gradient
-    if(radius > 1E-10 * std::max(1., std::fabs(center))) drds = .25 / radius * rowvec3{t_stress(0) - t_stress(1), t_stress(1) - t_stress(0), 4. * t_stress(2)};
-
-    return {center + radius, center - radius, dcds + drds, dcds - drds};
-}
-
 std::tuple<double, double> DuncanSelig::compute_modulus(const double ps, const double ref_modulus, const double order) const {
     const auto fraction = ps / p_atm;
     if(fraction <= min_ratio) return {ref_modulus * std::pow(min_ratio, order), 0.};
@@ -59,6 +44,18 @@ std::tuple<double, double> DuncanSelig::compute_modulus(const double ps, const d
 std::tuple<double, double> DuncanSelig::compute_elastic(const double ps) const { return compute_modulus(ps, ref_elastic, n); }
 
 std::tuple<double, double> DuncanSelig::compute_bulk(const double ps) const { return compute_modulus(ps, ref_bulk, m); }
+
+DuncanSelig::ds_tuple DuncanSelig::compute_principal_stress(const vec& t_stress) const {
+    static constexpr auto center_scale{-.5}; // this is correct as later the algorithm uses s3
+    const auto center = center_scale * (t_stress(0) + t_stress(1));
+    const rowvec3 dcds{center_scale, center_scale, 0.};
+
+    const auto radius = .5 * dev(t_stress);
+    rowvec3 drds(fill::zeros);
+    if(radius > tolerance * std::max(1., std::fabs(center))) drds = .25 / radius * rowvec3{t_stress(0) - t_stress(1), t_stress(1) - t_stress(0), 4. * t_stress(2)};
+
+    return {center + radius, center - radius, dcds + drds, dcds - drds};
+}
 
 DuncanSelig::ds_tuple DuncanSelig::compute_elastic_moduli(const vec& t_stress) const {
     // principal stresses
@@ -177,25 +174,17 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
     trial_stress = current_stress + current_stiffness * incre_strain;
     trial_history = current_history;
 
-    // improve the predictor by a few fixed-point iterations so that large stress increments do not
-    // start the local Newton iteration from a stress state that is far from the converged solution
+    const auto plastic = dev(trial_stress) > trial_history(0);
+
+    // improve the predictor by a few fixed-point iterations
     for(auto I = 0u; I < 3u; ++I) {
-        const auto moduli = dev(trial_stress) > trial_history(0) ? compute_plastic_moduli(trial_stress) : compute_elastic_moduli(trial_stress);
+        const auto moduli = plastic ? compute_plastic_moduli(trial_stress) : compute_elastic_moduli(trial_stress);
         trial_stress = current_stress + compute_stiffness(std::get<0>(moduli), std::get<1>(moduli)) * incre_strain;
     }
 
-    auto ref_error = 0.;
-    vec3 incre;
-
-    // the plastic/elastic branch is discontinuous at the historical maximum deviatoric stress,
-    // switching branches within the local Newton iteration can result in an endless oscillation
-    // between the two branches, freeze the branch determined at the predictor for this increment
-    const auto plastic = dev(trial_stress) > trial_history(0);
-
-    const auto residual_norm = [&](const vec& t_stress) {
+    const auto backtracking = [&](const vec& t_stress) {
         const auto moduli = plastic ? compute_plastic_moduli(t_stress) : compute_elastic_moduli(t_stress);
-        const auto elastic = std::get<0>(moduli);
-        const auto bulk = std::get<1>(moduli);
+        const auto elastic = std::get<0>(moduli), bulk = std::get<1>(moduli);
 
         mat33 right(fill::zeros);
         right(0, 0) = right(1, 1) = 3. * bulk * (3. * bulk + elastic);
@@ -204,6 +193,9 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
 
         return suanpan::inf_norm((9. * bulk - elastic) * (t_stress - current_stress) - right * incre_strain);
     };
+
+    auto ref_error = 0.;
+    vec3 incre;
 
     auto counter = 0u;
     while(true) {
@@ -241,22 +233,18 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
         const auto error = suanpan::inf_norm(incre);
         if(1u == counter) ref_error = error;
         suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) {
+        const auto residual_norm = suanpan::inf_norm(residual);
+        if(error < tolerance * ref_error || ((error < tolerance || residual_norm < tolerance) && counter > 5u)) {
             if(!solve(trial_stiffness, jacobian, right)) return SUANPAN_FAIL;
 
             trial_history(0) = std::max(trial_history(0), double_dev_stress);
             return SUANPAN_SUCCESS;
         }
 
-        // backtracking line search on the residual norm to avoid divergence caused by the
-        // strong nonlinearity of the moduli, the consistent tangent is not affected
+        // backtracking line search on the residual norm
         auto step = 1.;
-        vec3 candidate = trial_stress - incre;
-        const auto ref_residual = suanpan::inf_norm(residual);
-        while(step > 1E-3 && residual_norm(candidate) >= ref_residual) {
-            step *= .5;
-            candidate = trial_stress - step * incre;
-        }
+        vec candidate = trial_stress - incre;
+        while(step > 1E-3 && backtracking(candidate) >= residual_norm) candidate = trial_stress - (step *= .5) * incre;
 
         trial_stress = candidate;
     }
