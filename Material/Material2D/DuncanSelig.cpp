@@ -174,8 +174,15 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
 
     if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
-    trial_stress = current_stress + initial_stiffness * incre_strain;
+    trial_stress = current_stress + current_stiffness * incre_strain;
     trial_history = current_history;
+
+    // improve the predictor by a few fixed-point iterations so that large stress increments do not
+    // start the local Newton iteration from a stress state that is far from the converged solution
+    for(auto I = 0u; I < 3u; ++I) {
+        const auto moduli = dev(trial_stress) > trial_history(0) ? compute_plastic_moduli(trial_stress) : compute_elastic_moduli(trial_stress);
+        trial_stress = current_stress + compute_stiffness(std::get<0>(moduli), std::get<1>(moduli)) * incre_strain;
+    }
 
     auto ref_error = 0.;
     vec3 incre;
