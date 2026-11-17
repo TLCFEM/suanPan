@@ -55,6 +55,8 @@ class DuncanSelig final : public Material2D {
     [[nodiscard]] ds_tuple compute_elastic_moduli(const vec&) const;
     [[nodiscard]] ds_tuple compute_plastic_moduli(const vec&) const;
 
+    int local_update(bool);
+
 public:
     DuncanSelig(
         unsigned,   // tag

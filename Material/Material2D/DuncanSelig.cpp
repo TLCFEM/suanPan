@@ -166,17 +166,9 @@ int DuncanSelig::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> DuncanSelig::unique_copy() { return std::make_unique<DuncanSelig>(*this); }
 
-int DuncanSelig::update_trial_status(const vec& t_strain) {
-    incre_strain = (trial_strain = t_strain) - current_strain;
-
-    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
-
-    trial_stress = current_stress + current_stiffness * incre_strain;
-    trial_history = current_history;
-
-    const auto plastic = dev(trial_stress) > trial_history(0);
-
+int DuncanSelig::local_update(const bool plastic) {
     // improve the predictor by a few fixed-point iterations
+    trial_stress = current_stress + current_stiffness * incre_strain;
     for(auto I = 0u; I < 3u; ++I) {
         const auto moduli = plastic ? compute_plastic_moduli(trial_stress) : compute_elastic_moduli(trial_stress);
         trial_stress = current_stress + compute_stiffness(std::get<0>(moduli), std::get<1>(moduli)) * incre_strain;
@@ -203,8 +195,6 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
             suanpan_debug("Local iteration cannot converge within {} iterations.\n", max_iteration);
             return SUANPAN_FAIL;
         }
-
-        const auto double_dev_stress = dev(trial_stress);
 
         const auto [elastic, bulk, deds, dkds] = plastic ? compute_plastic_moduli(trial_stress) : compute_elastic_moduli(trial_stress);
 
@@ -237,7 +227,6 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
         if(error < tolerance * ref_error || ((error < tolerance || residual_norm < tolerance) && counter > 5u)) {
             if(!solve(trial_stiffness, jacobian, right)) return SUANPAN_FAIL;
 
-            trial_history(0) = std::max(trial_history(0), double_dev_stress);
             return SUANPAN_SUCCESS;
         }
 
@@ -248,6 +237,24 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
 
         trial_stress = candidate;
     }
+}
+
+int DuncanSelig::update_trial_status(const vec& t_strain) {
+    incre_strain = (trial_strain = t_strain) - current_strain;
+
+    if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
+
+    trial_history = current_history;
+
+    // first assume elastic loading/unloading
+    if(SUANPAN_SUCCESS != local_update(false)) return SUANPAN_FAIL;
+
+    // if the elastic solution violates the plastic condition, redo the local iteration with plastic moduli
+    if(dev(trial_stress) > trial_history(0) && SUANPAN_SUCCESS != local_update(true)) return SUANPAN_FAIL;
+
+    trial_history(0) = std::max(trial_history(0), dev(trial_stress));
+
+    return SUANPAN_SUCCESS;
 }
 
 int DuncanSelig::clear_status() {
