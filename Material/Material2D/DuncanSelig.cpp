@@ -187,6 +187,11 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
     auto ref_error = 0.;
     vec3 incre;
 
+    // the plastic/elastic branch is discontinuous at the historical maximum deviatoric stress,
+    // switching branches within the local Newton iteration can result in an endless oscillation
+    // between the two branches, freeze the branch determined at the predictor for this increment
+    const auto plastic = dev(trial_stress) > trial_history(0);
+
     auto counter = 0u;
     while(true) {
         if(max_iteration < ++counter) {
@@ -196,7 +201,7 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
 
         const auto double_dev_stress = dev(trial_stress);
 
-        const auto [elastic, bulk, deds, dkds] = double_dev_stress > trial_history(0) ? compute_plastic_moduli(trial_stress) : compute_elastic_moduli(trial_stress);
+        const auto [elastic, bulk, deds, dkds] = plastic ? compute_plastic_moduli(trial_stress) : compute_elastic_moduli(trial_stress);
 
         const auto factor_a = 3. * bulk * (3. * bulk + elastic);
         const auto factor_b = 3. * bulk * (3. * bulk - elastic);
