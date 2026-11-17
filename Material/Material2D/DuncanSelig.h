@@ -35,26 +35,25 @@
 
 class DuncanSelig final : public Material2D {
     static constexpr unsigned max_iteration = 20u;
-    static constexpr double min_ratio = 1.;
+    static constexpr double min_ratio = .1;
+    static constexpr double min_degradation = .1;
+
+    using ds_tuple = std::tuple<double, double, rowvec3, rowvec3>;
 
     static double dev(const vec&);
-    static rowvec3 der_dev(const vec&);
     static mat compute_stiffness(double, double);
-
-    using ds_moduli = std::tuple<double, double, rowvec3, rowvec3>;
+    static ds_tuple compute_principal_stress(const vec&);
 
     double p_atm = 14.7;
     double ref_elastic = 400. * p_atm, n = .6;
     double ref_bulk = 300. * p_atm, m = .2;
     double ini_phi = .7, ten_fold_phi_diff = .1, r_f = .7, cohesion = .5;
 
+    [[nodiscard]] std::tuple<double, double> compute_modulus(double, double, double) const;
     [[nodiscard]] std::tuple<double, double> compute_elastic(double) const;
     [[nodiscard]] std::tuple<double, double> compute_bulk(double) const;
-    [[nodiscard]] ds_moduli compute_elastic_moduli();
-    [[nodiscard]] ds_moduli compute_plastic_moduli();
-
-    int project_onto_surface(double&);
-    int local_update(const vec&, const vec&, bool);
+    [[nodiscard]] ds_tuple compute_elastic_moduli(const vec&) const;
+    [[nodiscard]] ds_tuple compute_plastic_moduli(const vec&) const;
 
 public:
     DuncanSelig(
