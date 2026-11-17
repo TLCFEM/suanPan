@@ -35,12 +35,15 @@ mat DuncanSelig::compute_stiffness(const double elastic, const double bulk) {
 
 DuncanSelig::ds_tuple DuncanSelig::compute_principal_stress(const vec& t_stress) {
     const auto radius = .5 * dev(t_stress);
-    rowvec3 drds(fill::zeros);
-    if(radius > datum::eps) drds = .25 / radius * rowvec3{t_stress(0) - t_stress(1), t_stress(1) - t_stress(0), 4. * t_stress(2)};
 
     static constexpr auto center_scale{-.5}; // this is correct as later the algorithm uses s3
     const auto center = center_scale * (t_stress(0) + t_stress(1));
     const rowvec3 dcds{center_scale, center_scale, 0.};
+
+    rowvec3 drds(fill::zeros);
+    // the gradient of the radius is not unique at a hydrostatic stress state, in which the
+    // deviatoric stress is dominated by floating-point round-off, use the isotropic gradient
+    if(radius > 1E-10 * std::max(1., std::fabs(center))) drds = .25 / radius * rowvec3{t_stress(0) - t_stress(1), t_stress(1) - t_stress(0), 4. * t_stress(2)};
 
     return {center + radius, center - radius, dcds + drds, dcds - drds};
 }
