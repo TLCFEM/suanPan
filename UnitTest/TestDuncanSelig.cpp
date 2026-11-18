@@ -104,17 +104,63 @@ namespace {
         REQUIRE(material->get_trial_stress().is_finite());
         REQUIRE(material->get_trial_stiffness().is_finite());
     }
+
+    void require_finite_path(const unique_ptr<DuncanSelig>& material, const vec& increment, const unsigned steps) {
+        for(auto I = 0u; I < steps; ++I) {
+            REQUIRE(SUANPAN_SUCCESS == material->update_incre_status(increment / static_cast<double>(steps)));
+            material->commit_status();
+        }
+        REQUIRE(material->get_current_stress().is_finite());
+        REQUIRE(material->get_current_stiffness().is_finite());
+    }
 } // namespace
+
+TEST_CASE("DuncanSelig Zero Increment", "[Material.DuncanSelig]") {
+    const auto material = make_loaded();
+
+    const auto stress = material->get_current_stress();
+    const auto stiffness = material->get_current_stiffness();
+
+    REQUIRE(SUANPAN_SUCCESS == material->update_trial_status(material->get_current_strain()));
+    REQUIRE(norm(material->get_trial_stress() - stress) < 1E-12);
+    REQUIRE(norm(material->get_trial_stiffness() - stiffness) < 1E-12);
+}
+
+TEST_CASE("DuncanSelig Small Strain Response", "[Material.DuncanSelig]") {
+    SECTION("Elastic Compression") {
+        const auto material = make_model();
+
+        REQUIRE(SUANPAN_SUCCESS == material->update_trial_status(vec{-1E-6, -1E-6, 0.}));
+
+        REQUIRE(material->get_trial_stress().is_finite());
+        REQUIRE(material->get_trial_stiffness().is_finite());
+        REQUIRE(material->get_trial_stress()(0) < 0.);
+        REQUIRE(material->get_trial_stress()(1) < 0.);
+        REQUIRE(material->get_trial_stress()(2) == Approx(0.).margin(1E-12));
+    }
+
+    SECTION("Elastic Shear") {
+        const auto material = make_model();
+
+        REQUIRE(SUANPAN_SUCCESS == material->update_trial_status(vec{0., 0., 1E-6}));
+
+        REQUIRE(material->get_trial_stress().is_finite());
+        REQUIRE(material->get_trial_stiffness().is_finite());
+        REQUIRE(material->get_trial_stress()(2) > 0.);
+    }
+}
 
 TEST_CASE("DuncanSelig Consistent Tangent", "[Material.DuncanSelig]") {
     SECTION("Elastic Compression") { require_consistent_tangent(make_unloaded(), vec{-1E-4, -1E-4, 0.}); }
     SECTION("Elastic Shear") { require_consistent_tangent(make_unloaded(), vec{0., 0., 1E-4}); }
+    SECTION("Plastic Compression") { require_consistent_tangent(make_loaded(), vec{-1E-3, -1E-3, 1E-4}); }
     SECTION("Plastic Compression And Shear") { require_consistent_tangent(make_loaded(), vec{-1E-3, -3E-4, 1E-3}); }
     SECTION("Uniaxial Compression") { require_consistent_tangent(make_confined(), vec{-3E-3, 0., 1E-4}); }
     SECTION("Tension") { require_consistent_tangent(make_loaded(), vec{1E-3, 1E-3, 1E-4}); }
 }
 
 TEST_CASE("DuncanSelig Robustness", "[Material.DuncanSelig]") {
+    SECTION("Large Compression") { require_finite_path(make_confined(), vec{-1E-2, -1E-2, 0.}, 10u); }
     SECTION("Large Shear") { require_finite_response(make_confined(), vec{0., 0., 1E-2}); }
     SECTION("Large Tension") { require_finite_response(make_confined(), vec{1E-2, 1E-2, 0.}); }
     SECTION("Mixed") { require_finite_response(make_confined(), vec{-1E-2, 1E-2, 1E-2}); }
@@ -127,6 +173,7 @@ TEST_CASE("DuncanSelig Robustness", "[Material.DuncanSelig]") {
         REQUIRE(material->get_current_stress().is_finite());
         REQUIRE(material->get_current_stiffness().is_finite());
     }
+    SECTION("Uniaxial Map Point") { require_finite_path(make_uniaxial(), vec{-1.067 * ref_strain, -2. * ref_strain, 0.}, 20u); }
     SECTION("Cyclic") {
         const auto material = make_confined();
         for(auto I = 0u; I < 20u; ++I) {
