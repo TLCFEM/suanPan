@@ -1,0 +1,39 @@
+# A TEST MODEL FOR US3DA SECTION
+# US3DA uses the registry whose dimensions are optimized against the
+# tabulated AISC section properties, so the computed area and inertias
+# match the AISC values more closely than the nominal geometry.
+
+node 1 0 0 0
+node 2 1 0 0
+
+orientation B3DL 1 0. 1. 0.
+
+material Elastic1D 1 10
+
+section US3DA W44X408 1 1 10 0 0
+section US3DA HSS34X10X1 2 1 10 0 0
+section US3DA WT22X204 3 1 10 0 0
+section US3DAC WT12X31 4 1 10
+
+element B31 1 1 2 1 1
+element B31 2 1 2 2 1
+element B31 3 1 2 3 1
+element B31 4 1 2 4 1
+
+fix2 1 E 1
+
+displacement 1 0 1 3 2
+
+step static 1
+
+analyze
+
+peek node 2
+
+# Node 2:
+# Coordinate:
+#   1.0000e+00  0.0000e+00  0.0000e+00
+# Displacement:
+#  -4.5330e-02 -6.7998e-17  1.0000e+00  0.0000e+00 -1.5000e+00 -1.0196e-16
+# Resistance:
+#   1.0632e-09 -1.9041e-10  9.5821e+09  0.0000e+00  2.5659e-06  8.6447e-11
