@@ -167,13 +167,6 @@ int DuncanSelig::initialize(const shared_ptr<DomainBase>&) {
 unique_ptr<Material> DuncanSelig::unique_copy() { return std::make_unique<DuncanSelig>(*this); }
 
 int DuncanSelig::local_update(const bool plastic) {
-    // improve the predictor by a few fixed-point iterations
-    trial_stress = current_stress + current_stiffness * incre_strain;
-    for(auto I = 0u; I < 3u; ++I) {
-        const auto moduli = plastic ? compute_plastic_moduli(trial_stress) : compute_elastic_moduli(trial_stress);
-        trial_stress = current_stress + compute_stiffness(std::get<0>(moduli), std::get<1>(moduli)) * incre_strain;
-    }
-
     const auto backtracking = [&](const vec& t_stress) {
         const auto moduli = plastic ? compute_plastic_moduli(t_stress) : compute_elastic_moduli(t_stress);
         const auto elastic = std::get<0>(moduli), bulk = std::get<1>(moduli);
@@ -245,6 +238,7 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
     if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_history = current_history;
+    trial_stress = current_stress;
 
     // first assume elastic loading/unloading
     if(SUANPAN_SUCCESS != local_update(false)) return SUANPAN_FAIL;
