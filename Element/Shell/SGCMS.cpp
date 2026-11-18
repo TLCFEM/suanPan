@@ -51,10 +51,10 @@ field<mat> SGCMS::form_plate_transformation(const mat& C) {
     const auto DX5 = X2 - X1, DX6 = X3 - X2, DX7 = X4 - X3, DX8 = X1 - X4;
     const auto DY5 = Y2 - Y1, DY6 = Y3 - Y2, DY7 = Y4 - Y3, DY8 = Y1 - Y4;
 
-    const auto L5 = sqrt(DX5 * DX5 + DY5 * DY5);
-    const auto L6 = sqrt(DX6 * DX6 + DY6 * DY6);
-    const auto L7 = sqrt(DX7 * DX7 + DY7 * DY7);
-    const auto L8 = sqrt(DX8 * DX8 + DY8 * DY8);
+    const auto L5 = std::hypot(DX5, DY5);
+    const auto L6 = std::hypot(DX6, DY6);
+    const auto L7 = std::hypot(DX7, DY7);
+    const auto L8 = std::hypot(DX8, DY8);
 
     const auto C5 = DY5 / L5, C6 = DY6 / L6, C7 = DY7 / L7, C8 = DY8 / L8;
     const auto S5 = -DX5 / L5, S6 = -DX6 / L6, S7 = -DX7 / L7, S8 = -DX8 / L8;

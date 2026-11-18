@@ -50,7 +50,7 @@ vec SGCMQ::form_diff_coor(const mat& ele_coor) const {
 
     if(objective_length > 0.)
         for(unsigned I{0}, J{4}; I < 4u; ++I, ++J) {
-            const auto s = objective_length / std::sqrt(diff_coor(I) * diff_coor(I) + diff_coor(J) * diff_coor(J));
+            const auto s = objective_length / std::hypot(diff_coor(I), diff_coor(J));
             diff_coor(I) *= s;
             diff_coor(J) *= s;
         }

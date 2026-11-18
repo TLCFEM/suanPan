@@ -62,10 +62,10 @@ CDP::CDP(const bool CHECK_INPUT, const unsigned T, const double E, const double 
         const auto half_elastic_strain = .5 * f_t / elastic_modulus;
         // try to find the total strain at half stress point, eq. (20), eq. (24), eq. (27) and eq. (49)
         // this defines a minimum stiffness degradation
-        ratio_t = half_elastic_strain / (std::log(1. + a_t + std::sqrt(1. + a_t * a_t)) / f_t / (1. + .5 * a_t) * g_t + half_elastic_strain);
+        ratio_t = half_elastic_strain / (std::log(1. + a_t + std::hypot(1., a_t)) / f_t / (1. + .5 * a_t) * g_t + half_elastic_strain);
         if(ratio_t >= DT) suanpan_warning("A minimum tension degradation of {:.3f} is required, resetting.\n", ratio_t);
     }
-    access::rw(cb_t) = std::log(std::clamp(DT, ratio_t, 1. - datum::eps)) / std::log(.5 * (1. + a_t - std::sqrt(1. + a_t * a_t)) / a_t);
+    access::rw(cb_t) = std::log(std::clamp(DT, ratio_t, 1. - datum::eps)) / std::log(.5 * (1. + a_t - std::hypot(1., a_t)) / a_t);
 
     // compression
     double ratio_c{};

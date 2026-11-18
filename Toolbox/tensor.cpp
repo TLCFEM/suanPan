@@ -601,7 +601,7 @@ mat transform::strain::trans(const double angle) {
 
 vec transform::strain::principal(const vec& strain) {
     const auto tmp_a = .5 * (strain(0) + strain(1));
-    const auto tmp_b = .5 * sqrt(pow(strain(0) - strain(1), 2.) + pow(strain(2), 2.));
+    const auto tmp_b = .5 * std::hypot(strain(0) - strain(1), strain(2));
 
     vec p_strain(3);
     p_strain(0) = tmp_a + tmp_b;
@@ -635,7 +635,7 @@ mat transform::stress::trans(const double angle) {
 
 vec transform::stress::principal(const vec& stress) {
     const auto tmp_a = .5 * (stress(0) + stress(1));
-    const auto tmp_b = .5 * sqrt(pow(stress(0) - stress(1), 2.) + pow(2. * stress(2), 2.));
+    const auto tmp_b = .5 * std::hypot(stress(0) - stress(1), 2. * stress(2));
 
     vec p_stress(3);
     p_stress(0) = tmp_a + tmp_b;

@@ -66,7 +66,7 @@ void Rotation3D::form_transformation(mat&& R) {
 Rotation3D::Rotation3D(const unsigned T, const unsigned MT, const double I, const double J, const double K)
     : Material3D(T, 0.)
     , mat_tag(MT) {
-    const auto N = sqrt(I * I + J * J + K * K);
+    const auto N = std::hypot(I, J, K);
     const auto S = sin(.5 * N) / N;
     const auto C = cos(.5 * N);
 

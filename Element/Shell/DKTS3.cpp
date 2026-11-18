@@ -71,9 +71,9 @@ field<mat> DKTS3::form_transform(const mat& C) {
     const auto DX4 = X2 - X1, DX5 = X3 - X2, DX6 = X1 - X3;
     const auto DY4 = Y2 - Y1, DY5 = Y3 - Y2, DY6 = Y1 - Y3;
 
-    const auto L4 = sqrt(DX4 * DX4 + DY4 * DY4);
-    const auto L5 = sqrt(DX5 * DX5 + DY5 * DY5);
-    const auto L6 = sqrt(DX6 * DX6 + DY6 * DY6);
+    const auto L4 = std::hypot(DX4, DY4);
+    const auto L5 = std::hypot(DX5, DY5);
+    const auto L6 = std::hypot(DX6, DY6);
 
     const auto C4 = DY4 / L4, C5 = DY5 / L5, C6 = DY6 / L6;
     const auto S4 = -DX4 / L4, S5 = -DX5 / L5, S6 = -DX6 / L6;

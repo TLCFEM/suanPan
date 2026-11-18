@@ -180,7 +180,7 @@ int CDPM2::compute_damage(const double gamma, const double s, const double p, co
     const auto ptbps = sqrt_three_two * e0 / fc;
     const auto term_a = ptaps * s + ptapp * p;
     const auto term_b = ptbps * s;
-    const auto term_c = std::sqrt(term_a * term_a + term_b * term_b);
+    const auto term_c = std::hypot(term_a, term_b);
     ee = term_a + term_c;
     const auto incre_ee = ee - current_ee;
     // at a stress-free state the equivalent strain is not differentiable
