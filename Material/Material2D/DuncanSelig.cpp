@@ -20,9 +20,7 @@
 
 #include <Domain/DomainBase.h>
 
-double DuncanSelig::dev(const vec& t_stress) { return std::sqrt(std::pow(t_stress(0) - t_stress(1), 2) + std::pow(2. * t_stress(2), 2)); }
-
-rowvec3 DuncanSelig::der_dev(const vec& t_stress) { return {t_stress(0) - t_stress(1), t_stress(1) - t_stress(0), 4. * t_stress(2)}; }
+double DuncanSelig::dev(const vec& t_stress) { /* omits the 0.5 that is moved to other places */ return std::hypot(t_stress(0) - t_stress(1), 2. * t_stress(2)); }
 
 mat DuncanSelig::compute_stiffness(const double elastic, const double bulk) {
     mat stiffness(3, 3, fill::zeros);
@@ -35,37 +33,34 @@ mat DuncanSelig::compute_stiffness(const double elastic, const double bulk) {
     return stiffness;
 }
 
-std::tuple<double, double> DuncanSelig::compute_elastic(const double s3) const {
-    double elastic, deds3 = 0.;
-    if(s3 < -min_ratio * p_atm) elastic = ref_elastic * std::pow(.01, n);
-    else if(s3 < min_ratio * p_atm) elastic = ref_elastic * std::pow(min_ratio, n);
-    else deds3 = n * (elastic = ref_elastic * std::pow(s3 / p_atm, n)) / s3;
+std::tuple<double, double> DuncanSelig::compute_modulus(const double ps, const double ref_modulus, const double order) const {
+    const auto fraction = ps / p_atm;
+    if(fraction <= min_ratio) return {ref_modulus * std::pow(min_ratio, order), 0.};
 
-    return {elastic, deds3};
+    const auto modulus = ref_modulus * std::pow(fraction, order);
+    return {modulus, order * modulus / ps};
 }
 
-std::tuple<double, double> DuncanSelig::compute_bulk(const double s3) const {
-    double bulk, dkds3 = 0.;
-    if(s3 < -min_ratio * p_atm) bulk = ref_bulk * std::pow(.01, m);
-    else if(s3 < min_ratio * p_atm) bulk = ref_bulk * std::pow(min_ratio, m);
-    else dkds3 = m * (bulk = ref_bulk * std::pow(s3 / p_atm, m)) / s3;
+std::tuple<double, double> DuncanSelig::compute_elastic(const double ps) const { return compute_modulus(ps, ref_elastic, n); }
 
-    return {bulk, dkds3};
+std::tuple<double, double> DuncanSelig::compute_bulk(const double ps) const { return compute_modulus(ps, ref_bulk, m); }
+
+DuncanSelig::ds_tuple DuncanSelig::compute_principal_stress(const vec& t_stress) const {
+    static constexpr auto center_scale{-.5}; // this is correct as later the algorithm uses s3
+    const auto center = center_scale * (t_stress(0) + t_stress(1));
+    const rowvec3 dcds{center_scale, center_scale, 0.};
+
+    const auto radius = .5 * dev(t_stress);
+    rowvec3 drds(fill::zeros);
+    if(radius > tolerance * std::max(1., std::fabs(center))) drds = .25 / radius * rowvec3{t_stress(0) - t_stress(1), t_stress(1) - t_stress(0), 4. * t_stress(2)};
+
+    return {center + radius, center - radius, dcds + drds, dcds - drds};
 }
 
-DuncanSelig::ds_moduli DuncanSelig::compute_elastic_moduli() {
+DuncanSelig::ds_tuple DuncanSelig::compute_elastic_moduli(const vec& t_stress) const {
     // principal stresses
 
-    const auto radius = .5 * dev(trial_stress);
-    rowvec3 drds(fill::zeros);
-    if(radius > datum::eps) drds = der_dev(trial_stress) / radius * .25;
-
-    const auto center = -.5 * (trial_stress(0) + trial_stress(1));
-    const rowvec3 dcds{-.5, -.5, 0.};
-
-    const auto s3 = center - radius;
-
-    const rowvec3 ds3ds = dcds - drds;
+    const auto [s1, s3, ds1ds, ds3ds] = compute_principal_stress(t_stress);
 
     // for elastic modulus
 
@@ -87,19 +82,10 @@ DuncanSelig::ds_moduli DuncanSelig::compute_elastic_moduli() {
     return {elastic, bulk, deds, dkds};
 }
 
-DuncanSelig::ds_moduli DuncanSelig::compute_plastic_moduli() {
+DuncanSelig::ds_tuple DuncanSelig::compute_plastic_moduli(const vec& t_stress) const {
     // principal stresses
 
-    const auto radius = .5 * dev(trial_stress);
-    rowvec3 drds(fill::zeros);
-    if(radius > datum::eps) drds = der_dev(trial_stress) / radius * .25;
-
-    const auto center = -.5 * (trial_stress(0) + trial_stress(1));
-    const rowvec3 dcds{-.5, -.5, 0.};
-
-    const auto s1 = center + radius, s3 = center - radius;
-
-    const rowvec3 ds1ds = dcds + drds, ds3ds = dcds - drds;
+    const auto [s1, s3, ds1ds, ds3ds] = compute_principal_stress(t_stress);
 
     // for elastic modulus
 
@@ -109,14 +95,15 @@ DuncanSelig::ds_moduli DuncanSelig::compute_plastic_moduli() {
     else dphids3 = -ten_fold_phi_diff / (s3 * log(10));
 
     const auto denom = 1. - std::sin(phi);
-    auto max_dev_stress = 2. / r_f * (cohesion * std::cos(phi) + s3 * std::sin(phi)) / denom;
+    auto max_dev_stress = 2. / r_f * (cohesion * std::cos(phi) + std::max(s3, 0.) * std::sin(phi)) / denom;
     auto dmdsds3 = 0.;
-    if(max_dev_stress > min_ratio * p_atm) {
+    if(max_dev_stress <= min_ratio * p_atm) max_dev_stress = min_ratio * p_atm;
+    else if(s3 > 0.) {
         const auto pmdspphi = 2. / r_f * (s3 * std::cos(phi) / denom + cohesion) / denom;
         const auto pmdsps3 = 2. / r_f * std::sin(phi) / denom;
         dmdsds3 = pmdspphi * dphids3 + pmdsps3;
     }
-    else max_dev_stress = min_ratio * p_atm;
+    else dmdsds3 = 2. / r_f * cohesion / denom * dphids3;
 
     const auto dev_stress = s1 - s3;
     constexpr auto pdsps1 = 1.;
@@ -124,10 +111,17 @@ DuncanSelig::ds_moduli DuncanSelig::compute_plastic_moduli() {
 
     const auto [ini_elastic, deids3] = compute_elastic(s3);
 
-    const auto pepei = std::pow(1. - dev_stress / max_dev_stress, 2.);
+    auto dddds{0.}, dddmds{0.};
+    auto degradation = 1. - dev_stress / max_dev_stress;
+    if(degradation < min_degradation) degradation = min_degradation;
+    else {
+        dddds = -1. / max_dev_stress;
+        dddmds = dev_stress / max_dev_stress / max_dev_stress;
+    }
+    const auto pepei = degradation * degradation;
     const auto elastic = ini_elastic * pepei;
-    const auto pepds = -2. * ini_elastic * (1. - dev_stress / max_dev_stress) / max_dev_stress;
-    const auto pepmds = -pepds * dev_stress / max_dev_stress;
+    const auto pepds = 2. * ini_elastic * degradation * dddds;
+    const auto pepmds = 2. * ini_elastic * degradation * dddmds;
 
     const auto peps1 = pepds * pdsps1;
     const auto peps3 = pepei * deids3 + pepds * pdsps3 + pepmds * dmdsds3;
@@ -148,121 +142,6 @@ DuncanSelig::ds_moduli DuncanSelig::compute_plastic_moduli() {
     return {elastic, bulk, deds, dkds};
 }
 
-int DuncanSelig::project_onto_surface(double& multiplier) {
-    const auto max_dev_stress = trial_history(0);
-
-    trial_stress = current_stress + current_stiffness * incre_strain;
-    multiplier = 1.;
-
-    auto ref_error = 0.;
-    vec4 incre, residual;
-
-    static const uvec sa{0, 1, 2}, sb{3};
-
-    auto counter = 0u;
-    while(true) {
-        if(max_iteration == ++counter) {
-            suanpan_error("Local elastic iteration cannot converge within {} iterations.\n", max_iteration);
-            return SUANPAN_FAIL;
-        }
-
-        const auto [elastic, bulk, deds, dkds] = compute_elastic_moduli();
-
-        const auto factor_a = 3. * bulk * (3. * bulk + elastic);
-        const auto factor_b = 3. * bulk * (3. * bulk - elastic);
-
-        mat33 right(fill::zeros);
-        right(0, 0) = right(1, 1) = factor_a;
-        right(0, 1) = right(1, 0) = factor_b;
-        right(2, 2) = 3. * bulk * elastic;
-
-        const auto trial_dev_stress = dev(trial_stress);
-        const vec3 t_stress = trial_stress - current_stress;
-        const vec3 t_strain = incre_strain * multiplier;
-
-        residual.head(3) = (9. * bulk - elastic) * t_stress - right * t_strain;
-        residual(3) = trial_dev_stress - max_dev_stress;
-
-        const rowvec3 factor_c = 3. * (elastic * dkds + bulk * deds);
-        const rowvec3 dfads = 18. * bulk * dkds + factor_c;
-        const rowvec3 dfbds = 18. * bulk * dkds - factor_c;
-
-        mat44 jacobian(fill::zeros);
-        jacobian(sa, sa) = (9. * bulk - elastic) * eye(3, 3) + t_stress * (9. * dkds - deds);
-        jacobian.row(0).head(3) -= t_strain(0) * dfads + t_strain(1) * dfbds;
-        jacobian.row(1).head(3) -= t_strain(0) * dfbds + t_strain(1) * dfads;
-        jacobian.row(2).head(3) -= t_strain(2) * factor_c;
-        jacobian(sa, sb) = -right * incre_strain;
-        if(trial_dev_stress > datum::eps) jacobian(sb, sa) = der_dev(trial_stress) / trial_dev_stress;
-
-        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
-
-        const auto error = suanpan::inf_norm(incre);
-        if(1u == counter) ref_error = error;
-        suanpan_debug("Local elastic iteration error: {:.5E}.\n", error / ref_error);
-        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) return SUANPAN_SUCCESS;
-
-        trial_stress -= incre.head(3);
-        multiplier -= incre(3);
-    }
-}
-
-int DuncanSelig::local_update(const vec& ref_stress, const vec& ref_strain, const bool two_stage) {
-    const auto update_moduli = [&] {
-        const auto max_dev_stress = trial_history(0);
-        return two_stage || dev(trial_stress) > max_dev_stress ? compute_plastic_moduli() : compute_elastic_moduli();
-    };
-
-    auto ref_error = 0.;
-    vec3 incre;
-
-    auto counter = 0u;
-    while(true) {
-        if(max_iteration == ++counter) {
-            if(two_stage)
-                suanpan_error("Local iteration cannot converge within {} iterations.\n", max_iteration);
-            else
-                suanpan_debug("Local iteration cannot converge within {} iterations.\n", max_iteration);
-            return SUANPAN_FAIL;
-        }
-
-        const auto [elastic, bulk, deds, dkds] = update_moduli();
-
-        const auto factor_a = 3. * bulk * (3. * bulk + elastic);
-        const auto factor_b = 3. * bulk * (3. * bulk - elastic);
-
-        mat33 right(fill::zeros);
-        right(0, 0) = right(1, 1) = factor_a;
-        right(0, 1) = right(1, 0) = factor_b;
-        right(2, 2) = 3. * bulk * elastic;
-
-        const vec3 t_stress = trial_stress - ref_stress;
-        const vec3 residual = (9. * bulk - elastic) * t_stress - right * ref_strain;
-
-        const rowvec3 factor_c = 3. * (elastic * dkds + bulk * deds);
-        const rowvec3 dfads = 18. * bulk * dkds + factor_c;
-        const rowvec3 dfbds = 18. * bulk * dkds - factor_c;
-
-        mat33 jacobian = (9. * bulk - elastic) * eye(3, 3) + t_stress * (9. * dkds - deds);
-        jacobian.row(0) -= ref_strain(0) * dfads + ref_strain(1) * dfbds;
-        jacobian.row(1) -= ref_strain(0) * dfbds + ref_strain(1) * dfads;
-        jacobian.row(2) -= ref_strain(2) * factor_c;
-
-        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
-
-        const auto error = suanpan::inf_norm(incre);
-        if(1u == counter) ref_error = error;
-        suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        if(error < tolerance * ref_error || ((error < tolerance || suanpan::inf_norm(residual) < tolerance) && counter > 5u)) {
-            if(!solve(trial_stiffness, jacobian, right)) return SUANPAN_FAIL;
-
-            return SUANPAN_SUCCESS;
-        }
-
-        trial_stress -= incre;
-    }
-}
-
 DuncanSelig::DuncanSelig(const unsigned T, const vec& P, const double R)
     : Material2D(T, PlaneType::E, R)
     , p_atm(P(0))
@@ -276,7 +155,7 @@ DuncanSelig::DuncanSelig(const unsigned T, const vec& P, const double R)
     , cohesion(P(8)) { access::rw(tolerance) = 1E-13; }
 
 int DuncanSelig::initialize(const shared_ptr<DomainBase>&) {
-    const auto [elastic, bulk, deds, dkds] = compute_elastic_moduli();
+    const auto [elastic, bulk, deds, dkds] = compute_elastic_moduli(vec{3, fill::zeros});
 
     trial_stiffness = current_stiffness = initial_stiffness = compute_stiffness(elastic, bulk);
 
@@ -293,31 +172,17 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
     if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_history = current_history;
+    trial_stress = current_stress;
 
-    trial_stress = current_stress + current_stiffness * incre_strain;
+    // first assume elastic loading/unloading
+    if(SUANPAN_SUCCESS != local_update<false>()) return SUANPAN_FAIL;
 
-    const auto update_dev_stress = [&] {
-        auto& max_dev_stress = trial_history(0);
-        if(const auto trail_dev_stress = dev(trial_stress); trail_dev_stress > max_dev_stress) max_dev_stress = trail_dev_stress;
-        return SUANPAN_SUCCESS;
-    };
+    // if the elastic solution violates the plastic condition, redo the local iteration with plastic moduli
+    if(dev(trial_stress) > trial_history(0) && SUANPAN_SUCCESS != local_update<true>()) return SUANPAN_FAIL;
 
-    // first try a whole step size local iteration
-    if(SUANPAN_SUCCESS == local_update(current_stress, incre_strain, false)) return update_dev_stress();
+    trial_history(0) = std::max(trial_history(0), dev(trial_stress));
 
-    // alternatively, directly use the plastic branch
-    // if(SUANPAN_SUCCESS == local_update(current_stress, incre_strain, true)) return update_dev_stress();
-
-    // if that fails, mostly likely due to discontinuity of the gradient
-    // assume proportional loading, project the stress onto the yield surface using elastic moduli
-    auto multiplier = 1.;
-    if(SUANPAN_SUCCESS != project_onto_surface(multiplier)) return SUANPAN_FAIL;
-
-    // then using plastic moduli to compute the new plastic state
-    // !!! the tangent operator is not algorithmically consistent in this case
-    if(SUANPAN_SUCCESS != local_update(vec(trial_stress), (1. - multiplier) * incre_strain, true)) return SUANPAN_FAIL;
-
-    return update_dev_stress();
+    return SUANPAN_SUCCESS;
 }
 
 int DuncanSelig::clear_status() {

@@ -4,6 +4,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         TestContainer.cpp
         TestCDPM2.cpp
         TestDafaliasManzari.cpp
+        TestDuncanSelig.cpp
         TestEigen.cpp
         TestExpression.cpp
         TestHomotopy.cpp
