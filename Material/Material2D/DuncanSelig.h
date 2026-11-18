@@ -88,7 +88,7 @@ class DuncanSelig final : public Material2D {
         }
 
         return std::tuple{residual, right, jacobian};
-    };
+    }
 
     template<bool plastic> int local_update() {
         auto ref_error = 0.;
