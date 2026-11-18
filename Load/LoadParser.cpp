@@ -235,7 +235,7 @@ namespace {
     // amplitudes
     //
 
-    template<typename T> void new_tag_amplitude(unique_ptr<Amplitude>& return_obj, std::istringstream& command, const unsigned tag) {
+    template<typename T> void new_tag_amplitude(unique_ptr<Amplitude>& return_obj, std::istringstream&, const unsigned tag) {
         return_obj = std::make_unique<T>(tag);
     }
 

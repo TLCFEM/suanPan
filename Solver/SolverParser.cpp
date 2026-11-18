@@ -385,11 +385,11 @@ namespace {
     // solvers
     //
 
-    void new_newton(unique_ptr<Solver>& return_obj, std::istringstream& command, const unsigned tag) {
+    void new_newton(unique_ptr<Solver>& return_obj, std::istringstream&, const unsigned tag) {
         return_obj = std::make_unique<Newton>(tag);
     }
 
-    void new_modified_newton(unique_ptr<Solver>& return_obj, std::istringstream& command, const unsigned tag) {
+    void new_modified_newton(unique_ptr<Solver>& return_obj, std::istringstream&, const unsigned tag) {
         return_obj = std::make_unique<Newton>(tag, true);
     }
 
@@ -403,7 +403,7 @@ namespace {
         return_obj = std::make_unique<AICN>(tag, length);
     }
 
-    void new_bfgs(unique_ptr<Solver>& return_obj, std::istringstream& command, const unsigned tag) {
+    void new_bfgs(unique_ptr<Solver>& return_obj, std::istringstream&, const unsigned tag) {
         return_obj = std::make_unique<BFGS>(tag);
     }
 
@@ -439,11 +439,11 @@ namespace {
         return_obj = std::make_unique<FEAST>(tag, eigen_number, centre, radius, quadratic);
     }
 
-    void new_mpdc(unique_ptr<Solver>& return_obj, std::istringstream& command, const unsigned tag) {
+    void new_mpdc(unique_ptr<Solver>& return_obj, std::istringstream&, const unsigned tag) {
         return_obj = std::make_unique<MPDC>(tag);
     }
 
-    void new_ramm(unique_ptr<Solver>& return_obj, std::istringstream& command, const unsigned tag) {
+    void new_ramm(unique_ptr<Solver>& return_obj, std::istringstream&, const unsigned tag) {
         return_obj = std::make_unique<Ramm>(tag);
     }
 } // namespace

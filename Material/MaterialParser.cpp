@@ -2791,7 +2791,7 @@ namespace {
         else return_obj = std::make_unique<CustomStressDegradation>(tag, mat_tag, p_expression_tag, n_expression_tag);
     }
 
-    void new_trivial(unique_ptr<Material>& return_obj, std::istringstream& command, const unsigned tag) {
+    void new_trivial(unique_ptr<Material>& return_obj, std::istringstream&, const unsigned tag) {
         return_obj = std::make_unique<Trivial>(tag);
     }
 

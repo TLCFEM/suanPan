@@ -1624,6 +1624,9 @@
     <ClCompile Include="..\..\..\UnitTest\TestUtility.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestDuncanSelig.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\Criterion\Criterion.h">

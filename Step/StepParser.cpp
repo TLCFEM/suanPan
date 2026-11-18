@@ -38,7 +38,7 @@ namespace {
         return_obj = std::make_unique<Frequency>(tag, eigen_number, suanpan::to_upper(type));
     }
 
-    void new_buckle(unique_ptr<Step>& return_obj, std::istringstream& command, const unsigned tag) {
+    void new_buckle(unique_ptr<Step>& return_obj, std::istringstream&, const unsigned tag) {
         return_obj = std::make_unique<Buckle>(tag);
     }
 
@@ -62,7 +62,7 @@ namespace {
         return_obj = std::make_unique<Dynamic>(tag, time, type);
     }
 
-    void new_arclength(unique_ptr<Step>& return_obj, std::istringstream& command, const unsigned tag) {
+    void new_arclength(unique_ptr<Step>& return_obj, std::istringstream&, const unsigned tag) {
         return_obj = std::make_unique<ArcLength>(tag);
     }
 } // namespace

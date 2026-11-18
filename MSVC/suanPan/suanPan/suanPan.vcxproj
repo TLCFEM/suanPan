@@ -64,7 +64,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalOptions>/bigobj /utf-8 /we4244 /we4267 /we4305 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/bigobj /utf-8 /we4244 /we4267 /we4305 /wd4702 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4068;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
@@ -88,7 +88,7 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalOptions>/bigobj /utf-8 /we4244 /we4267 /we4305 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/bigobj /utf-8 /we4244 /we4267 /we4305 /wd4702 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4068;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -544,6 +544,7 @@
     <ClCompile Include="..\..\..\UnitTest\TestColoring.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestContainer.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestDafaliasManzari.cpp" />
+    <ClCompile Include="..\..\..\UnitTest\TestDuncanSelig.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestEigen.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestExpression.cpp" />
     <ClCompile Include="..\..\..\UnitTest\TestHomotopy.cpp" />

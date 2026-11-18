@@ -418,7 +418,7 @@ namespace {
     // interaction
     //
 
-    void new_hertzian(unique_ptr<Interaction>& return_obj, std::istringstream& command, const unsigned tag) {
+    void new_hertzian(unique_ptr<Interaction>& return_obj, std::istringstream&, const unsigned tag) {
         return_obj = std::make_unique<Hertzian>(tag);
     }
 
