@@ -166,72 +166,6 @@ int DuncanSelig::initialize(const shared_ptr<DomainBase>&) {
 
 unique_ptr<Material> DuncanSelig::unique_copy() { return std::make_unique<DuncanSelig>(*this); }
 
-int DuncanSelig::local_update(const bool plastic) {
-    const auto backtracking = [&](const vec& t_stress) {
-        const auto moduli = plastic ? compute_plastic_moduli(t_stress) : compute_elastic_moduli(t_stress);
-        const auto elastic = std::get<0>(moduli), bulk = std::get<1>(moduli);
-
-        mat33 right(fill::zeros);
-        right(0, 0) = right(1, 1) = 3. * bulk * (3. * bulk + elastic);
-        right(0, 1) = right(1, 0) = 3. * bulk * (3. * bulk - elastic);
-        right(2, 2) = 3. * bulk * elastic;
-
-        return suanpan::inf_norm((9. * bulk - elastic) * (t_stress - current_stress) - right * incre_strain);
-    };
-
-    auto ref_error = 0.;
-    vec3 incre;
-
-    auto counter = 0u;
-    while(true) {
-        if(max_iteration < ++counter) {
-            suanpan_debug("Local iteration cannot converge within {} iterations.\n", max_iteration);
-            return SUANPAN_FAIL;
-        }
-
-        const auto [elastic, bulk, deds, dkds] = plastic ? compute_plastic_moduli(trial_stress) : compute_elastic_moduli(trial_stress);
-
-        const auto factor_a = 3. * bulk * (3. * bulk + elastic);
-        const auto factor_b = 3. * bulk * (3. * bulk - elastic);
-
-        mat33 right(fill::zeros);
-        right(0, 0) = right(1, 1) = factor_a;
-        right(0, 1) = right(1, 0) = factor_b;
-        right(2, 2) = 3. * bulk * elastic;
-
-        const vec3 t_stress = trial_stress - current_stress;
-        const vec3 residual = (9. * bulk - elastic) * t_stress - right * incre_strain;
-
-        const rowvec3 factor_c = 3. * (elastic * dkds + bulk * deds);
-        const rowvec3 dfads = 18. * bulk * dkds + factor_c;
-        const rowvec3 dfbds = 18. * bulk * dkds - factor_c;
-
-        mat33 jacobian = (9. * bulk - elastic) * eye(3, 3) + t_stress * (9. * dkds - deds);
-        jacobian.row(0) -= incre_strain(0) * dfads + incre_strain(1) * dfbds;
-        jacobian.row(1) -= incre_strain(0) * dfbds + incre_strain(1) * dfads;
-        jacobian.row(2) -= incre_strain(2) * factor_c;
-
-        if(!solve(incre, jacobian, residual)) return SUANPAN_FAIL;
-
-        const auto error = suanpan::inf_norm(incre);
-        if(1u == counter) ref_error = error;
-        suanpan_debug("Local iteration error: {:.5E}.\n", error);
-        const auto residual_norm = suanpan::inf_norm(residual);
-        if(error < tolerance * ref_error || ((error < tolerance || residual_norm < tolerance) && counter > 5u)) {
-            if(!solve(trial_stiffness, jacobian, right)) return SUANPAN_FAIL;
-
-            return SUANPAN_SUCCESS;
-        }
-
-        // backtracking line search on the residual norm
-        auto step = 1.;
-        vec candidate = trial_stress - incre;
-        while(step > 1E-3 && backtracking(candidate) >= residual_norm) candidate = trial_stress - (step *= .5) * incre;
-
-        trial_stress = candidate;
-    }
-}
-
 int DuncanSelig::update_trial_status(const vec& t_strain) {
     incre_strain = (trial_strain = t_strain) - current_strain;
 
@@ -241,10 +175,10 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
     trial_stress = current_stress;
 
     // first assume elastic loading/unloading
-    if(SUANPAN_SUCCESS != local_update(false)) return SUANPAN_FAIL;
+    if(SUANPAN_SUCCESS != local_update<false>()) return SUANPAN_FAIL;
 
     // if the elastic solution violates the plastic condition, redo the local iteration with plastic moduli
-    if(dev(trial_stress) > trial_history(0) && SUANPAN_SUCCESS != local_update(true)) return SUANPAN_FAIL;
+    if(dev(trial_stress) > trial_history(0) && SUANPAN_SUCCESS != local_update<true>()) return SUANPAN_FAIL;
 
     trial_history(0) = std::max(trial_history(0), dev(trial_stress));
 
