@@ -1472,6 +1472,54 @@ namespace {
         return registry.fetch(type);
     }
 
+    vec nzisection_adjusted(const std::string_view type) {
+        static const TokenRegistry<vec> registry{
+            {"150UB14.0", {74.3334, 7.2034, 74.3334, 7.2034, 136.8981, 5.1998}},
+            {"150UB18.0", {74.7416, 9.6129, 74.7416, 9.6129, 136.7888, 6.319}},
+            {"180UB16.1", {89.6093, 7.0982, 89.6093, 7.0982, 160.6816, 4.7903}},
+            {"180UB18.1", {89.4429, 8.1552, 89.4429, 8.1552, 160.0077, 5.2746}},
+            {"180UB22.2", {89.5681, 10.1582, 89.5681, 10.1582, 159.9187, 6.2615}},
+            {"200UB18.2", {98.5586, 7.1278, 98.5586, 7.1278, 186.5345, 4.9308}},
+            {"200UB22.3", {132.7535, 7.0461, 132.7535, 7.0461, 189.216, 5.2837}},
+            {"200UB25.4", {132.4546, 7.8898, 132.4546, 7.8898, 188.8219, 6.0487}},
+            {"200UB29.8", {133.7364, 9.6671, 133.7364, 9.6671, 188.7547, 6.5614}},
+            {"250UB25.7", {123.3198, 8.1458, 123.3198, 8.1458, 234.7422, 5.3844}},
+            {"250UB31.4", {145.705, 8.658, 145.705, 8.658, 235.6388, 6.3257}},
+            {"250UB37.3", {145.6067, 10.9881, 145.6067, 10.9881, 235.3354, 6.5951}},
+            {"310UB32.0", {148.052, 8.1601, 148.052, 8.1601, 285.1937, 5.8514}},
+            {"310UB40.4", {164.7299, 10.2561, 164.7299, 10.2561, 285.7205, 6.4266}},
+            {"310UB46.2", {165.9912, 11.8029, 165.9912, 11.8029, 285.2791, 7.0802}},
+            {"360UB44.7", {171.0864, 9.6882, 171.0864, 9.6882, 335.2519, 7.1976}},
+            {"360UB50.7", {170.8787, 11.5269, 170.8787, 11.5269, 335.1522, 7.564}},
+            {"360UB56.7", {171.2929, 13.1126, 171.2929, 13.1126, 334.1135, 8.2278}},
+            {"410UB53.7", {178.0078, 10.9358, 178.0078, 10.9358, 383.5384, 7.8373}},
+            {"410UB59.7", {178.6637, 12.7086, 178.6637, 12.7086, 383.4281, 8.0991}},
+            {"460UB67.1", {188.7414, 12.9171, 188.7414, 12.9171, 429.8909, 8.6256}},
+            {"460UB74.6", {189.9338, 14.5095, 189.9338, 14.5095, 430.6456, 9.3143}},
+            {"460UB82.1", {190.6971, 16.0569, 190.6971, 16.0569, 430.0219, 10.1903}},
+            {"530UB82.0", {208.1556, 13.3408, 208.1556, 13.3408, 504.5879, 9.8257}},
+            {"530UB92.4", {208.6697, 15.6818, 208.6697, 15.6818, 504.4984, 10.4315}},
+            {"610UB101", {227.6591, 14.8655, 227.6591, 14.8655, 575.3325, 10.8458}},
+            {"610UB113", {228.1488, 17.2922, 228.1488, 17.2922, 575.2722, 11.4933}},
+            {"610UB125", {228.5177, 19.7153, 228.5177, 19.7153, 573.978, 12.1822}},
+            {"100UC14.8", {97.7031, 7.2991, 97.7031, 7.2991, 83.1831, 5.5}},
+            {"150UC23.4", {151.2995, 6.9144, 151.2995, 6.9144, 139.3296, 6.0412}},
+            {"150UC30.0", {153.0814, 9.3555, 153.0814, 9.3555, 139.8924, 6.9531}},
+            {"150UC37.2", {154.6917, 11.4265, 154.6917, 11.4265, 139.7223, 8.4668}},
+            {"200UC46.2", {203.6955, 10.9747, 203.6955, 10.9747, 182.5148, 7.7441}},
+            {"200UC52.2", {203.9182, 12.5655, 203.9182, 12.5655, 181.9477, 8.3191}},
+            {"200UC59.5", {207.3273, 13.8853, 207.3273, 13.8853, 183.297, 10.2917}},
+            {"250UC72.9", {255.5956, 14.0313, 255.5956, 14.0313, 227.7855, 9.4183}},
+            {"250UC89.5", {255.6148, 17.4269, 255.6148, 17.4269, 226.3892, 10.7698}},
+            {"310UC96.8", {304.7689, 15.471, 304.7689, 15.471, 278.6559, 10.5239}},
+            {"310UC118", {307.674, 18.6437, 307.674, 18.6437, 278.7745, 12.7768}},
+            {"310UC137", {309.4473, 21.6415, 309.4473, 21.6415, 278.5691, 14.5823}},
+            {"320UC158", {310.913, 25.0697, 310.913, 25.0697, 277.8268, 16.4021}},
+        };
+
+        return registry.fetch(type);
+    }
+
     vec nzrhsection(const std::string_view type) {
         static const TokenRegistry<vec> registry{
             {"250X150X9.0RHS", {150.0, 250.0, 9.0}},
@@ -4512,7 +4560,7 @@ namespace {
         return_obj = std::make_unique<ISection3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
     }
 
-    void new_nz2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
+    template<bool adjusted> void new_nz2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
         unsigned material_id;
         if(!get_input(command, material_id)) {
             suanpan_error("A valid material tag is required.\n");
@@ -4534,6 +4582,15 @@ namespace {
         auto eccentricity = 0.;
         if(!command.eof() && !get_input(command, eccentricity)) {
             suanpan_error("A valid eccentricity is required.\n");
+            return;
+        }
+
+        if(adjusted) {
+            const auto dim = nzisection_adjusted(type);
+
+            if(dim.is_empty()) suanpan_error("No adjusted dimensions are available for the given designation.\n");
+            else return_obj = std::make_unique<ISection2D>(tag, scale * dim, material_id, int_pt, eccentricity);
+
             return;
         }
 
@@ -4572,7 +4629,7 @@ namespace {
         suanpan_error("Cannot identify section type.\n");
     }
 
-    void new_nz3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
+    template<bool adjusted> void new_nz3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
         unsigned material_id;
         if(!get_input(command, material_id)) {
             suanpan_error("A valid material tag is required.\n");
@@ -4600,6 +4657,15 @@ namespace {
         auto eccentricity_z = 0.;
         if(!command.eof() && !get_input(command, eccentricity_z)) {
             suanpan_error("A valid eccentricity is required.\n");
+            return;
+        }
+
+        if(adjusted) {
+            const auto dim = nzisection_adjusted(type);
+
+            if(dim.is_empty()) suanpan_error("No adjusted dimensions are available for the given designation.\n");
+            else return_obj = std::make_unique<ISection3D>(tag, scale * dim, material_id, int_pt, vec{eccentricity_y, eccentricity_z});
+
             return;
         }
 
@@ -4800,16 +4866,17 @@ int create_new_section(const shared_ptr<DomainBase>& domain, std::istringstream&
         {"NM3D3K", new_nmk<17>},
         {"EU2D", new_eu2d<false>},
         {"EU3D", new_eu3d<false>},
-        {"NZ2D", new_nz2d},
-        {"NZ3D", new_nz3d},
-        // adjusted variants, optimized against the EN 10365 section properties
-        {"EU2DA", new_eu2d<true>},
-        {"EU3DA", new_eu3d<true>},
+        {"NZ2D", new_nz2d<false>},
+        {"NZ3D", new_nz3d<false>},
         {"US2D", new_us2d<false, false>},
         {"US3D", new_us3d<false, false>},
         {"US2DC", new_us2d<true, false>},
         {"US3DC", new_us3d<true, false>},
-        // adjusted variants, optimized against the AISC section properties
+        // adjusted variants
+        {"EU2DA", new_eu2d<true>},
+        {"EU3DA", new_eu3d<true>},
+        {"NZ2DA", new_nz2d<true>},
+        {"NZ3DA", new_nz3d<true>},
         {"US2DA", new_us2d<false, true>},
         {"US3DA", new_us3d<false, true>},
         {"US2DAC", new_us2d<true, true>},
@@ -4824,7 +4891,7 @@ int create_new_section(const shared_ptr<DomainBase>& domain, std::istringstream&
 
     // code-based sections take an additional designation before the tag
     std::string designation;
-    if(is_equal_any(section_id, "EU2D", "EU3D", "EU2DA", "EU3DA", "NZ2D", "NZ3D", "US2D", "US3D", "US2DC", "US3DC", "US2DA", "US3DA", "US2DAC", "US3DAC") && !get_input(command, designation)) {
+    if(is_equal_any(section_id, "EU2D", "EU3D", "EU2DA", "EU3DA", "NZ2D", "NZ3D", "NZ2DA", "NZ3DA", "US2D", "US3D", "US2DC", "US3DC", "US2DA", "US3DA", "US2DAC", "US3DAC") && !get_input(command, designation)) {
         suanpan_error("A valid designation is required.\n");
         return SUANPAN_SUCCESS;
     }
