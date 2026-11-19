@@ -811,6 +811,105 @@ namespace {
         return registry.fetch(type);
     }
 
+    // Adjusted registry: dimensions optimized against the EN 10365:2017
+    // tabulated section properties with eu_registry_generator.py.
+    vec euisection_adjusted(const std::string_view type) {
+        static const TokenRegistry<vec> registry{
+            {"HEA100", {97.691, 8.568, 97.691, 8.568, 79.6896, 5.5}},
+            {"HEA120", {117.9505, 8.4099, 117.9505, 8.4099, 98.1606, 5.5}},
+            {"HEA140", {138.417, 8.7843, 138.417, 8.7843, 116.4839, 6.05}},
+            {"HEA160", {157.1275, 9.4804, 157.1275, 9.4804, 134.385, 6.6}},
+            {"HEA180", {177.4459, 9.8953, 177.4459, 9.8953, 152.5743, 6.6}},
+            {"HEA200", {196.3389, 10.5449, 196.3389, 10.5449, 170.7469, 7.15}},
+            {"HEA220", {217.0883, 11.4293, 217.0883, 11.4293, 189.0169, 7.7}},
+            {"HEA240", {235.8553, 12.612, 235.8553, 12.612, 206.9081, 8.25}},
+            {"HEA260", {254.1675, 13.3329, 254.1675, 13.3329, 225.7152, 8.25}},
+            {"HEA280", {274.7888, 13.7119, 274.7888, 13.7119, 245.0676, 8.8}},
+            {"HEA300", {293.5974, 14.8848, 293.5974, 14.8848, 263.0602, 9.35}},
+            {"HEA320", {294.5305, 16.3334, 294.5305, 16.3334, 280.2272, 9.9}},
+            {"HEA340", {295.327, 17.2591, 295.327, 17.2591, 298.5394, 10.45}},
+            {"HEA360", {296.03, 18.1865, 296.03, 18.1865, 316.8691, 11}},
+            {"HEA400", {297.272, 19.5197, 297.272, 19.5197, 354.6969, 12.1}},
+            {"HEA450", {298.3663, 21.354, 298.3663, 21.354, 401.5175, 12.65}},
+            {"HEA500", {298.4433, 23.3776, 298.4433, 23.3776, 447.4821, 13.0017}},
+            {"HEA550", {298.5961, 24.3522, 298.5961, 24.3522, 495.7862, 13.432}},
+            {"HEA600", {298.5439, 25.3765, 298.5439, 25.3765, 543.9308, 13.8233}},
+            {"HEA650", {298.553, 26.3841, 298.553, 26.3841, 592.2004, 14.2303}},
+            {"HEA700", {298.7392, 27.3603, 298.7392, 27.3603, 640.3927, 15.1855}},
+            {"HEA800", {298.5747, 28.4297, 298.5747, 28.4297, 740.0272, 15.7171}},
+            {"HEA900", {298.769, 30.4044, 298.769, 30.4044, 836.5271, 16.6276}},
+            {"HEA1000", {298.4732, 31.4976, 298.4732, 31.4976, 934.3554, 17.0193}},
+            {"HEB100", {98.3149, 10.5214, 98.3149, 10.5214, 79.6808, 6.6}},
+            {"HEB120", {118.723, 11.353, 118.723, 11.353, 98.0659, 7.15}},
+            {"HEB140", {139.0868, 12.2349, 139.0868, 12.2349, 116.3071, 7.7}},
+            {"HEB160", {158.368, 13.3974, 158.368, 13.3974, 134.2476, 8.8}},
+            {"HEB180", {178.8755, 14.2625, 178.8755, 14.2625, 152.5877, 9.35}},
+            {"HEB200", {198.0148, 15.441, 198.0148, 15.441, 170.4936, 9.9}},
+            {"HEB220", {218.5923, 16.3049, 218.5923, 16.3049, 188.8673, 10.45}},
+            {"HEB240", {237.6463, 17.4952, 237.6463, 17.4952, 206.7062, 11}},
+            {"HEB260", {256.5056, 18.1978, 256.5056, 18.1978, 225.6217, 11}},
+            {"HEB280", {276.93, 18.583, 276.93, 18.583, 244.8957, 11.55}},
+            {"HEB300", {295.8913, 19.7685, 295.8913, 19.7685, 262.8302, 12.1}},
+            {"HEB320", {296.6303, 21.183, 296.6303, 21.183, 280.1067, 12.65}},
+            {"HEB340", {297.1553, 22.1076, 297.1553, 22.1076, 298.4484, 13.2}},
+            {"HEB360", {297.7069, 23.0123, 297.7069, 23.0123, 316.8539, 13.75}},
+            {"HEB400", {298.5746, 24.3565, 298.5746, 24.3565, 354.53, 14.8271}},
+            {"HEB450", {298.5356, 26.3925, 298.5356, 26.3925, 400.5413, 15.1335}},
+            {"HEB500", {298.5444, 28.4145, 298.5444, 28.4145, 446.669, 15.4803}},
+            {"HEB550", {298.9226, 29.3338, 298.9226, 29.3338, 495.1858, 15.9425}},
+            {"HEB600", {298.862, 30.3568, 298.862, 30.3568, 543.2262, 16.3409}},
+            {"HEB650", {298.8843, 31.3538, 298.8843, 31.3538, 591.5389, 16.7531}},
+            {"HEB700", {298.9326, 32.3589, 298.9326, 32.3589, 639.6524, 17.6892}},
+            {"HEB800", {298.6181, 33.4794, 298.6181, 33.4794, 738.823, 18.2072}},
+            {"HEB900", {298.9461, 35.4115, 298.9461, 35.4115, 835.4178, 19.1301}},
+            {"HEB1000", {298.8989, 36.4395, 298.8989, 36.4395, 933.7528, 19.5424}},
+            {"IPE80", {45.7955, 5.2815, 45.7955, 5.2815, 70.1448, 3.9639}},
+            {"IPE100", {53.9583, 6.0481, 53.9583, 6.0481, 88.6381, 4.2675}},
+            {"IPE120", {63.5475, 6.4532, 63.5475, 6.4532, 108.1512, 4.6318}},
+            {"IPE140", {72.3342, 7.097, 72.3342, 7.097, 126.636, 4.8523}},
+            {"IPE160", {81.3965, 7.5744, 81.3965, 7.5744, 146.4131, 5.3257}},
+            {"IPE180", {90.6581, 8.112, 90.6581, 8.112, 165.4307, 5.5649}},
+            {"IPE200", {98.8244, 8.801, 98.8244, 8.801, 184.7715, 6.0364}},
+            {"IPE220", {109.3756, 9.3775, 109.3756, 9.3775, 203.6655, 6.3416}},
+            {"IPE240", {118.9326, 10.1011, 118.9326, 10.1011, 223.2791, 6.7843}},
+            {"IPE270", {133.8222, 10.4908, 133.8222, 10.4908, 252.375, 7.0887}},
+            {"IPE300", {149.394, 10.8456, 149.394, 10.8456, 281.9668, 7.6118}},
+            {"IPE330", {158.1958, 11.9168, 158.1958, 11.9168, 310.2552, 8.0501}},
+            {"IPE360", {168.7851, 12.9867, 168.7851, 12.9867, 338.3886, 8.5571}},
+            {"IPE400", {178.4041, 13.8935, 178.4041, 13.8935, 377.6917, 9.2802}},
+            {"IPE450", {188.8299, 14.8964, 188.8299, 14.8964, 426.0294, 10.0199}},
+            {"IPE500", {198.6215, 16.3589, 198.6215, 16.3589, 472.5746, 10.7171}},
+            {"IPE550", {208.0608, 17.7206, 208.0608, 17.7206, 520.8236, 11.6783}},
+            {"IPE600", {218.3108, 19.4718, 218.3108, 19.4718, 567.0712, 12.5455}},
+            {"HEM100", {105.5019, 20.3133, 105.5019, 20.3133, 79.8257, 12.9802}},
+            {"HEM120", {125.6042, 21.2127, 125.6042, 21.2127, 98.0436, 13.4019}},
+            {"HEM140", {145.6138, 22.1756, 145.6138, 22.1756, 116.095, 13.8232}},
+            {"HEM160", {165.4564, 23.2411, 165.4564, 23.2411, 134.1825, 15.0849}},
+            {"HEM180", {185.5054, 24.1978, 185.5054, 24.1978, 152.2794, 15.4807}},
+            {"HEM200", {205.2962, 25.2657, 205.2962, 25.2657, 170.3865, 16.2204}},
+            {"HEM220", {225.3201, 26.242, 225.3201, 26.242, 188.4152, 16.5708}},
+            {"HEM240", {247.2405, 32.3065, 247.2405, 32.3065, 206.4009, 19.3584}},
+            {"HEM260", {267.1516, 32.8245, 267.1516, 32.8245, 225.7206, 19.6576}},
+            {"HEM280", {286.9407, 33.3683, 286.9407, 33.3683, 244.5611, 19.9738}},
+            {"HEM300", {308.9561, 39.4015, 308.9561, 39.4015, 262.6004, 22.7783}},
+            {"HEM320", {307.9445, 40.4264, 307.9445, 40.4264, 279.5918, 22.6043}},
+            {"HEM340", {307.9217, 40.4327, 307.9217, 40.4327, 297.682, 22.5018}},
+            {"HEM360", {307.0607, 40.3775, 307.0607, 40.3775, 315.9547, 22.4766}},
+            {"HEM400", {306.119, 40.3686, 306.119, 40.3686, 353.1491, 22.3274}},
+            {"HEM450", {306.0943, 40.373, 306.0943, 40.373, 399.4615, 22.1385}},
+            {"HEM500", {304.9735, 40.4116, 304.9735, 40.4116, 445.5218, 21.9985}},
+            {"HEM550", {305.1661, 40.3487, 305.1661, 40.3487, 494.046, 21.9296}},
+            {"HEM600", {304.2427, 40.3259, 304.2427, 40.3259, 542.3115, 21.8577}},
+            {"HEM650", {304.0394, 40.4015, 304.0394, 40.4015, 590.3673, 21.7198}},
+            {"HEM700", {303.0963, 40.3841, 303.0963, 40.3841, 638.6716, 21.6711}},
+            {"HEM800", {301.9789, 40.4432, 301.9789, 40.4432, 737.9423, 21.7248}},
+            {"HEM900", {300.8195, 40.5028, 300.8195, 40.5028, 834.1924, 21.5979}},
+            {"HEM1000", {300.8277, 40.5054, 300.8277, 40.5054, 932.7207, 21.525}},
+        };
+
+        return registry.fetch(type);
+    }
+
     vec nzchsection(const std::string_view type) {
         static const TokenRegistry<vec> registry{
             {"610.0X12.7CHS", {305.00, 12.7}},
@@ -3937,7 +4036,7 @@ namespace {
         return registry.fetch(type);
     }
 
-    void new_eu2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
+    template<bool adjusted> void new_eu2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
         unsigned material_id;
         if(!get_input(command, material_id)) {
             suanpan_error("A valid material tag is required.\n");
@@ -3962,7 +4061,7 @@ namespace {
             return;
         }
 
-        const auto dim = euisection(type);
+        const auto dim = adjusted ? euisection_adjusted(type) : euisection(type);
 
         if(dim.is_empty()) {
             suanpan_error("Cannot identify section type.\n");
@@ -3972,7 +4071,7 @@ namespace {
         return_obj = std::make_unique<ISection2D>(tag, scale * dim, material_id, int_pt, eccentricity);
     }
 
-    void new_eu3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
+    template<bool adjusted> void new_eu3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
         unsigned material_id;
         if(!get_input(command, material_id)) {
             suanpan_error("A valid material tag is required.\n");
@@ -4003,7 +4102,7 @@ namespace {
             return;
         }
 
-        const auto dim = euisection(type);
+        const auto dim = adjusted ? euisection_adjusted(type) : euisection(type);
 
         if(dim.is_empty()) {
             suanpan_error("Cannot identify section type.\n");
@@ -4139,7 +4238,7 @@ namespace {
         suanpan_error("Cannot identify section type.\n");
     }
 
-    template<bool recenter, bool adjusted = false> void new_us2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
+    template<bool recenter, bool adjusted> void new_us2d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
         unsigned material_id;
         if(!get_input(command, material_id)) {
             suanpan_error("A valid material tag is required.\n");
@@ -4196,7 +4295,7 @@ namespace {
         suanpan_error("Cannot identify section type.\n");
     }
 
-    template<bool recenter, bool adjusted = false> void new_us3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
+    template<bool recenter, bool adjusted> void new_us3d(unique_ptr<Section>& return_obj, std::istringstream& command, const unsigned tag, const std::string& type) {
         unsigned material_id;
         if(!get_input(command, material_id)) {
             suanpan_error("A valid material tag is required.\n");
@@ -4299,14 +4398,17 @@ int create_new_section(const shared_ptr<DomainBase>& domain, std::istringstream&
         {"NM3D3", new_nm3d<13>},
         {"NM2D3K", new_nmk<13>},
         {"NM3D3K", new_nmk<17>},
-        {"EU2D", new_eu2d},
-        {"EU3D", new_eu3d},
+        {"EU2D", new_eu2d<false>},
+        {"EU3D", new_eu3d<false>},
         {"NZ2D", new_nz2d},
         {"NZ3D", new_nz3d},
-        {"US2D", new_us2d<false>},
-        {"US3D", new_us3d<false>},
-        {"US2DC", new_us2d<true>},
-        {"US3DC", new_us3d<true>},
+        // adjusted variants, optimized against the EN 10365 section properties
+        {"EU2DA", new_eu2d<true>},
+        {"EU3DA", new_eu3d<true>},
+        {"US2D", new_us2d<false, false>},
+        {"US3D", new_us3d<false, false>},
+        {"US2DC", new_us2d<true, false>},
+        {"US3DC", new_us3d<true, false>},
         // adjusted variants, optimized against the AISC section properties
         {"US2DA", new_us2d<false, true>},
         {"US3DA", new_us3d<false, true>},
@@ -4322,7 +4424,7 @@ int create_new_section(const shared_ptr<DomainBase>& domain, std::istringstream&
 
     // code-based sections take an additional designation before the tag
     std::string designation;
-    if(is_equal_any(section_id, "EU2D", "EU3D", "NZ2D", "NZ3D", "US2D", "US3D", "US2DC", "US3DC", "US2DA", "US3DA", "US2DAC", "US3DAC") && !get_input(command, designation)) {
+    if(is_equal_any(section_id, "EU2D", "EU3D", "EU2DA", "EU3DA", "NZ2D", "NZ3D", "US2D", "US3D", "US2DC", "US3DC", "US2DA", "US3DA", "US2DAC", "US3DAC") && !get_input(command, designation)) {
         suanpan_error("A valid designation is required.\n");
         return SUANPAN_SUCCESS;
     }
