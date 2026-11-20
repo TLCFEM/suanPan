@@ -39,7 +39,6 @@ class DuncanSelig final : public Material2D {
     static constexpr double min_degradation = .1;
 
     static double dev(const vec&);
-    static mat compute_stiffness(double, double);
 
     double p_atm = 14.7;
     double ref_elastic = 400. * p_atm, n = .6;
@@ -54,6 +53,7 @@ class DuncanSelig final : public Material2D {
     [[nodiscard]] ds_tuple compute_principal_stress(const vec&) const;
     [[nodiscard]] ds_tuple compute_elastic_moduli(const vec&) const;
     [[nodiscard]] ds_tuple compute_plastic_moduli(const vec&) const;
+    [[nodiscard]] mat compute_stiffness(const vec&);
 
     template<bool plastic> [[nodiscard]] auto compute_moduli(const vec& t_stress) const {
         if constexpr(plastic) return compute_plastic_moduli(t_stress);

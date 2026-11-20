@@ -22,17 +22,6 @@
 
 double DuncanSelig::dev(const vec& t_stress) { /* omits the 0.5 that is moved to other places */ return std::hypot(t_stress(0) - t_stress(1), 2. * t_stress(2)); }
 
-mat DuncanSelig::compute_stiffness(const double elastic, const double bulk) {
-    mat stiffness(3, 3, fill::zeros);
-
-    stiffness(0, 0) = stiffness(1, 1) = 3. * bulk + elastic;
-    stiffness(1, 0) = stiffness(0, 1) = 3. * bulk - elastic;
-    stiffness(2, 2) = elastic;
-    stiffness *= 3. * bulk / (9. * bulk - elastic);
-
-    return stiffness;
-}
-
 std::tuple<double, double> DuncanSelig::compute_modulus(const double ps, const double ref_modulus, const double order) const {
     const auto fraction = ps / p_atm;
     if(fraction <= min_ratio) return {ref_modulus * std::pow(min_ratio, order), 0.};
@@ -142,6 +131,19 @@ DuncanSelig::ds_tuple DuncanSelig::compute_plastic_moduli(const vec& t_stress) c
     return {elastic, bulk, deds, dkds};
 }
 
+mat DuncanSelig::compute_stiffness(const vec& t_stress) {
+    const auto [elastic, bulk, deds, dkds] = compute_elastic_moduli(t_stress);
+
+    mat stiffness(3, 3, fill::zeros);
+
+    stiffness(0, 0) = stiffness(1, 1) = 3. * bulk + elastic;
+    stiffness(1, 0) = stiffness(0, 1) = 3. * bulk - elastic;
+    stiffness(2, 2) = elastic;
+    stiffness *= 3. * bulk / (9. * bulk - elastic);
+
+    return stiffness;
+}
+
 DuncanSelig::DuncanSelig(const unsigned T, const vec& P, const double R)
     : Material2D(T, PlaneType::E, R)
     , p_atm(P(0))
@@ -155,9 +157,7 @@ DuncanSelig::DuncanSelig(const unsigned T, const vec& P, const double R)
     , cohesion(P(8)) { access::rw(tolerance) = 1E-13; }
 
 int DuncanSelig::initialize(const shared_ptr<DomainBase>&) {
-    const auto [elastic, bulk, deds, dkds] = compute_elastic_moduli(vec{3, fill::zeros});
-
-    trial_stiffness = current_stiffness = initial_stiffness = compute_stiffness(elastic, bulk);
+    trial_stiffness = current_stiffness = initial_stiffness = compute_stiffness(vec{3, fill::zeros});
 
     initialize_history(1);
 
@@ -172,7 +172,7 @@ int DuncanSelig::update_trial_status(const vec& t_strain) {
     if(norm(incre_strain) <= datum::eps) return SUANPAN_SUCCESS;
 
     trial_history = current_history;
-    trial_stress = current_stress;
+    trial_stress = current_stress + compute_stiffness(current_stress) * incre_strain;
 
     // first assume elastic loading/unloading
     if(SUANPAN_SUCCESS != local_update<false>()) return SUANPAN_FAIL;

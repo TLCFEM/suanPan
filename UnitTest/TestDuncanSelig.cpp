@@ -162,6 +162,14 @@ TEST_CASE("DuncanSelig Consistent Tangent", "[Material.DuncanSelig]") {
 TEST_CASE("DuncanSelig Robustness", "[Material.DuncanSelig]") {
     SECTION("Large Compression") { require_finite_path(make_confined(), vec{-1E-2, -1E-2, 0.}, 10u); }
     SECTION("Large Shear") { require_finite_response(make_confined(), vec{0., 0., 1E-2}); }
+    SECTION("Large Lateral Compression") {
+        // low confinement makes the moduli highly stress dependent, the local iteration must not stall
+        const auto material = make_model();
+        REQUIRE(SUANPAN_SUCCESS == material->update_trial_status(vec{-9.5E-3, -1.E-4, 0.}));
+        REQUIRE(material->get_trial_stress().is_finite());
+        REQUIRE(material->get_trial_stiffness().is_finite());
+        REQUIRE(material->get_trial_stress()(0) < -50.);
+    }
     SECTION("Large Tension") { require_finite_response(make_confined(), vec{1E-2, 1E-2, 0.}); }
     SECTION("Mixed") { require_finite_response(make_confined(), vec{-1E-2, 1E-2, 1E-2}); }
     SECTION("Neutral Loading") {
