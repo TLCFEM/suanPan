@@ -345,18 +345,18 @@ Additional libraries used in **suanPan** are listed below.
 
 - [**AMD Optimizing CPU Libraries (AOCL)**](https://www.amd.com/en/developer/aocl.html) version 5.3
 - [**ARPACK**](https://github.com/opencollab/arpack-ng)
-- [**Armadillo**](http://arma.sourceforge.net/) version 15.6.2
+- [**Armadillo**](http://arma.sourceforge.net/) version 15.8.0
 - [**CUDA**](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/) version 12.9
 - [**Catch2**](https://github.com/catchorg/Catch2) version 3.16.1
 - [**FEAST**](http://www.feast-solver.org/) version 4.0
 - [**HDF5**](https://www.hdfgroup.org/solutions/hdf5/) version 2.2.0
-- [**MAGMA**](https://icl.utk.edu/magma/) version 2.9.0
+- [**MAGMA**](https://icl.utk.edu/magma/) version 2.10.0
 - [**OpenBLAS**](https://github.com/xianyi/OpenBLAS) version 0.3.34
 - [**SPIKE**](http://www.spike-solver.org/) version 1.0
 - [**SuperLU MT**](https://portal.nersc.gov/project/sparse/superlu/) version 4.0.0
 - [**SuperLU**](https://portal.nersc.gov/project/sparse/superlu/) version 7.0.1
 - [**TBB** Threading Building Blocks](https://github.com/oneapi-src/oneTBB) version 2023.1.0
-- [**VTK**](https://vtk.org/) version 9.7.1
+- [**VTK**](https://vtk.org/) version 9.7.2
 - [**argparse**](https://github.com/p-ranav/argparse)
 - [**cpp-linenoise**](https://github.com/yhirose/cpp-linenoise)
 - [**exprtk**](https://github.com/ArashPartow/exprtk) version 0.0.3
