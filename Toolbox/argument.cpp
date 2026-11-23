@@ -19,6 +19,7 @@
 
 #include <Include/whereami/whereami.h>
 #include <Step/Bead.h>
+#include <Toolbox/async_print.h>
 #include <Toolbox/command.h>
 #include <Toolbox/revision.h>
 #include <Toolbox/utility.h>
@@ -264,12 +265,22 @@ void argument_parser(const int argc, char** argv) {
         print_header();
         const auto model = std::make_shared<Bead>();
         if(file_in.empty()) cli_mode(model);
-        else if(process_file(model, file_in.c_str()) != SUANPAN_EXIT) {
-            if(output_file.is_open()) {
-                SUANPAN_COUT.rdbuf(buffer_backup);
-                print_header();
+        else {
+            // Batch analysis prints heavily, offload the screen writes to the
+            // print worker. The guard flushes everything before the stream
+            // buffer is restored and before the interactive CLI starts.
+            int code = SUANPAN_SUCCESS;
+            {
+                const suanpan::AsyncPrintGuard guard;
+                code = process_file(model, file_in.c_str());
             }
-            cli_mode(model);
+            if(code != SUANPAN_EXIT) {
+                if(output_file.is_open()) {
+                    SUANPAN_COUT.rdbuf(buffer_backup);
+                    print_header();
+                }
+                cli_mode(model);
+            }
         }
     }
     else {

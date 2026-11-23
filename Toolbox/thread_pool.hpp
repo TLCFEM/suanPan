@@ -43,8 +43,6 @@ class [[nodiscard]] thread_pool {
 
     std::unique_ptr<std::thread[]> threads = nullptr;
 
-    std::atomic<bool> waiting = false;
-
     void create_threads() {
         running = true;
         for(concurrency_t i = 0; i < thread_count; ++i) threads[i] = std::thread(&thread_pool::worker, this);
@@ -64,18 +62,28 @@ class [[nodiscard]] thread_pool {
 
     void worker() {
         while(running) {
-            std::unique_lock tasks_lock(tasks_mutex);
-            task_available_cv.wait(tasks_lock, [this] { return !tasks.empty() || !running; });
-            if(running) {
-                std::function<void()> task;
+            std::function<void()> task;
+            {
+                std::unique_lock tasks_lock(tasks_mutex);
+                task_available_cv.wait(tasks_lock, [this] { return !tasks.empty() || !running; });
+                if(!running) break;
                 task = std::move(tasks.front());
                 tasks.pop();
-                tasks_lock.unlock();
-                task();
-                tasks_lock.lock();
-                --tasks_total;
-                if(waiting) task_done_cv.notify_one();
             }
+
+            // A throwing task must not terminate the worker, otherwise tasks
+            // would remain queued forever and wait_for_tasks() would hang.
+            try {
+                task();
+            }
+            catch(...) {
+            }
+
+            {
+                const std::scoped_lock tasks_lock(tasks_mutex);
+                --tasks_total;
+            }
+            task_done_cv.notify_all();
         }
     }
 
@@ -142,11 +150,8 @@ public:
     }
 
     void wait_for_tasks() {
-        if(waiting) return;
-        waiting = true;
         std::unique_lock tasks_lock(tasks_mutex);
-        task_done_cv.wait(tasks_lock, [this] { return (tasks_total == 0); });
-        waiting = false;
+        task_done_cv.wait(tasks_lock, [this] { return 0 == tasks_total; });
     }
 };
 

@@ -1,4 +1,5 @@
 target_sources(${PROJECT_NAME} PRIVATE
+        TestAsyncPrint.cpp
         TestColoring.cpp
         TestColor.cpp
         TestContainer.cpp

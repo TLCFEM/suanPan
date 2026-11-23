@@ -1,5 +1,6 @@
 target_sources(${PROJECT_NAME} PRIVATE
         argument.cpp
+        async_print.cpp
         command.cpp
         Expression.cpp
         ExpressionParser.cpp
