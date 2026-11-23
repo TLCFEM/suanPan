@@ -53,7 +53,7 @@ namespace suanpan {
      * @brief Disable asynchronous printing.
      *
      * All messages queued so far are drained before this function returns.
-     * Any message submitted afterwards is written synchronously again.
+     * Any message submitted afterward is written synchronously again.
      */
     void disable_async_print();
 
@@ -80,12 +80,9 @@ namespace suanpan {
     class AsyncPrintGuard final {
     public:
         AsyncPrintGuard();
-
-        ~AsyncPrintGuard();
-
         AsyncPrintGuard(const AsyncPrintGuard&) = delete;
-
         AsyncPrintGuard& operator=(const AsyncPrintGuard&) = delete;
+        ~AsyncPrintGuard();
     };
 } // namespace suanpan
 

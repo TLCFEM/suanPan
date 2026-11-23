@@ -28,57 +28,48 @@
 #include "async_print.h"
 
 #include <Toolbox/thread_pool.hpp>
-#include <atomic>
-#include <mutex>
-#include <ostream>
-#include <string>
 #include <suanPan.h>
 
 namespace {
-    std::atomic<bool> async_enabled{false};
+    std::atomic async_enabled{false};
+    std::mutex print_mutex;
 
     thread_pool& get_print_pool() {
-        // Constructed on first use, destroyed before std::cout at exit.
         static thread_pool pool(1);
         return pool;
     }
 } // namespace
 
-void suanpan::print_message(const std::string& message, std::ostream& stream) {
-    // Serialise producers so that the queue order matches the call order.
-    const std::scoped_lock lock(print_mutex);
+namespace suanpan {
+    void print_message(const std::string& message, std::ostream& stream) {
+        const std::scoped_lock lock(print_mutex);
 
-    if(async_enabled.load(std::memory_order_relaxed)) {
-        // Exactly one worker consumes the FIFO queue, preserving message order.
-        // The pool isolates the worker from throwing tasks.
-        get_print_pool().push_task([&stream, message] { stream << message; });
+        if(async_enabled.load(std::memory_order_relaxed)) get_print_pool().push_task([&stream, message] { stream << message; });
+        else stream << message;
     }
-    else {
-        stream << message;
+
+    void enable_async_print() {
+        const std::scoped_lock lock(print_mutex);
+        if(async_enabled.exchange(true)) return;
+        get_print_pool();
     }
-}
 
-void suanpan::enable_async_print() {
-    const std::scoped_lock lock(print_mutex);
-    if(async_enabled.exchange(true)) return;
-    get_print_pool();
-}
+    void disable_async_print() {
+        const std::scoped_lock lock(print_mutex);
+        if(!async_enabled.exchange(false)) return;
+        get_print_pool().wait_for_tasks();
+    }
 
-void suanpan::disable_async_print() {
-    const std::scoped_lock lock(print_mutex);
-    if(!async_enabled.exchange(false)) return;
-    get_print_pool().wait_for_tasks();
-}
+    void flush_print() {
+        const std::scoped_lock lock(print_mutex);
+        if(async_enabled.load(std::memory_order_relaxed)) get_print_pool().wait_for_tasks();
+    }
 
-void suanpan::flush_print() {
-    const std::scoped_lock lock(print_mutex);
-    if(async_enabled.load(std::memory_order_relaxed)) get_print_pool().wait_for_tasks();
-}
+    bool is_async_print_enabled() { return async_enabled.load(std::memory_order_relaxed); }
 
-bool suanpan::is_async_print_enabled() { return async_enabled.load(std::memory_order_relaxed); }
+    AsyncPrintGuard::AsyncPrintGuard() { enable_async_print(); }
 
-suanpan::AsyncPrintGuard::AsyncPrintGuard() { enable_async_print(); }
-
-suanpan::AsyncPrintGuard::~AsyncPrintGuard() { disable_async_print(); }
+    AsyncPrintGuard::~AsyncPrintGuard() { disable_async_print(); }
+} // namespace suanpan
 
 //! @}

@@ -192,7 +192,6 @@ constexpr auto SUANPAN_FAIL = -1;
 #endif
 
 #include <iostream>
-#include <ostream>
 #include <string>
 inline auto& SUANPAN_COUT = std::cout;
 inline auto& SUANPAN_CWRN = std::cout;
@@ -261,11 +260,8 @@ inline void barrier() {
 }
 
 #include <fmt/color.h>
-#include <mutex>
 
 namespace suanpan {
-    inline std::mutex print_mutex;
-
 #ifdef SUANPAN_DLL
     SUANPAN_IMPORT void print_message(const std::string& message, std::ostream& stream);
 #else
@@ -276,8 +272,7 @@ namespace suanpan {
         std::string pattern;
 
         // ReSharper disable once CppIfCanBeReplacedByConstexprIf
-        // ReSharper disable once CppDFAConstantConditions
-        // ReSharper disable once CppDFAUnreachableCode
+        // ReSharper disable once CppUnreachableCode
         if(comm_size > 1) pattern.append(fmt::format("[P{}] ", comm_rank));
 
         const auto pos = file_path.find_last_of("/\\");
@@ -386,7 +381,7 @@ namespace suanpan {
         return a;
     }
 
-    template<typename T1> [[nodiscard]] typename enable_if2<is_arma_type<T1>::value, typename T1::pod_type>::result inf_norm(const T1& X) { return arma::norm(X, "inf"); }
+    template<typename T1> [[nodiscard]] enable_if2<is_arma_type<T1>::value, typename T1::pod_type>::result inf_norm(const T1& X) { return arma::norm(X, "inf"); }
 } // namespace suanpan
 
 #endif

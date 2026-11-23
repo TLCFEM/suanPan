@@ -1,9 +1,5 @@
 # Changelog
 
-## unreleased
-
-1. offload screen printing to a dedicated worker thread during batch (non-CLI) analysis, preserving output order
-
 ## known issues
 
 1. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
