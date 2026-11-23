@@ -32,6 +32,10 @@
 
 namespace {
     std::atomic async_enabled{false};
+
+    // Only the synchronous (CLI) write path needs this lock: it writes on the
+    // calling thread, so concurrent callers have to be serialised. The async
+    // path is serialised by the print pool itself (single worker + FIFO queue).
     std::mutex print_mutex;
 
     thread_pool& get_print_pool() {
@@ -42,26 +46,24 @@ namespace {
 
 namespace suanpan {
     void print_message(const std::string& message, std::ostream& stream) {
-        const std::scoped_lock lock(print_mutex);
-
         if(async_enabled.load(std::memory_order_relaxed)) get_print_pool().push_task([&stream, message] { stream << message; });
-        else stream << message;
+        else {
+            const std::scoped_lock lock(print_mutex);
+            stream << message;
+        }
     }
 
     void enable_async_print() {
-        const std::scoped_lock lock(print_mutex);
         if(async_enabled.exchange(true)) return;
         get_print_pool();
     }
 
     void disable_async_print() {
-        const std::scoped_lock lock(print_mutex);
         if(!async_enabled.exchange(false)) return;
         get_print_pool().wait_for_tasks();
     }
 
     void flush_print() {
-        const std::scoped_lock lock(print_mutex);
         if(async_enabled.load(std::memory_order_relaxed)) get_print_pool().wait_for_tasks();
     }
 

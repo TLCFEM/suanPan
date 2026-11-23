@@ -22,12 +22,15 @@
  * suanPan.h formats a message on the calling thread and hands it to
  * suanpan::print_message(). When asynchronous printing is enabled, the actual
  * write is performed by a single dedicated worker thread instead of blocking
- * the caller. A single worker consumes a FIFO queue, thus messages appear in
- * submission order.
+ * the caller. The pool serialises enqueueing with its own mutex and has a single
+ * worker consuming a FIFO queue, so asynchronous writes need no additional
+ * locking and messages appear in submission order.
  *
  * Asynchronous printing is intended for non-interactive (batch) runs only. In
  * CLI mode the prompt must be written before the next line is read, so printing
- * stays synchronous there.
+ * stays synchronous there. Synchronous writes happen on the calling thread and
+ * are serialised by a local mutex so that concurrent callers cannot interleave
+ * their output.
  *
  * @author tlc
  * @date 23/11/2026
@@ -44,8 +47,8 @@ namespace suanpan {
      * @brief Enable asynchronous printing.
      *
      * Subsequent messages are queued for the print worker. This function is
-     * idempotent and shares suanpan::print_mutex with the logging helpers so
-     * that enqueueing and mode switches cannot interleave.
+     * idempotent; the mode flag is atomic and the print pool is constructed on
+     * first use in a thread-safe manner, so no extra synchronisation is needed.
      */
     void enable_async_print();
 
