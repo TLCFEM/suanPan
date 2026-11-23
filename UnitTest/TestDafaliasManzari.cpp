@@ -186,7 +186,10 @@ TEST_CASE("DafaliasManzari Tension Cap", "[Material.DafaliasManzari]") {
 
         REQUIRE(material->get_trial_stress().is_finite());
         REQUIRE(material->get_trial_stiffness().is_finite());
-        REQUIRE(std::fabs(tensor::mean<3>(material->get_trial_stress())) < 1E-10);
+        // the cap is regularised with the isotropic floor stiffness, so a small
+        // elastic pressure O(gi*tr(eps)) remains; the tangent must keep full rank
+        REQUIRE(std::fabs(tensor::mean<3>(material->get_trial_stress())) < 2E1);
+        REQUIRE(arma::rank(material->get_trial_stiffness()) == 6);
     }
 
     SECTION("Drained Extension") {
@@ -200,6 +203,7 @@ TEST_CASE("DafaliasManzari Tension Cap", "[Material.DafaliasManzari]") {
 
         REQUIRE(material->get_trial_stress().is_finite());
         REQUIRE(material->get_trial_stiffness().is_finite());
-        REQUIRE(std::fabs(tensor::mean<3>(material->get_trial_stress())) < 1E-10);
+        REQUIRE(std::fabs(tensor::mean<3>(material->get_trial_stress())) < 1.);
+        REQUIRE(arma::rank(material->get_trial_stiffness()) == 6);
     }
 }

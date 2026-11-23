@@ -120,13 +120,9 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
         s -= incre(sb);
     }
 
-    // the yield surface is only defined for p<0 (compression)
-    // a tensile trial pressure means the sand loses all confinement, cap it at zero and
-    // keep the deviatoric response, which already uses the pressure-independent floor modulus gi
-    // a small tolerance is used as the cap is also approached at p=0 from below
     if(p > -std::fabs(pc) * tolerance) {
-        trial_stress = s;
-        trial_stiffness = 2. * gi * unit_dev_tensor;
+        trial_stress = s + p * tensor::unit_tensor2;
+        trial_stiffness = initial_stiffness;
 
         return SUANPAN_SUCCESS;
     }
@@ -166,8 +162,8 @@ int DafaliasManzari::update_trial_status(const vec& t_strain) {
         if(trial_p <= -1E-2 * std::fabs(pc)) return false;
 
         trial_history = current_history;
-        trial_stress = trial_s;
-        trial_stiffness = 2. * gi * unit_dev_tensor;
+        trial_stress = trial_s + trial_p * tensor::unit_tensor2;
+        trial_stiffness = initial_stiffness;
 
         return true;
     };
