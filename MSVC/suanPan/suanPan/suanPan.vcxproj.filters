@@ -1627,6 +1627,9 @@
     <ClCompile Include="..\..\..\UnitTest\TestDuncanSelig.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\async_print.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Constraint\Criterion\Criterion.h">
@@ -3012,6 +3015,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Recorder\ModalRecorder.h">
       <Filter>Recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\async_print.h">
+      <Filter>Toolbox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
