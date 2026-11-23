@@ -17,6 +17,11 @@
 9. refactor command parsers with token registries, factory functions and centralized tag extraction, with improved error handling [#406](https://github.com/TLCFEM/suanPan/pull/406) [#407](https://github.com/TLCFEM/suanPan/pull/407) [#409](https://github.com/TLCFEM/suanPan/pull/409) [#410](https://github.com/TLCFEM/suanPan/pull/410)
 10. use an RAII wrapper for `HDF5` handling and remove the `hdf5_hl` dependency [#398](https://github.com/TLCFEM/suanPan/pull/398)
 11. update `VTK` to version `9.7.2`
+12. add asynchronous printing support with a dedicated worker thread for ordered, non-blocking output in batch runs, with an `AsyncPrintGuard` RAII helper and improved `thread_pool` thread safety [#413](https://github.com/TLCFEM/suanPan/pull/413)
+13. refactor `DuncanSelig` local iteration for modularity and stability, seed the iteration with an elastic predictor and add coverage tests [#412](https://github.com/TLCFEM/suanPan/pull/412)
+14. update `Armadillo` to version `15.8.0`
+15. add adjusted steel section registries `US2DA`, `US3DA`, `US2DAC`, `US3DAC`, `EU2DA`, `EU3DA`, `NZ2DA` and `NZ3DA`, with dimensions optimized against tabulated `AISC`, `EN 10365` and NZ properties
+16. replace manual Euclidean norm computations with `std::hypot` for improved numerical robustness
 
 ## version 4.3
 
