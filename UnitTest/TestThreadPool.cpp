@@ -109,3 +109,14 @@ TEST_CASE("Thread Pool Many Tasks", "[Utility.ThreadPool]") {
         REQUIRE(I * I == v);
     }
 }
+
+TEST_CASE("Thread Pool Survives Throwing Task", "[Utility.ThreadPool]") {
+    thread_pool pool(1);
+
+    pool.push_task([] { throw std::runtime_error("boom"); });
+    auto future = pool.submit([] { return 42; });
+
+    pool.wait_for_tasks();
+
+    REQUIRE(42 == future.get());
+}

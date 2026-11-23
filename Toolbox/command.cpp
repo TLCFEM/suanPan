@@ -55,6 +55,7 @@
 #include <Toolbox/Expression.h>
 #include <Toolbox/ExpressionParser.h>
 #include <Toolbox/argument.h>
+#include <Toolbox/async_print.h>
 #include <Toolbox/resampling.h>
 #include <Toolbox/response_spectrum.h>
 #include <Toolbox/thread_pool.hpp>
@@ -87,12 +88,13 @@ namespace {
 
         for(auto I = 1; I <= N; ++I) {
             pool.push_task([I] {
-                SUANPAN_COUT << '[';
                 const auto length = static_cast<int>(50. * I / N);
-                for(auto J = 0; J < length; ++J) SUANPAN_COUT << '=';
-                for(auto J = length; J < 50; ++J) SUANPAN_COUT << '-';
-                SUANPAN_COUT << "]\r";
-                SUANPAN_COUT.flush();
+                std::string progress{'['};
+                progress.append(length, '=');
+                progress.append(50 - length, '-');
+                progress.append("]\r");
+                suanpan::print_message(progress, SUANPAN_COUT);
+                suanpan::flush_print();
             });
             vec x = solve(A, b);
             x(randi<uvec>(1, distr_param(0, M - 1))).fill(I);
@@ -153,11 +155,13 @@ namespace {
         unique_ptr<std::stringbuf> buffer_tmp;
 
         const auto redirect = [&] {
+            suanpan::flush_print();
             buffer_backup = SUANPAN_COUT.rdbuf();
             buffer_tmp = std::make_unique<std::stringbuf>();
             SUANPAN_COUT.rdbuf(buffer_tmp.get());
         };
         const auto restore = [&] {
+            suanpan::flush_print();
             SUANPAN_COUT.rdbuf(buffer_backup);
             for(const auto I : buffer_tmp->str()) {
                 SUANPAN_COUT << I;
