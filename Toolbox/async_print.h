@@ -79,10 +79,10 @@ namespace suanpan {
      */
     class AsyncPrintGuard final {
     public:
-        AsyncPrintGuard();
+        AsyncPrintGuard() { enable_async_print(); }
         AsyncPrintGuard(const AsyncPrintGuard&) = delete;
         AsyncPrintGuard& operator=(const AsyncPrintGuard&) = delete;
-        ~AsyncPrintGuard();
+        ~AsyncPrintGuard() { disable_async_print(); }
     };
 } // namespace suanpan
 

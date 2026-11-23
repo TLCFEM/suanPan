@@ -66,10 +66,6 @@ namespace suanpan {
     }
 
     bool is_async_print_enabled() { return async_enabled.load(std::memory_order_relaxed); }
-
-    AsyncPrintGuard::AsyncPrintGuard() { enable_async_print(); }
-
-    AsyncPrintGuard::~AsyncPrintGuard() { disable_async_print(); }
 } // namespace suanpan
 
 //! @}
