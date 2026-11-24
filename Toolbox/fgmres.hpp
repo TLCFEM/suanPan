@@ -43,13 +43,6 @@
 #include <mkl_rci.h>
 #include <suanPan.h>
 
-#include <algorithm>
-#include <array>
-#include <cmath>
-#include <concepts>
-#include <cstddef>
-#include <vector>
-
 /**
  * Solve A*x = b with the oneMKL FGMRES solver, using diagonal preconditioning.
  *
@@ -65,24 +58,24 @@
  *         -5 request limit exceeded; -6 get failed;
  *         -7 iteration limit reached without convergence.
  */
-template<typename T> requires requires(const T& a, const mat& b) { { a* b } -> std::same_as<mat>; a.n_rows; }
+template<typename T> requires requires(const T& a, const mat& b) { { a * b } -> std::same_as<mat>; a.n_rows; }
 int fgmres_solve(const T& kernel, const vec& diagonal, double* left, double* right, const double tolerance, MKL_INT* itercount = nullptr) {
     const auto n = static_cast<MKL_INT>(kernel.n_rows);
     const auto r = std::min(MKL_INT{150}, n);
 
     if(n <= 0 || nullptr == left || nullptr == right || !std::isfinite(tolerance) || tolerance <= 0. || diagonal.n_elem != static_cast<uword>(n)) {
-        suanpan_error("FGMRES: invalid arguments.\n");
+        suanpan_error("Invalid arguments.\n");
         return -1;
     }
 
     for(const auto value : diagonal)
         if(0. == value || !std::isfinite(value)) {
-            suanpan_error("FGMRES: preconditioner diagonal must be finite and nonzero.\n");
+            suanpan_error("Preconditioner diagonal must be finite and nonzero.\n");
             return -1;
         }
 
     // oneMKL requires ((2*r + 1)*n + r*(r + 9)/2 + 1) double slots in tmp.
-    std::vector<double> work(static_cast<std::size_t>((2 * r + 1) * n + r * (r + 9) / 2 + 1), 0.);
+    std::vector work(static_cast<std::size_t>((2 * r + 1) * n + r * (r + 9) / 2 + 1), 0.);
     std::array<MKL_INT, 128> ipar{};
     std::array<double, 128> dpar{};
     MKL_INT info{};
@@ -90,7 +83,7 @@ int fgmres_solve(const T& kernel, const vec& diagonal, double* left, double* rig
     // Pass x and b as well: a non-null initial guess makes the call well-defined.
     dfgmres_init(&n, left, right, &info, ipar.data(), dpar.data(), work.data());
     if(0 != info) {
-        suanpan_error("FGMRES: initialization failed with code {}.\n", info);
+        suanpan_error("Initialization failed with code {}.\n", info);
         return -2;
     }
 
@@ -106,15 +99,15 @@ int fgmres_solve(const T& kernel, const vec& diagonal, double* left, double* rig
     if(0 != info) {
         // -1001/-1010/-1011 only report warnings or adjusted parameters.
         if(info < -1011) {
-            suanpan_error("FGMRES: parameter check failed with code {}.\n", info);
+            suanpan_error("Parameter check failed with code {}.\n", info);
             return -3;
         }
-        suanpan_debug("FGMRES: parameter check reported code {}.\n", info);
+        suanpan_debug("Parameter check reported code {}.\n", info);
     }
 
     const auto limit = std::max(MKL_INT{32}, 10 * ipar[4] + 32);
-    bool converged = false;
-    bool exhausted = false;
+    auto converged{false};
+    auto exhausted{false};
 
     for(MKL_INT count = 0; count < limit && !converged && !exhausted; ++count) {
         dfgmres(&n, left, right, &info, ipar.data(), dpar.data(), work.data());
@@ -123,10 +116,10 @@ int fgmres_solve(const T& kernel, const vec& diagonal, double* left, double* rig
         case 0:
             converged = true;
             break;
-        case 1: // y = A*x
+        case 1:   // y = A*x
         case 3: { // y = M^-1*x
             if(ipar[21] < 1 || ipar[22] < 1 || static_cast<std::size_t>(ipar[21] + n - 1) > work.size() || static_cast<std::size_t>(ipar[22] + n - 1) > work.size()) {
-                suanpan_error("FGMRES: invalid work offsets returned by oneMKL.\n");
+                suanpan_error("Invalid work offsets returned by oneMKL.\n");
                 return -4;
             }
             const vec xn(&work[ipar[21] - 1], static_cast<uword>(n), false, true);
@@ -134,7 +127,7 @@ int fgmres_solve(const T& kernel, const vec& diagonal, double* left, double* rig
             if(1 == info) {
                 const mat product = kernel * xn;
                 if(product.n_rows != static_cast<uword>(n) || product.n_cols != 1) {
-                    suanpan_error("FGMRES: matrix-vector product has unexpected size.\n");
+                    suanpan_error("Matrix-vector product has unexpected size.\n");
                     return -4;
                 }
                 yn = product;
@@ -152,13 +145,13 @@ int fgmres_solve(const T& kernel, const vec& diagonal, double* left, double* rig
             exhausted = true;
             break;
         default:
-            suanpan_error("FGMRES: oneMKL returned error code {}.\n", info);
+            suanpan_error("Solver returned error code {}.\n", info);
             return -4;
         }
     }
 
     if(!converged && !exhausted) {
-        suanpan_error("FGMRES: exceeded {} reverse-communication requests.\n", limit);
+        suanpan_error("Exceeded {} reverse-communication requests.\n", limit);
         return -5;
     }
 
@@ -166,22 +159,22 @@ int fgmres_solve(const T& kernel, const vec& diagonal, double* left, double* rig
     dfgmres_get(&n, left, right, &info, ipar.data(), dpar.data(), work.data(), &counter);
     if(nullptr != itercount) *itercount = counter;
     if(0 != info) {
-        suanpan_error("FGMRES: could not retrieve the solution (code {}).\n", info);
+        suanpan_error("Could not retrieve the solution (code {}).\n", info);
         return -6;
     }
 
     for(uword i = 0; i < static_cast<uword>(n); ++i)
         if(!std::isfinite(left[i])) {
-            suanpan_error("FGMRES: solution contains non-finite values.\n");
+            suanpan_error("Solution contains non-finite values.\n");
             return -4;
         }
 
     if(!converged) {
-        suanpan_debug("FGMRES: stopped after {} iterations without convergence.\n", counter);
+        suanpan_debug("Stopped after {} iterations without convergence.\n", counter);
         return -7;
     }
 
-    suanpan_debug("FGMRES: converged in {} iterations.\n", counter);
+    suanpan_debug("Converged in {} iterations.\n", counter);
     return 0;
 }
 
