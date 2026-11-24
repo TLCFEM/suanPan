@@ -29,10 +29,6 @@
 
 #include <Toolbox/fgmres.hpp>
 
-#include <algorithm>
-#include <cmath>
-#include <limits>
-
 namespace {
 
     struct DenseKernel {
@@ -86,7 +82,11 @@ namespace {
     double max_difference(const vec& lhs, const vec& rhs) {
         REQUIRE(lhs.n_elem == rhs.n_elem);
         double difference = 0.;
-        for(uword i = 0; i < lhs.n_elem; ++i) difference = std::max(difference, std::abs(lhs[i] - rhs[i]));
+        for(uword i = 0; i < lhs.n_elem; ++i) {
+            const auto delta = lhs[i] - rhs[i];
+            const auto magnitude = delta < 0. ? -delta : delta;
+            if(magnitude > difference) difference = magnitude;
+        }
         return difference;
     }
 
@@ -205,8 +205,8 @@ TEST_CASE("FGMRES input validation", "[Utility.FGMRES]") {
     SECTION("rejects invalid tolerances") {
         REQUIRE(-1 == fgmres_solve(kernel, diagonal, x.memptr(), b.memptr(), 0.));
         REQUIRE(-1 == fgmres_solve(kernel, diagonal, x.memptr(), b.memptr(), -1E-12));
-        REQUIRE(-1 == fgmres_solve(kernel, diagonal, x.memptr(), b.memptr(), std::numeric_limits<double>::quiet_NaN()));
-        REQUIRE(-1 == fgmres_solve(kernel, diagonal, x.memptr(), b.memptr(), std::numeric_limits<double>::infinity()));
+        REQUIRE(-1 == fgmres_solve(kernel, diagonal, x.memptr(), b.memptr(), datum::nan));
+        REQUIRE(-1 == fgmres_solve(kernel, diagonal, x.memptr(), b.memptr(), datum::inf));
     }
 
     SECTION("rejects a mis-sized preconditioner") {
@@ -221,7 +221,7 @@ TEST_CASE("FGMRES input validation", "[Utility.FGMRES]") {
         REQUIRE(-1 == fgmres_solve(kernel, zero_diagonal, x.memptr(), b.memptr(), 1E-12));
 
         vec nan_diagonal = diagonal;
-        nan_diagonal[1] = std::numeric_limits<double>::quiet_NaN();
+        nan_diagonal[1] = datum::nan;
         REQUIRE(-1 == fgmres_solve(kernel, nan_diagonal, x.memptr(), b.memptr(), 1E-12));
     }
 }
