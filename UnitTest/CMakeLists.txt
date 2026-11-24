@@ -8,6 +8,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         TestDuncanSelig.cpp
         TestEigen.cpp
         TestExpression.cpp
+        TestFGMRES.cpp
         TestHomotopy.cpp
         TestIGAValidation.cpp
         TestIntegration.cpp

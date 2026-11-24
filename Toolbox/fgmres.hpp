@@ -60,7 +60,8 @@
  * @param itercount optional output for the number of performed iterations
  *
  * @return 0 on convergence; -1 invalid input; -2 init failed; -3 check failed;
- *         -4 oneMKL error; -5 request limit exceeded; -6 get failed;
+ *         -4 numerical error (oneMKL error or non-finite solution);
+ *         -5 request limit exceeded; -6 get failed;
  *         -7 iteration limit reached without convergence.
  */
 template<typename T> requires requires(const T& a, const mat& b) { { a* b } -> std::same_as<mat>; a.n_rows; }
@@ -72,6 +73,12 @@ int fgmres_solve(const T& kernel, const vec& diagonal, double* left, double* rig
         suanpan_error("FGMRES: invalid arguments.\n");
         return -1;
     }
+
+    for(const auto value : diagonal)
+        if(0. == value || !std::isfinite(value)) {
+            suanpan_error("FGMRES: preconditioner diagonal must be finite and nonzero.\n");
+            return -1;
+        }
 
     // oneMKL requires ((2*r + 1)*n + r*(r + 9)/2 + 1) double slots in tmp.
     std::vector<double> work(static_cast<std::size_t>((2 * r + 1) * n + r * (r + 9) / 2 + 1), 0.);
@@ -161,6 +168,12 @@ int fgmres_solve(const T& kernel, const vec& diagonal, double* left, double* rig
         suanpan_error("FGMRES: could not retrieve the solution (code {}).\n", info);
         return -6;
     }
+
+    for(uword i = 0; i < static_cast<uword>(n); ++i)
+        if(!std::isfinite(left[i])) {
+            suanpan_error("FGMRES: solution contains non-finite values.\n");
+            return -4;
+        }
 
     if(!converged) {
         suanpan_debug("FGMRES: stopped after {} iterations without convergence.\n", counter);
