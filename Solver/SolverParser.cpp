@@ -417,7 +417,7 @@ namespace {
         return_obj = std::make_unique<BFGS>(tag, max_history);
     }
 
-    template<bool quadratic> void new_feast(unique_ptr<Solver>& return_obj, std::istringstream& command, const unsigned tag) {
+    void new_feast(unique_ptr<Solver>& return_obj, std::istringstream& command, const unsigned tag) {
         unsigned eigen_number;
         if(!get_input(command, eigen_number)) {
             suanpan_error("A valid number of frequencies is required.\n");
@@ -436,7 +436,7 @@ namespace {
             return;
         }
 
-        return_obj = std::make_unique<FEAST>(tag, eigen_number, centre, radius, quadratic);
+        return_obj = std::make_unique<FEAST>(tag, eigen_number, centre, radius);
     }
 
     void new_mpdc(unique_ptr<Solver>& return_obj, std::istringstream&, const unsigned tag) {
@@ -528,8 +528,7 @@ int create_new_solver(const shared_ptr<DomainBase>& domain, std::istringstream& 
         {"AICN", new_aicn},
         {"BFGS", new_bfgs},
         {"LBFGS", new_lbfgs},
-        {"FEAST", new_feast<false>},
-        {"QuadraticFEAST", new_feast<true>},
+        {"FEAST", new_feast},
         {"DisplacementControl", new_mpdc},
         {"MPDC", new_mpdc},
         {"Ramm", new_ramm},

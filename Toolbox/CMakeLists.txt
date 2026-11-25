@@ -14,7 +14,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 )
 
 if (SP_ENABLE_MPI)
-    target_sources(${PROJECT_NAME} PRIVATE parpack.cpp)
+    target_sources(${PROJECT_NAME} PRIVATE parpack.cpp pfeast.cpp)
 else ()
-    target_sources(${PROJECT_NAME} PRIVATE arpack.cpp)
+    target_sources(${PROJECT_NAME} PRIVATE arpack.cpp feast.cpp)
 endif ()

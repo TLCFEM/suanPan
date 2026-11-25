@@ -15,25 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @fn eig_solver
- * @brief Select the serial ARPACK or distributed PARPACK eigensolver.
+ * @fn pfeast
+ * @brief Provide a wrapper for PFEAST.
  *
  * @author tlc
- * @date 06/11/2026
+ * @date 21/11/2026
  * @version 0.1.0
- * @file eig_solver.h
+ * @file pfeast.h
  * @addtogroup Utility
  * @{
  */
 
-#ifndef EIG_SOLVER_H
-#define EIG_SOLVER_H
+#ifndef SUANPAN_PFEAST_H
+#define SUANPAN_PFEAST_H
 
-#ifdef SUANPAN_DISTRIBUTED
-#include <Toolbox/parpack.h>
-#else
-#include <Toolbox/arpack.h>
-#endif
+#include <Domain/MetaMat/MetaMat.hpp>
+#include <memory>
+
+enum class StorageScheme;
+
+using feast_mat = std::shared_ptr<MetaMat<double>>;
+
+int feast_solve(vec&, mat&, const feast_mat&, const feast_mat&, StorageScheme, unsigned, double, double, unsigned = 0, unsigned = 0);
 
 #endif
 

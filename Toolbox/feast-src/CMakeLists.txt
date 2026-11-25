@@ -5,6 +5,9 @@ project(feast Fortran)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../Libs)
 
 file(GLOB FEAST_SRC *.f90)
+list(FILTER FEAST_SRC EXCLUDE REGEX "pdz")
+
+file(GLOB FEAST_MPI_SRC *.f90)
 
 set(SPIKE_SRC
         spike-src/cpivul.f
@@ -34,9 +37,12 @@ add_library(feast_obj OBJECT ${FEAST_SRC} ${SPIKE_SRC})
 add_library(${PROJECT_NAME} $<TARGET_OBJECTS:feast_obj>)
 
 if (SP_ENABLE_MPI)
-    add_library(feast_mpi_obj OBJECT ${FEAST_SRC} ${SPIKE_SRC})
+    add_library(feast_mpi_obj OBJECT ${FEAST_MPI_SRC} ${SPIKE_SRC})
     target_compile_definitions(feast_mpi_obj PRIVATE MPI)
+    target_link_libraries(feast_mpi_obj PUBLIC MPI::MPI_Fortran)
+
     add_library(pfeast $<TARGET_OBJECTS:feast_mpi_obj>)
+    target_link_libraries(pfeast MPI::MPI_Fortran)
 endif ()
 
 message(STATUS "FEAST Fortran_FLAGS: ${CMAKE_Fortran_FLAGS}")
