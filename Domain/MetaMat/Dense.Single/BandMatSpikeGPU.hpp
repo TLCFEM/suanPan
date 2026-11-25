@@ -85,7 +85,7 @@ template<sp_d T> int BandMatSpikeGPU<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
         mixer.reset();
 
         d_A = cuda_ptr(sizeof(T), static_cast<int>(this->n_elem));
-        cudaMemcpy(d_A.get<T>(), this->memptr(), sizeof(T) * this->n_elem, cudaMemcpyHostToDevice);
+        d_A.copy_from(this->memptr());
 
         if constexpr(std::is_same_v<T, float>) solver = std::make_unique<gspike::solver<float>>(N, KL, KU, d_A.get<float>(), LDAB);
         else mixer = std::make_unique<gspike::mixed_solver>(N, KL, KU, d_A.get<double>(), LDAB);
@@ -93,9 +93,10 @@ template<sp_d T> int BandMatSpikeGPU<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
         this->factored = true;
     }
 
-    if(d_B.size < static_cast<int>(B.n_elem)) d_B = cuda_ptr(sizeof(T), static_cast<int>(B.n_elem));
+    // sync copies transfer the whole buffer, so it must match the RHS exactly
+    if(d_B.size != static_cast<int>(B.n_elem)) d_B = cuda_ptr(sizeof(T), static_cast<int>(B.n_elem));
 
-    cudaMemcpy(d_B.get<T>(), B.memptr(), sizeof(T) * B.n_elem, cudaMemcpyHostToDevice);
+    d_B.copy_from(B.memptr());
 
     auto INFO = 0;
     if constexpr(std::is_same_v<T, float>) INFO = solver->solve(NRHS, d_B.get<float>(), LDB);
@@ -106,7 +107,7 @@ template<sp_d T> int BandMatSpikeGPU<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
         return INFO;
     }
 
-    cudaMemcpy(B.memptr(), d_B.get<T>(), sizeof(T) * B.n_elem, cudaMemcpyDeviceToHost);
+    d_B.copy_to(B.memptr());
 
     X = std::move(B);
 
