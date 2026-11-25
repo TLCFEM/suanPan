@@ -43,8 +43,8 @@ int Step::initialize() {
         if(SolverType::LAPACK == system_solver || SolverType::SPIKE == system_solver) system_solver = SolverType::SUPERLU;
     }
     else if(!symm_mat && band_mat) {
-        // only LAPACK and SPIKE are supported
-        if(SolverType::LAPACK != system_solver && SolverType::SPIKE != system_solver) system_solver = SolverType::LAPACK;
+        // only LAPACK, SPIKE and CUDA are supported
+        if(SolverType::LAPACK != system_solver && SolverType::SPIKE != system_solver && SolverType::CUDA != system_solver) system_solver = SolverType::LAPACK;
     }
     else if(!symm_mat && !band_mat) {
         // only LAPACK and CUDA solvers are supported
