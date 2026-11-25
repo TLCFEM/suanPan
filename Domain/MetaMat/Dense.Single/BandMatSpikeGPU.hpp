@@ -33,20 +33,12 @@
 #ifndef BANDMATSPIKEGPU_HPP
 #define BANDMATSPIKEGPU_HPP
 
-#include "../DenseMat.hpp"
 #include "../cuda_ptr.hpp"
+#include "BandMatSpikeBase.hpp"
 
 #include <gspike/spike.h>
 
-template<sp_d T> class BandMatSpikeGPU final : public DenseMat<T> {
-    static constexpr auto TRAN = 'N';
-
-    static T bin;
-
-    const uword l_band;
-    const uword u_band;
-    const uword m_rows; // memory block layout
-
+template<sp_d T> class BandMatSpikeGPU final : public BandMatSpikeBase<T> {
     cuda_ptr d_A{}, d_B{};
 
     std::unique_ptr<gspike::solver<T>> solver;
@@ -59,81 +51,32 @@ template<sp_d T> class BandMatSpikeGPU final : public DenseMat<T> {
     }
 
 protected:
-    using DenseMat<T>::direct_solve;
+    using BandMatSpikeBase<T>::direct_solve;
 
     int direct_solve(Mat<T>&, Mat<T>&&) override;
 
 public:
     BandMatSpikeGPU(const uword in_size, const uword in_l, const uword in_u)
-        : DenseMat<T>(in_size, in_size, (in_l + in_u + 1) * in_size)
-        , l_band(in_l)
-        , u_band(in_u)
-        , m_rows(in_l + in_u + 1) { init_config(); }
+        : BandMatSpikeBase<T>(in_size, in_l, in_u) { init_config(); }
 
     BandMatSpikeGPU(const BandMatSpikeGPU& other)
-        : DenseMat<T>(other)
-        , l_band(other.l_band)
-        , u_band(other.u_band)
-        , m_rows(other.m_rows) { init_config(); }
+        : BandMatSpikeBase<T>(other) { init_config(); }
 
     BandMatSpikeGPU(BandMatSpikeGPU&&) = delete;
     BandMatSpikeGPU& operator=(const BandMatSpikeGPU&) = delete;
     BandMatSpikeGPU& operator=(BandMatSpikeGPU&&) = delete;
 
     unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<BandMatSpikeGPU>(*this); }
-
-    void nullify(const uword K) override {
-        this->factored = false;
-        suanpan::for_each(std::max(K, u_band) - u_band, std::min(this->n_rows, K + l_band + 1), [&](const uword I) { this->memory[I + u_band + K * (m_rows - 1)] = T(0); });
-        suanpan::for_each(std::max(K, l_band) - l_band, std::min(this->n_cols, K + u_band + 1), [&](const uword I) { this->memory[K + u_band + I * (m_rows - 1)] = T(0); });
-    }
-
-    T operator()(const uword in_row, const uword in_col) const override {
-        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]]
-            return bin = T(0);
-        return this->memory[in_row + u_band + in_col * (m_rows - 1)];
-    }
-
-    T& unsafe_at(const uword in_row, const uword in_col) override {
-        this->factored = false;
-        return this->memory[in_row + u_band + in_col * (m_rows - 1)];
-    }
-
-    T& at(const uword in_row, const uword in_col) override {
-        if(in_row > in_col + l_band || in_row + u_band < in_col) [[unlikely]]
-            return bin = T(0);
-        return this->unsafe_at(in_row, in_col);
-    }
-
-    Mat<T> operator*(const Mat<T>&) const override;
 };
-
-template<sp_d T> T BandMatSpikeGPU<T>::bin = T(0);
-
-template<sp_d T> Mat<T> BandMatSpikeGPU<T>::operator*(const Mat<T>& X) const {
-    Mat<T> Y(arma::size(X));
-
-    const auto M = static_cast<blas_int>(this->n_rows);
-    const auto N = static_cast<blas_int>(this->n_cols);
-    const auto KL = static_cast<blas_int>(l_band);
-    const auto KU = static_cast<blas_int>(u_band);
-    const auto LDA = static_cast<blas_int>(m_rows);
-    static constexpr blas_int INC = 1;
-    static constexpr T ALPHA{1}, BETA{0};
-
-    if constexpr(std::is_same_v<T, float>) suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_sgbmv)(&TRAN, &M, &N, &KL, &KU, &ALPHA, this->memptr(), &LDA, X.colptr(I), &INC, &BETA, Y.colptr(I), &INC); });
-    else suanpan::for_each(X.n_cols, [&](const uword I) { arma_fortran(arma_dgbmv)(&TRAN, &M, &N, &KL, &KU, &ALPHA, this->memptr(), &LDA, X.colptr(I), &INC, &BETA, Y.colptr(I), &INC); });
-    return Y;
-}
 
 template<sp_d T> int BandMatSpikeGPU<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     suanpan_assert([&] { if(this->n_rows != this->n_cols) throw std::invalid_argument("requires a square matrix"); });
 
     const auto N = static_cast<int>(this->n_rows);
-    const auto KL = static_cast<int>(l_band);
-    const auto KU = static_cast<int>(u_band);
+    const auto KL = static_cast<int>(this->l_band);
+    const auto KU = static_cast<int>(this->u_band);
     const auto NRHS = static_cast<int>(B.n_cols);
-    const auto LDAB = static_cast<int>(m_rows);
+    const auto LDAB = static_cast<int>(this->m_rows);
     const auto LDB = static_cast<int>(B.n_rows);
 
     if(!this->factored) {
