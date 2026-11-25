@@ -19,7 +19,7 @@
 
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Toolbox/eig_solver.h>
+#include <Toolbox/eigen_solver.h>
 
 WilsonPenzienNewmark::WilsonPenzienNewmark(const unsigned T, vec&& DR, const double A, const double B)
     : Newmark(T, A, B)

@@ -30,22 +30,12 @@
 
 #include <Solver/Solver.h>
 
-template<sp_d T> class Factory;
-using LongFactory = Factory<double>;
-
 class FEAST final : public Solver {
-    static constexpr char UPLO = 'F';
-
-    const bool quadratic = false;
-
     const unsigned eigen_num;
     const double centre, radius;
 
-    [[nodiscard]] int linear_solve(const shared_ptr<LongFactory>&) const;
-    [[nodiscard]] int quadratic_solve(const shared_ptr<LongFactory>&) const;
-
 public:
-    FEAST(unsigned, unsigned, double, double, bool);
+    FEAST(unsigned, unsigned, double, double);
 
     int initialize() override;
 

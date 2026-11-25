@@ -20,7 +20,7 @@
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
-#include <Toolbox/eig_solver.h>
+#include <Toolbox/eigen_solver.h>
 
 Arnoldi::Arnoldi(const unsigned T, const unsigned N, const char TP)
     : Solver(T)

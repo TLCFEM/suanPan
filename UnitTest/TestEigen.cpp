@@ -1,7 +1,7 @@
 #include "CatchHeader.h"
 
 #include <Domain/MetaMat/Dense.Single/FullMat.hpp>
-#include <Toolbox/eig_solver.h>
+#include <Toolbox/eigen_solver.h>
 #include <Toolbox/utility.h>
 
 TEST_CASE("Eigensolver", "[Utility.Eigen]") {

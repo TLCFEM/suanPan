@@ -15,25 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @fn eig_solver
- * @brief Select the serial ARPACK or distributed PARPACK eigensolver.
+ * @fn feast
+ * @brief Provide a wrapper for FEAST.
  *
  * @author tlc
- * @date 06/11/2026
+ * @date 21/11/2026
  * @version 0.1.0
- * @file eig_solver.h
+ * @file feast.h
  * @addtogroup Utility
  * @{
  */
 
-#ifndef EIG_SOLVER_H
-#define EIG_SOLVER_H
+#ifndef SUANPAN_FEAST_H
+#define SUANPAN_FEAST_H
 
-#ifdef SUANPAN_DISTRIBUTED
-#include <Toolbox/parpack.h>
-#else
-#include <Toolbox/arpack.h>
-#endif
+#include <Domain/Factory.hpp>
+#include <memory>
+
+int feast_solve(const std::shared_ptr<Factory<double>>&, unsigned, double, double);
 
 #endif
 
