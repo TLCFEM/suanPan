@@ -1522,6 +1522,9 @@ template<sp_d T> unique_ptr<MetaMat<T>> Factory<T>::get_basic_container() {
 #endif
         return std::make_unique<FullMat<T>>(n_size, n_size);
     case StorageScheme::BAND:
+#ifdef SUANPAN_CUDA
+        if(contain_solver_type(SolverType::CUDA)) return std::make_unique<BandMatSpikeGPU<T>>(n_size, n_lobw, n_upbw);
+#endif
         if(contain_solver_type(SolverType::SPIKE)) return std::make_unique<BandMatSpike<T>>(n_size, n_lobw, n_upbw);
 #ifdef SUANPAN_MAGMA
         if(contain_solver_type(SolverType::MAGMA)) return std::make_unique<BandMatMAGMA<T>>(n_size, n_lobw, n_upbw);

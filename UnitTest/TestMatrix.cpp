@@ -178,6 +178,10 @@ namespace {
 #endif
 
 #ifdef SUANPAN_CUDA
+    template<> BandMatSpikeGPU<double> create_new(const uword N) { return {N, std::max(N / uword{200}, uword{3}), std::max(N / uword{200}, uword{3})}; }
+
+    template<> BandMatSpikeGPU<float> create_new(const uword N) { return {N, std::max(N / uword{200}, uword{3}), std::max(N / uword{200}, uword{3})}; }
+
     template<> FullMatCUDA<double> create_new(const uword N) { return {N, N}; }
 
     template<> FullMatCUDA<float> create_new(const uword N) { return {N, N}; }
@@ -226,6 +230,7 @@ namespace {
 #endif
 #ifdef SUANPAN_CUDA
         else if(std::is_same_v<FullMatCUDA<ET>, T>) title = "Full CUDA ";
+        else if(std::is_same_v<BandMatSpikeGPU<ET>, T>) title = "BandSpike GPU ";
         else if(std::is_same_v<SparseMatCUDA<ET>, T>) title = "Sparse CUDA ";
 #ifdef SUANPAN_MAGMA
         else if(std::is_same_v<BandMatMAGMA<ET>, T>) title = "Band Magma ";
@@ -378,6 +383,10 @@ TEST_CASE("SparseMatClusterPARDISOFloat", "[Matrix.Sparse]") { test_sparse_mat_s
 #endif
 
 #ifdef SUANPAN_CUDA
+TEST_CASE("BandMatSpikeGPU", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<BandMatSpikeGPU<double>>); }
+
+TEST_CASE("BandMatSpikeGPUFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>(create_new<BandMatSpikeGPU<float>>); }
+
 TEST_CASE("SparseMatCUDA", "[Matrix.Sparse]") { test_sparse_mat_setup<double>(create_new<SparseMatCUDA<double>>); }
 
 TEST_CASE("SparseMatCUDAFloat", "[Matrix.Sparse]") { test_sparse_mat_setup<float>(create_new<SparseMatCUDA<float>>); }
@@ -677,6 +686,8 @@ TEST_CASE("Unify SparseMatPARDISO", "[Matrix.Utility]") { test_sparse_mat_unify(
 #endif
 
 #ifdef SUANPAN_CUDA
+TEST_CASE("Unify BandMatSpikeGPU", "[Matrix.Utility]") { test_dense_mat_unify(BandMatSpikeGPU<double>(10, 2, 3)); }
+
 TEST_CASE("Unify SparseMatCUDA", "[Matrix.Utility]") { test_sparse_mat_unify(SparseMatCUDA<double>(10, 10)); }
 
 #ifdef SUANPAN_MAGMA

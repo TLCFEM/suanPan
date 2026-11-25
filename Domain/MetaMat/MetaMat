@@ -18,6 +18,7 @@
 #endif
 
 #ifdef SUANPAN_CUDA
+#include "Dense.Single/BandMatSpikeGPU.hpp"
 #include "Dense.Single/FullMatCUDA.hpp"
 #include "Sparse.Single/SparseMatCUDA.hpp"
 #ifdef SUANPAN_MAGMA
