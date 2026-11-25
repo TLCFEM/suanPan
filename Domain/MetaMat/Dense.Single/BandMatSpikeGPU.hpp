@@ -18,8 +18,9 @@
  * @class BandMatSpikeGPU
  * @brief A BandMatSpikeGPU class that holds matrices.
  *
- * The `BandMatSpikeGPU` class uses GSPIKE, a GPU based SPIKE solver, and
- * supports single, double and mixed precision.
+ * The `BandMatSpikeGPU` class uses GSPIKE, a GPU based SPIKE solver. Single
+ * precision matrices are solved directly, while double precision matrices
+ * always use the mixed precision solver with iterative refinement.
  *
  * @author tlc
  * @date 25/11/2026
@@ -41,7 +42,7 @@
 template<sp_d T> class BandMatSpikeGPU final : public BandMatSpikeBase<T> {
     cuda_ptr d_A{}, d_B{};
 
-    std::unique_ptr<gspike::solver<T>> solver;
+    std::unique_ptr<gspike::solver<float>> solver;
     std::unique_ptr<gspike::mixed_solver> mixer;
 
     void init_config() {
@@ -87,7 +88,6 @@ template<sp_d T> int BandMatSpikeGPU<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
         cudaMemcpy(d_A.get<T>(), this->memptr(), sizeof(T) * this->n_elem, cudaMemcpyHostToDevice);
 
         if constexpr(std::is_same_v<T, float>) solver = std::make_unique<gspike::solver<float>>(N, KL, KU, d_A.get<float>(), LDAB);
-        else if(Precision::FULL == this->setting.precision) solver = std::make_unique<gspike::solver<double>>(N, KL, KU, d_A.get<double>(), LDAB);
         else mixer = std::make_unique<gspike::mixed_solver>(N, KL, KU, d_A.get<double>(), LDAB);
 
         this->factored = true;
@@ -99,7 +99,6 @@ template<sp_d T> int BandMatSpikeGPU<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
 
     auto INFO = 0;
     if constexpr(std::is_same_v<T, float>) INFO = solver->solve(NRHS, d_B.get<float>(), LDB);
-    else if(Precision::FULL == this->setting.precision) INFO = solver->solve(NRHS, d_B.get<double>(), LDB);
     else INFO = mixer->solve(NRHS, d_B.get<double>(), LDB);
 
     if(0 != INFO) {
