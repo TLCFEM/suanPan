@@ -132,8 +132,8 @@ int feast_solve(vec& eigval, mat& eigvec, const feast_mat& K, const feast_mat& M
     switch(scheme) {
     case StorageScheme::FULL: {
         const auto size = static_cast<std::size_t>(N) * static_cast<std::size_t>(N);
-        std::vector<double> A(K->memptr(), K->memptr() + size);
-        std::vector<double> B(M->memptr(), M->memptr() + size);
+        std::vector A(K->memptr(), K->memptr() + size);
+        std::vector B(M->memptr(), M->memptr() + size);
 
         new_dfeast_sygv_(&UPLO, &N, A.data(), &N, B.data(), &N, fpm.data(), &epsout, &loop, &Emin, &Emax, &M0, E.memptr(), X.memptr(), &mode, R.memptr(), &info);
         break;
