@@ -15,24 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @fn feast
- * @brief Provide a wrapper for FEAST.
+ * @fn arpack
+ * @brief Provide a wrapper for ARPACK.
  *
  * @author tlc
- * @date 21/11/2026
+ * @date 05/01/2022
  * @version 0.1.0
- * @file feast.h
+ * @file eigen_arpack.h
  * @addtogroup Utility
  * @{
  */
 
-#ifndef SUANPAN_FEAST_H
-#define SUANPAN_FEAST_H
+#ifndef EIGEN_ARPACK_H
+#define EIGEN_ARPACK_H
 
-#include <Domain/Factory.hpp>
-#include <memory>
+#include <Domain/MetaMat/MetaMat>
 
-int feast_solve(const std::shared_ptr<Factory<double>>&, unsigned, double, double);
+int eig_solve(vec&, mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "SM");
+
+int eig_solve(cx_vec&, cx_mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "LM");
+
+int eig_solve(cx_vec&, const std::shared_ptr<MetaMat<double>>&, unsigned);
 
 #endif
 

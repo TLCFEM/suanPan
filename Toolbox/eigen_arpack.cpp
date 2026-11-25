@@ -17,9 +17,7 @@
 
 // ReSharper disable CppFunctionalStyleCast
 // ReSharper disable IdentifierTypo
-#include "arpack.h"
-
-#include <Domain/MetaMat/operator_times.hpp>
+#include "eigen_arpack.h"
 
 using mat_ptr = std::shared_ptr<MetaMat<double>>;
 

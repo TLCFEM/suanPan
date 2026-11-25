@@ -30,11 +30,11 @@
 #define EIGEN_SOLVER_H
 
 #ifdef SUANPAN_DISTRIBUTED
-#include <Toolbox/parpack.h>
-#include <Toolbox/pfeast.h>
+#include <Toolbox/eigen_parpack.h>
+#include <Toolbox/eigen_pfeast.h>
 #else
-#include <Toolbox/arpack.h>
-#include <Toolbox/feast.h>
+#include <Toolbox/eigen_arpack.h>
+#include <Toolbox/eigen_feast.h>
 #endif
 
 #endif

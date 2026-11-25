@@ -1282,9 +1282,6 @@
     <ClCompile Include="..\..\..\Toolbox\argument.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Toolbox\arpack.cpp">
-      <Filter>Toolbox</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\command.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
@@ -1628,6 +1625,12 @@
       <Filter>UnitTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Toolbox\async_print.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\eigen_arpack.cpp">
+      <Filter>Toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Toolbox\eigen_feast.cpp">
       <Filter>Toolbox</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2743,9 +2746,6 @@
     <ClInclude Include="..\..\..\Toolbox\argument.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Toolbox\arpack.h">
-      <Filter>Toolbox</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\command.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
@@ -3017,6 +3017,12 @@
       <Filter>Recorder</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Toolbox\async_print.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\eigen_arpack.h">
+      <Filter>Toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Toolbox\eigen_feast.h">
       <Filter>Toolbox</Filter>
     </ClInclude>
   </ItemGroup>

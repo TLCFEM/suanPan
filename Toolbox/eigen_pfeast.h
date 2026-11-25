@@ -15,28 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @fn parpack
- * @brief Provide a wrapper for PARPACK.
+ * @fn pfeast
+ * @brief Provide a wrapper for PFEAST.
  *
  * @author tlc
- * @date 06/11/2026
+ * @date 21/11/2026
  * @version 0.1.0
- * @file parpack.h
+ * @file eigen_pfeast.h
  * @addtogroup Utility
  * @{
  */
 
-#ifndef PARPACK_H
-#define PARPACK_H
+#ifndef EIGEN_PFEAST_H
+#define EIGEN_PFEAST_H
 
-#include <Domain/MetaMat/MetaMat.hpp>
-#include <memory>
+#include <Domain/Factory.hpp>
 
-int eig_solve(vec&, mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "SM");
-
-int eig_solve(cx_vec&, cx_mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "LM");
-
-int eig_solve(cx_vec&, const std::shared_ptr<MetaMat<double>>&, unsigned);
+int feast_solve(const std::shared_ptr<Factory<double>>&, unsigned, double, double);
 
 #endif
 

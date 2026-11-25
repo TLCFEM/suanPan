@@ -528,9 +528,10 @@
     <ClCompile Include="..\..\..\Step\StepParser.cpp" />
     <ClCompile Include="..\..\..\suanPan.cpp" />
     <ClCompile Include="..\..\..\Toolbox\argument.cpp" />
-    <ClCompile Include="..\..\..\Toolbox\arpack.cpp" />
     <ClCompile Include="..\..\..\Toolbox\async_print.cpp" />
     <ClCompile Include="..\..\..\Toolbox\command.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\eigen_arpack.cpp" />
+    <ClCompile Include="..\..\..\Toolbox\eigen_feast.cpp" />
     <ClCompile Include="..\..\..\Toolbox\Expression.cpp" />
     <ClCompile Include="..\..\..\Toolbox\ExpressionParser.cpp" />
     <ClCompile Include="..\..\..\Toolbox\HDF5Wrapper.cpp" />
@@ -1012,10 +1013,11 @@
     <ClInclude Include="..\..\..\Step\StepParser.h" />
     <ClInclude Include="..\..\..\suanPan.h" />
     <ClInclude Include="..\..\..\Toolbox\argument.h" />
-    <ClInclude Include="..\..\..\Toolbox\arpack.h" />
     <ClInclude Include="..\..\..\Toolbox\async_print.h" />
     <ClInclude Include="..\..\..\Toolbox\command.h" />
     <ClInclude Include="..\..\..\Toolbox\container.h" />
+    <ClInclude Include="..\..\..\Toolbox\eigen_arpack.h" />
+    <ClInclude Include="..\..\..\Toolbox\eigen_feast.h" />
     <ClInclude Include="..\..\..\Toolbox\Expression.h" />
     <ClInclude Include="..\..\..\Toolbox\ExpressionParser.h" />
     <ClInclude Include="..\..\..\Toolbox\HDF5Wrapper.h" />

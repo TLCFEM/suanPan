@@ -17,10 +17,8 @@
 
 // ReSharper disable CppFunctionalStyleCast
 // ReSharper disable IdentifierTypo
-#include "feast.h"
+#include "eigen_feast.h"
 
-#include <Domain/Factory.hpp>
-#include <algorithm>
 #include <array>
 
 #ifdef __cplusplus

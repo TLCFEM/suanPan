@@ -15,22 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @fn arpack
- * @brief Provide a wrapper for ARPACK.
+ * @fn parpack
+ * @brief Provide a wrapper for PARPACK.
  *
  * @author tlc
- * @date 05/01/2022
+ * @date 06/11/2026
  * @version 0.1.0
- * @file arpack.h
+ * @file eigen_parpack.h
  * @addtogroup Utility
  * @{
  */
 
-#ifndef ARPACK_H
-#define ARPACK_H
+#ifndef EIGEN_PARPACK_H
+#define EIGEN_PARPACK_H
 
-#include <Domain/MetaMat/MetaMat.hpp>
-#include <memory>
+#include <Domain/MetaMat/MetaMat>
 
 int eig_solve(vec&, mat&, const std::shared_ptr<MetaMat<double>>&, const std::shared_ptr<MetaMat<double>>&, unsigned, const char* = "SM");
 

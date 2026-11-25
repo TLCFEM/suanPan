@@ -15,22 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 /**
- * @fn pfeast
- * @brief Provide a wrapper for PFEAST.
+ * @fn feast
+ * @brief Provide a wrapper for FEAST.
  *
  * @author tlc
  * @date 21/11/2026
  * @version 0.1.0
- * @file pfeast.h
+ * @file eigen_feast.h
  * @addtogroup Utility
  * @{
  */
 
-#ifndef SUANPAN_PFEAST_H
-#define SUANPAN_PFEAST_H
+#ifndef EIGEN_FEAST_H
+#define EIGEN_FEAST_H
 
 #include <Domain/Factory.hpp>
-#include <memory>
 
 int feast_solve(const std::shared_ptr<Factory<double>>&, unsigned, double, double);
 
