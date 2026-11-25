@@ -25,6 +25,7 @@
  * @{
  */
 
+#ifdef SUANPAN_MKL
 #include "CatchHeader.h"
 
 #include <Toolbox/fgmres.hpp>
@@ -282,5 +283,6 @@ TEST_CASE("FGMRES failure reporting", "[Utility.FGMRES]") {
         }
     }
 }
+#endif
 
 //! @}
