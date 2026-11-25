@@ -63,9 +63,9 @@ namespace {
         return csr_form<double, la_it>(to_triplet_form<double, la_it>(matrix), SparseBase::ONE);
     }
 
-    int assign_result(vec& eigval, mat& eigvec, const vec& E, const mat& X, const la_it mode) {
-        eigval = E.head(static_cast<uword>(mode));
-        eigvec = X.head_cols(static_cast<uword>(mode));
+    int assign_result(const shared_ptr<Factory<double>>& W, const vec& E, const mat& X, const la_it mode) {
+        W->modify_eigenvalue() = E.head(static_cast<uword>(mode));
+        W->modify_eigenvector() = X.head_cols(static_cast<uword>(mode));
 
         return SUANPAN_SUCCESS;
     }
@@ -123,5 +123,5 @@ int feast_solve(const shared_ptr<Factory<double>>& W, const unsigned num, const 
         return SUANPAN_FAIL;
     }
 
-    return assign_result(W->modify_eigenvalue(), W->modify_eigenvector(), E, X, mode);
+    return assign_result(W, E, X, mode);
 }

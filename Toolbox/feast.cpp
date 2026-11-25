@@ -58,9 +58,9 @@ namespace {
         return csr_form<double, la_it>(to_triplet_form<double, la_it>(matrix), SparseBase::ONE);
     }
 
-    int assign_result(vec& eigval, mat& eigvec, const vec& E, const mat& X, const la_it mode) {
-        eigval = E.head(static_cast<uword>(mode));
-        eigvec = X.head_cols(static_cast<uword>(mode));
+    int assign_result(const shared_ptr<Factory<double>>& W, const vec& E, const mat& X, const la_it mode) {
+        W->modify_eigenvalue() = E.head(static_cast<uword>(mode));
+        W->modify_eigenvector() = X.head_cols(static_cast<uword>(mode));
 
         return SUANPAN_SUCCESS;
     }
@@ -75,23 +75,6 @@ namespace {
         for(uword J{0}; J < N; ++J)
             for(auto I = J > band ? J - band : 0; I <= std::min(N - 1, J + band); ++I) {
                 const auto offset = band + I - J + J * lda;
-                A[offset] = (*K)(I, J);
-                B[offset] = (*M)(I, J);
-            }
-
-        return {std::move(A), std::move(B)};
-    }
-
-    // A lower band stores the main diagonal on row 0 of an array with `band + 1` rows.
-    std::pair<std::vector<double>, std::vector<double>> to_lower_band(const feast_mat& K, const feast_mat& M, const unsigned band) {
-        const auto N = K->n_rows;
-        const auto lda = band + 1;
-
-        std::vector<double> A(lda * N, 0.), B(lda * N, 0.);
-
-        for(uword J{0}; J < N; ++J)
-            for(auto I = J; I <= std::min(N - 1, J + band); ++I) {
-                const auto offset = I - J + J * lda;
                 A[offset] = (*K)(I, J);
                 B[offset] = (*M)(I, J);
             }
@@ -117,8 +100,6 @@ int feast_solve(const shared_ptr<Factory<double>>& W, const unsigned num, const 
     const auto scheme = W->get_storage_scheme();
     const auto [low_band, up_band] = W->get_bandwidth();
 
-    auto fpm = initialize_parameters();
-
     auto N = static_cast<la_it>(K->n_rows);
     auto M0 = static_cast<la_it>(std::min<uword>(num, K->n_rows));
 
@@ -126,6 +107,8 @@ int feast_solve(const shared_ptr<Factory<double>>& W, const unsigned num, const 
         suanpan_error("The number of requested eigenvalues must be positive.\n");
         return SUANPAN_FAIL;
     }
+
+    auto fpm = initialize_parameters();
 
     la_it mode{0}, loop{0}, info{0};
     double epsout{0.};
@@ -139,11 +122,7 @@ int feast_solve(const shared_ptr<Factory<double>>& W, const unsigned num, const 
 
     switch(scheme) {
     case StorageScheme::FULL: {
-        const auto size = static_cast<std::size_t>(N) * static_cast<std::size_t>(N);
-        std::vector A(K->memptr(), K->memptr() + size);
-        std::vector B(M->memptr(), M->memptr() + size);
-
-        new_dfeast_sygv_(&UPLO, &N, A.data(), &N, B.data(), &N, fpm.data(), &epsout, &loop, &Emin, &Emax, &M0, E.memptr(), X.memptr(), &mode, R.memptr(), &info);
+        new_dfeast_sygv_(&UPLO, &N, K->memptr(), &N, M->memptr(), &N, fpm.data(), &epsout, &loop, &Emin, &Emax, &M0, E.memptr(), X.memptr(), &mode, R.memptr(), &info);
         break;
     }
     case StorageScheme::BAND: {
@@ -152,12 +131,9 @@ int feast_solve(const shared_ptr<Factory<double>>& W, const unsigned num, const 
         auto KL = static_cast<la_it>(band);
         auto LD = static_cast<la_it>(2 * band + 1);
 
-        // SPIKE already stores a symmetric band matrix in the compact layout FEAST expects.
-        auto* spike_k = dynamic_cast<BandMatSpike<double>*>(K.get());
-        auto* spike_m = dynamic_cast<BandMatSpike<double>*>(M.get());
-
-        if(nullptr != spike_k && nullptr != spike_m && low_band == up_band)
-            new_dfeast_sbgv_(&UPLO, &N, &KL, spike_k->memptr(), &LD, &KL, spike_m->memptr(), &LD, fpm.data(), &epsout, &loop, &Emin, &Emax, &M0, E.memptr(), X.memptr(), &mode, R.memptr(), &info);
+        // The factory stores a symmetric band matrix in the compact SPIKE layout when SPIKE is selected.
+        if(W->contain_solver_type(SolverType::SPIKE) && low_band == up_band)
+            new_dfeast_sbgv_(&UPLO, &N, &KL, K->memptr(), &LD, &KL, M->memptr(), &LD, fpm.data(), &epsout, &loop, &Emin, &Emax, &M0, E.memptr(), X.memptr(), &mode, R.memptr(), &info);
         else {
             suanpan_warning("The banded matrix is not stored in the SPIKE layout, converting it requires extra memory and impairs performance. Consider using the SPIKE solver directly.\n");
 
@@ -168,15 +144,12 @@ int feast_solve(const shared_ptr<Factory<double>>& W, const unsigned num, const 
         break;
     }
     case StorageScheme::BANDSYMM: {
-        const auto band = std::max(low_band, up_band);
-        auto [A, B] = to_lower_band(K, M, band);
-
         constexpr char LOWER = 'L';
 
-        auto KL = static_cast<la_it>(band);
-        auto LD = static_cast<la_it>(band + 1);
+        auto KL = static_cast<la_it>(low_band);
+        auto LD = static_cast<la_it>(low_band + 1);
 
-        new_dfeast_sbgv_(&LOWER, &N, &KL, A.data(), &LD, &KL, B.data(), &LD, fpm.data(), &epsout, &loop, &Emin, &Emax, &M0, E.memptr(), X.memptr(), &mode, R.memptr(), &info);
+        new_dfeast_sbgv_(&LOWER, &N, &KL, K->memptr(), &LD, &KL, M->memptr(), &LD, fpm.data(), &epsout, &loop, &Emin, &Emax, &M0, E.memptr(), X.memptr(), &mode, R.memptr(), &info);
         break;
     }
     case StorageScheme::SPARSE:
@@ -198,5 +171,5 @@ int feast_solve(const shared_ptr<Factory<double>>& W, const unsigned num, const 
         return SUANPAN_FAIL;
     }
 
-    return assign_result(W->modify_eigenvalue(), W->modify_eigenvector(), E, X, mode);
+    return assign_result(W, E, X, mode);
 }

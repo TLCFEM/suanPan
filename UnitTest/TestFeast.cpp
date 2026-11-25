@@ -106,6 +106,7 @@ TEST_CASE("FEASTSpike", "[Utility.FEAST]") {
     assign(*MM, M);
 
     const auto factory = make_factory(KK, MM, StorageScheme::BAND, 1, 1);
+    factory->set_solver_type(SolverType::SPIKE);
 
     REQUIRE(feast_solve(factory, N, 2., 1.95) == SUANPAN_SUCCESS);
     REQUIRE(factory->get_eigenvector().n_cols == factory->get_eigenvalue().n_elem);
