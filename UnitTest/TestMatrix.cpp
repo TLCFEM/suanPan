@@ -347,6 +347,30 @@ TEST_CASE("BandMat", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new
 
 TEST_CASE("BandMatSpike", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<BandMatSpike<double>>); }
 
+extern "C" void spikerl_calc_size_partitions_(la_it*, la_it*, la_it*);
+
+// The tuned SPIKE ratios must never shrink a partition below the bandwidth.
+// Otherwise SPIKE indexes outside its work arrays while factorizing.
+TEST_CASE("Spike Tuning", "[Matrix.Dense]") {
+    la_it N = 200;
+    la_it KLU = 3;
+
+    la_it proto[64]{};
+    dspike_tune_(proto);
+
+    la_it spm[64]{};
+    spikeinit_(spm, &N, &KLU);
+    spm[6] = proto[6];
+    spm[4] = spm[6] + spm[6] / 2 + 10;
+    spm[3] = spm[4] / 2;
+
+    std::vector<la_it> ajmin(spm[19] + 1);
+    spikerl_calc_size_partitions_(spm, ajmin.data(), &N);
+
+    for(la_it p = 0; p < spm[19]; ++p)
+        REQUIRE(ajmin[p + 1] - ajmin[p] >= 2 * KLU);
+}
+
 TEST_CASE("BandSymmMat", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<BandSymmMat<double>>); }
 
 TEST_CASE("FullMatFloat", "[Matrix.Dense]") { test_dense_mat_setup<float>(create_new<FullMat<float>>); }

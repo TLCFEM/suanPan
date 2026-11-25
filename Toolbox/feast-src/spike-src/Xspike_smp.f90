@@ -771,6 +771,11 @@ integer :: infoloc
 integer(8),parameter :: fout=6
 !double precision, external :: OMP_GET_WTIME
 logical :: pivot
+integer, parameter :: NRUN = 5
+double precision, dimension(NRUN) :: samples
+double precision :: sample
+integer :: run, i, j
+integer :: nthreads_saved
 
 pivot = spm(3) .eq. 1
 
@@ -789,29 +794,70 @@ call T_ALLOC(wallocate_2)(A,lda,n,infoloc)
 call T_ALLOC(wallocate_2)(B,n,klu,infoloc)
 call wallocate_1i(ipiv,n,infoloc)
 
+! The model used to derive the partition ratios assumes a single threaded
+! factorization and solve. Enforce that condition while timing, otherwise
+! threaded BLAS distorts the measured ratio and yields unusable partitions.
+nthreads_saved = omp_get_max_threads()
+call omp_set_num_threads(1)
+
+! Warm up the kernels and the OpenMP runtime. The first solve initializes
+! threaded BLAS and would otherwise dominate the measured solve time.
 B=ONE_PREC
 A=ONE_PREC
 A(klu+1,:) = 3*klu*ONE_PREC
-
 if(pivot) then
-  t0 = OMP_GET_WTIME()
   call T_DEC(GBTRFUL)(n,n,klu,klu,A,lda,ipiv,info)
-  t1 = OMP_GET_WTIME()
-!  call DGBTRSL('N',n,klu,klu,klu,A,LDA,ipiv,B,n,info)
   call T_DEC(GBTRSL)('N',n,klu,klu,klu,A,LDA,ipiv,B,n,info)
   call T_DEC(GBTRSU)('N',n,klu,klu,klu,A,LDA,ipiv,B,n,info)
-!  call DGBTRS('N',n,klu,klu,klu,A,LDA,ipiv,B,n,info)
-  t2 = OMP_GET_WTIME()
-  K = 1.0d0*(t2-t1)/(t1-t0)
 else
-  t0 = OMP_GET_WTIME()
   call T_DEC(GBALU)(n,klu,klu,A,lda,nzero,norma,info)
-  t1 = OMP_GET_WTIME()
   call T_DEC(TBSM)('L','N','U',n,klu,klu,A,lda,B,n)
   call T_DEC(TBSM)('U','N','N',n,klu,klu,A,lda,B,n)
-  t2 = OMP_GET_WTIME()
-  K = 1.0d0*(t2-t1)/(t1-t0)
 endif
+
+! Every factorization destroys A and every solve modifies B, so restore both
+! before each measurement. The median discards occasional timing outliers.
+do run = 1, NRUN
+  B=ONE_PREC
+  A=ONE_PREC
+  A(klu+1,:) = 3*klu*ONE_PREC
+  if(pivot) then
+    t0 = OMP_GET_WTIME()
+    call T_DEC(GBTRFUL)(n,n,klu,klu,A,lda,ipiv,info)
+    t1 = OMP_GET_WTIME()
+    call T_DEC(GBTRSL)('N',n,klu,klu,klu,A,LDA,ipiv,B,n,info)
+    call T_DEC(GBTRSU)('N',n,klu,klu,klu,A,LDA,ipiv,B,n,info)
+    t2 = OMP_GET_WTIME()
+  else
+    t0 = OMP_GET_WTIME()
+    call T_DEC(GBALU)(n,klu,klu,A,lda,nzero,norma,info)
+    t1 = OMP_GET_WTIME()
+    call T_DEC(TBSM)('L','N','U',n,klu,klu,A,lda,B,n)
+    call T_DEC(TBSM)('U','N','N',n,klu,klu,A,lda,B,n)
+    t2 = OMP_GET_WTIME()
+  endif
+
+  if(t1 > t0 .and. t2 > t1) then
+    samples(run) = 1.0d0*(t2-t1)/(t1-t0)
+  else
+    samples(run) = 0.0d0
+  endif
+enddo
+
+do i = 2, NRUN
+  sample = samples(i)
+  j = i - 1
+  do
+    if(j < 1) exit
+    if(samples(j) <= sample) exit
+    samples(j+1) = samples(j)
+    j = j - 1
+  enddo
+  samples(j+1) = sample
+enddo
+K = samples((NRUN+1)/2)
+
+call omp_set_num_threads(nthreads_saved)
 
 spm(7) = int(K*10)
 !spm(4) = spm(7) +5
