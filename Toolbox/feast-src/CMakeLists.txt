@@ -9,6 +9,9 @@ file(GLOB SPIKE_SRC CONFIGURE_DEPENDS
         spike-src/*.f90
 )
 
+# The X-prefixed files are templates included by the concrete SPIKE sources.
+list(FILTER SPIKE_SRC EXCLUDE REGEX "spike-src/X[^/]*$")
+
 set(FEAST_COMMON_SRC
         dzlsprim.f90
         feast_aux.f90

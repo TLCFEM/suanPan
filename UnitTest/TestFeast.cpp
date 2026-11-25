@@ -87,6 +87,27 @@ TEST_CASE("FEASTBand", "[Utility.FEAST]") {
     require_eigen(eigval, tridiagonal_eigen(N));
 }
 
+TEST_CASE("FEASTSpike", "[Utility.FEAST]") {
+    constexpr auto N = 10;
+
+    const mat K = tridiagonal(N);
+    const mat M = eye<mat>(N, N);
+
+    auto KK = std::make_shared<BandMatSpike<double>>(N, 1, 1);
+    auto MM = std::make_shared<BandMatSpike<double>>(N, 1, 1);
+
+    assign(*KK, K);
+    assign(*MM, M);
+
+    vec eigval;
+    mat eigvec;
+
+    REQUIRE(feast_solve(eigval, eigvec, KK, MM, StorageScheme::BAND, N, 2., 1.95, 1, 1) == SUANPAN_SUCCESS);
+    REQUIRE(eigvec.n_cols == eigval.n_elem);
+
+    require_eigen(eigval, tridiagonal_eigen(N));
+}
+
 TEST_CASE("FEASTBandSymm", "[Utility.FEAST]") {
     constexpr auto N = 10;
 

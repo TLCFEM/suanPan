@@ -140,12 +140,23 @@ int feast_solve(vec& eigval, mat& eigvec, const feast_mat& K, const feast_mat& M
     }
     case StorageScheme::BAND: {
         const auto band = std::max(low_band, up_band);
-        auto [A, B] = to_full_band(K, M, band);
 
         auto KL = static_cast<la_it>(band);
         auto LD = static_cast<la_it>(2 * band + 1);
 
-        new_dfeast_sbgv_(&UPLO, &N, &KL, A.data(), &LD, &KL, B.data(), &LD, fpm.data(), &epsout, &loop, &Emin, &Emax, &M0, E.memptr(), X.memptr(), &mode, R.memptr(), &info);
+        // SPIKE already stores a symmetric band matrix in the compact layout FEAST expects.
+        auto* spike_k = dynamic_cast<BandMatSpike<double>*>(K.get());
+        auto* spike_m = dynamic_cast<BandMatSpike<double>*>(M.get());
+
+        if(nullptr != spike_k && nullptr != spike_m && low_band == up_band)
+            new_dfeast_sbgv_(&UPLO, &N, &KL, spike_k->memptr(), &LD, &KL, spike_m->memptr(), &LD, fpm.data(), &epsout, &loop, &Emin, &Emax, &M0, E.memptr(), X.memptr(), &mode, R.memptr(), &info);
+        else {
+            suanpan_warning("The banded matrix is not stored in the SPIKE layout, converting it requires extra memory and impairs performance. Consider using the SPIKE solver directly.\n");
+
+            auto [A, B] = to_full_band(K, M, band);
+
+            new_dfeast_sbgv_(&UPLO, &N, &KL, A.data(), &LD, &KL, B.data(), &LD, fpm.data(), &epsout, &loop, &Emin, &Emax, &M0, E.memptr(), X.memptr(), &mode, R.memptr(), &info);
+        }
         break;
     }
     case StorageScheme::BANDSYMM: {
