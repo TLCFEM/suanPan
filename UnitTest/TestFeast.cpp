@@ -40,7 +40,7 @@ namespace {
     }
 
     shared_ptr<Factory<double>> make_factory(const shared_ptr<MetaMat<double>>& K, const shared_ptr<MetaMat<double>>& M, const StorageScheme scheme, const unsigned low_band = 0, const unsigned up_band = 0) {
-        auto factory = std::make_shared<Factory<double>>(K->n_rows, AnalysisType::EIGEN, scheme);
+        auto factory = std::make_shared<Factory<double>>(static_cast<unsigned>(K->n_rows), AnalysisType::EIGEN, scheme);
         factory->set_stiffness(K);
         factory->set_mass(M);
         factory->set_bandwidth(low_band, up_band);
