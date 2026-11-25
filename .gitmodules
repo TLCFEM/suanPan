@@ -2,3 +2,7 @@
 	path = Include/ezp
 	url = https://github.com/TLCFEM/ezp.git
 	branch = lite-lib
+[submodule "Include/GSPIKE"]
+	path = Include/GSPIKE
+	url = https://github.com/TLCFEM/GSPIKE.git
+	branch = lite-lib
