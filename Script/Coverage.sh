@@ -135,6 +135,8 @@ else
   tail -n 40 "$ROOTDIR/Results/tests.log" >&2
 fi
 
+rm -rf "$ROOTDIR/Results/tests.log"
+
 if ! tar -czf Results.tar.gz Results; then
   echo "Failed to create Results.tar.gz." >&2
   exit 1
