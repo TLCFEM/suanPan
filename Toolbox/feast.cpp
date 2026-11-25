@@ -37,6 +37,8 @@ void new_dfeast_scsrgv_(const char*, la_it*, double*, la_it*, la_it*, double*, l
 namespace {
     constexpr char UPLO = 'F';
 
+    using feast_mat = std::shared_ptr<MetaMat<double>>;
+
     std::array<la_it, 64> initialize_parameters() {
         std::array<la_it, 64> fpm{};
 
@@ -98,7 +100,10 @@ namespace {
     }
 } // namespace
 
-int feast_solve(vec& eigval, mat& eigvec, const feast_mat& K, const feast_mat& M, const StorageScheme scheme, const unsigned num, const double centre, const double radius, const unsigned low_band, const unsigned up_band) {
+int feast_solve(const shared_ptr<Factory<double>>& W, const unsigned num, const double centre, const double radius) {
+    const auto& K = W->get_stiffness();
+    const auto& M = W->get_mass();
+
     if(K->n_rows != K->n_cols || M->n_rows != M->n_cols || K->n_rows != M->n_rows) {
         suanpan_error("The system matrices must be square and of the same size.\n");
         return SUANPAN_FAIL;
@@ -108,6 +113,9 @@ int feast_solve(vec& eigval, mat& eigvec, const feast_mat& K, const feast_mat& M
         suanpan_error("The global mass matrix is empty, check if the element type supports mass and density settings.\n");
         return SUANPAN_FAIL;
     }
+
+    const auto scheme = W->get_storage_scheme();
+    const auto [low_band, up_band] = W->get_bandwidth();
 
     auto fpm = initialize_parameters();
 
@@ -190,5 +198,5 @@ int feast_solve(vec& eigval, mat& eigvec, const feast_mat& K, const feast_mat& M
         return SUANPAN_FAIL;
     }
 
-    return assign_result(eigval, eigvec, E, X, mode);
+    return assign_result(W->modify_eigenvalue(), W->modify_eigenvector(), E, X, mode);
 }

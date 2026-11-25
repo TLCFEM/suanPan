@@ -38,6 +38,14 @@ namespace {
 
         return sort(eigval);
     }
+
+    shared_ptr<Factory<double>> make_factory(const shared_ptr<MetaMat<double>>& K, const shared_ptr<MetaMat<double>>& M, const StorageScheme scheme, const unsigned low_band = 0, const unsigned up_band = 0) {
+        auto factory = std::make_shared<Factory<double>>(K->n_rows, AnalysisType::EIGEN, scheme);
+        factory->set_stiffness(K);
+        factory->set_mass(M);
+        factory->set_bandwidth(low_band, up_band);
+        return factory;
+    }
 } // namespace
 
 #ifndef SUANPAN_DISTRIBUTED
@@ -57,13 +65,12 @@ TEST_CASE("FEASTDense", "[Utility.FEAST]") {
     assign(*KK, K);
     assign(*MM, M);
 
-    vec eigval;
-    mat eigvec;
+    const auto factory = make_factory(KK, MM, StorageScheme::FULL);
 
-    REQUIRE(feast_solve(eigval, eigvec, KK, MM, StorageScheme::FULL, N, .5 * (N + 1), 1. * N) == SUANPAN_SUCCESS);
-    REQUIRE(eigvec.n_cols == eigval.n_elem);
+    REQUIRE(feast_solve(factory, N, .5 * (N + 1), 1. * N) == SUANPAN_SUCCESS);
+    REQUIRE(factory->get_eigenvector().n_cols == factory->get_eigenvalue().n_elem);
 
-    require_eigen(eigval, regspace(1., 1., static_cast<double>(N)));
+    require_eigen(factory->get_eigenvalue(), regspace(1., 1., static_cast<double>(N)));
 }
 
 TEST_CASE("FEASTBand", "[Utility.FEAST]") {
@@ -78,13 +85,12 @@ TEST_CASE("FEASTBand", "[Utility.FEAST]") {
     assign(*KK, K);
     assign(*MM, M);
 
-    vec eigval;
-    mat eigvec;
+    const auto factory = make_factory(KK, MM, StorageScheme::BAND, 1, 1);
 
-    REQUIRE(feast_solve(eigval, eigvec, KK, MM, StorageScheme::BAND, N, 2., 1.95, 1, 1) == SUANPAN_SUCCESS);
-    REQUIRE(eigvec.n_cols == eigval.n_elem);
+    REQUIRE(feast_solve(factory, N, 2., 1.95) == SUANPAN_SUCCESS);
+    REQUIRE(factory->get_eigenvector().n_cols == factory->get_eigenvalue().n_elem);
 
-    require_eigen(eigval, tridiagonal_eigen(N));
+    require_eigen(factory->get_eigenvalue(), tridiagonal_eigen(N));
 }
 
 TEST_CASE("FEASTSpike", "[Utility.FEAST]") {
@@ -99,13 +105,12 @@ TEST_CASE("FEASTSpike", "[Utility.FEAST]") {
     assign(*KK, K);
     assign(*MM, M);
 
-    vec eigval;
-    mat eigvec;
+    const auto factory = make_factory(KK, MM, StorageScheme::BAND, 1, 1);
 
-    REQUIRE(feast_solve(eigval, eigvec, KK, MM, StorageScheme::BAND, N, 2., 1.95, 1, 1) == SUANPAN_SUCCESS);
-    REQUIRE(eigvec.n_cols == eigval.n_elem);
+    REQUIRE(feast_solve(factory, N, 2., 1.95) == SUANPAN_SUCCESS);
+    REQUIRE(factory->get_eigenvector().n_cols == factory->get_eigenvalue().n_elem);
 
-    require_eigen(eigval, tridiagonal_eigen(N));
+    require_eigen(factory->get_eigenvalue(), tridiagonal_eigen(N));
 }
 
 TEST_CASE("FEASTBandSymm", "[Utility.FEAST]") {
@@ -120,13 +125,12 @@ TEST_CASE("FEASTBandSymm", "[Utility.FEAST]") {
     assign(*KK, K);
     assign(*MM, M);
 
-    vec eigval;
-    mat eigvec;
+    const auto factory = make_factory(KK, MM, StorageScheme::BANDSYMM, 1, 1);
 
-    REQUIRE(feast_solve(eigval, eigvec, KK, MM, StorageScheme::BANDSYMM, N, 2., 1.95, 1, 1) == SUANPAN_SUCCESS);
-    REQUIRE(eigvec.n_cols == eigval.n_elem);
+    REQUIRE(feast_solve(factory, N, 2., 1.95) == SUANPAN_SUCCESS);
+    REQUIRE(factory->get_eigenvector().n_cols == factory->get_eigenvalue().n_elem);
 
-    require_eigen(eigval, tridiagonal_eigen(N));
+    require_eigen(factory->get_eigenvalue(), tridiagonal_eigen(N));
 }
 #endif
 
@@ -142,11 +146,10 @@ TEST_CASE("FEASTSparse", "[Utility.FEAST]") {
     assign(*KK, K);
     assign(*MM, M);
 
-    vec eigval;
-    mat eigvec;
+    const auto factory = make_factory(KK, MM, StorageScheme::SPARSE);
 
-    REQUIRE(feast_solve(eigval, eigvec, KK, MM, StorageScheme::SPARSE, N, 2., 1.95) == SUANPAN_SUCCESS);
-    REQUIRE(eigvec.n_cols == eigval.n_elem);
+    REQUIRE(feast_solve(factory, N, 2., 1.95) == SUANPAN_SUCCESS);
+    REQUIRE(factory->get_eigenvector().n_cols == factory->get_eigenvalue().n_elem);
 
-    require_eigen(eigval, tridiagonal_eigen(N));
+    require_eigen(factory->get_eigenvalue(), tridiagonal_eigen(N));
 }

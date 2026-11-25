@@ -29,14 +29,10 @@
 #ifndef SUANPAN_FEAST_H
 #define SUANPAN_FEAST_H
 
-#include <Domain/MetaMat/MetaMat.hpp>
+#include <Domain/Factory.hpp>
 #include <memory>
 
-enum class StorageScheme;
-
-using feast_mat = std::shared_ptr<MetaMat<double>>;
-
-int feast_solve(vec&, mat&, const feast_mat&, const feast_mat&, StorageScheme, unsigned, double, double, unsigned = 0, unsigned = 0);
+int feast_solve(const std::shared_ptr<Factory<double>>&, unsigned, double, double);
 
 #endif
 

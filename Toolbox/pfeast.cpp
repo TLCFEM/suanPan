@@ -35,6 +35,8 @@ void new_pdfeast_scsrgv_(const char*, la_it*, double*, la_it*, la_it*, double*, 
 namespace {
     constexpr char UPLO = 'F';
 
+    using feast_mat = std::shared_ptr<MetaMat<double>>;
+
     std::array<la_it, 64> initialize_parameters(const la_it size) {
         std::array<la_it, 64> fpm{};
 
@@ -69,7 +71,12 @@ namespace {
     }
 } // namespace
 
-int feast_solve(vec& eigval, mat& eigvec, const feast_mat& K, const feast_mat& M, const StorageScheme scheme, const unsigned num, const double centre, const double radius, const unsigned, const unsigned) {
+int feast_solve(const shared_ptr<Factory<double>>& W, const unsigned num, const double centre, const double radius) {
+    const auto& K = W->get_stiffness();
+    const auto& M = W->get_mass();
+
+    const auto scheme = W->get_storage_scheme();
+
     if(StorageScheme::SPARSE != scheme && StorageScheme::SPARSESYMM != scheme) {
         suanpan_error("Only sparse storage is supported by the parallel FEAST solver.\n");
         return SUANPAN_FAIL;
@@ -116,5 +123,5 @@ int feast_solve(vec& eigval, mat& eigvec, const feast_mat& K, const feast_mat& M
         return SUANPAN_FAIL;
     }
 
-    return assign_result(eigval, eigvec, E, X, mode);
+    return assign_result(W->modify_eigenvalue(), W->modify_eigenvector(), E, X, mode);
 }

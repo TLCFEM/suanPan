@@ -74,9 +74,7 @@ int FEAST::analyze() {
     if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
     D->update<Statistics::ProcessConstraint>(t_clock);
 
-    const auto [low_band, up_band] = W->get_bandwidth();
-
-    return feast_solve(W->modify_eigenvalue(), W->modify_eigenvector(), W->get_stiffness(), W->get_mass(), W->get_storage_scheme(), eigen_num, centre, radius, low_band, up_band);
+    return feast_solve(W, eigen_num, centre, radius);
 }
 
 void FEAST::print() { suanpan_info("An eigen solver using FEAST solver.\n"); }
