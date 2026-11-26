@@ -398,20 +398,14 @@ TEST_CASE("BandMatSpike Sign", "[Matrix.Dense]") {
     test_spike_sign_det<float>(Precision::FULL);
 }
 
-// The tuned SPIKE ratios must never shrink a partition below the bandwidth.
-// Otherwise SPIKE indexes outside its work arrays while factorizing.
-TEST_CASE("Spike Tuning", "[Matrix.Dense]") {
+// the default SPIKE ratios must not shrink a partition below the bandwidth
+// otherwise SPIKE indexes outside its work arrays while factorizing
+TEST_CASE("Spike Partitioning", "[Matrix.Dense]") {
     la_it N = 200;
     la_it KLU = 3;
 
-    la_it proto[64]{};
-    dspike_tune_(proto);
-
     la_it spm[64]{};
     spikeinit_(spm, &N, &KLU);
-    spm[6] = proto[6];
-    spm[4] = spm[6] + spm[6] / 2 + 10;
-    spm[3] = spm[4] / 2;
 
     std::vector<la_it> ajmin(spm[19] + 1);
     spikerl_calc_size_partitions_(spm, ajmin.data(), &N);

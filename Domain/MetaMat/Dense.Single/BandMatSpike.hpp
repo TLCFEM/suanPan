@@ -34,10 +34,8 @@
 
 extern "C" {
 void spikeinit_(la_it*, la_it*, la_it*);
-void dspike_tune_(la_it*);
 void dspike_gbtrf_(la_it*, la_it*, la_it*, la_it*, double*, la_it*, double*, la_it*);
 void dspike_gbtrs_(la_it*, const char*, la_it*, la_it*, la_it*, la_it*, double*, la_it*, double*, double*, la_it*);
-void sspike_tune_(la_it*);
 void sspike_gbtrf_(la_it*, la_it*, la_it*, la_it*, float*, la_it*, float*, la_it*);
 void sspike_gbtrs_(la_it*, const char*, la_it*, la_it*, la_it*, la_it*, float*, la_it*, float*, float*, la_it*);
 void spikerl_calc_size_partitions_(la_it*, la_it*, la_it*);
@@ -164,8 +162,6 @@ namespace spike_detail {
 template<sp_d T> class BandMatSpike final : public BandMatSpikeBase<T> {
     static constexpr auto TRAN = 'N';
 
-    static la_it SPROTO, DPROTO;
-
     la_it SPIKE[64]{};
 
     podarray<T> WORK;
@@ -176,10 +172,6 @@ template<sp_d T> class BandMatSpike final : public BandMatSpikeBase<T> {
         auto KLU = static_cast<la_it>(std::max(this->l_band, this->u_band));
 
         spikeinit_(SPIKE, &N, &KLU);
-
-        SPIKE[6] = std::is_same_v<T, float> ? SPROTO : DPROTO;
-        SPIKE[4] = SPIKE[6] + SPIKE[6] / 2 + 10;
-        SPIKE[3] = SPIKE[4] / 2;
     }
 
     int solve_trs(Mat<T>&, Mat<T>&&);
@@ -217,18 +209,6 @@ public:
         return spike_detail::determinant_sign(SPIKE, N, KL, KU, this->s_memory.memptr(), LDA, SWORK.memptr());
     }
 };
-
-template<sp_d T> la_it BandMatSpike<T>::SPROTO = [] {
-    la_it PROTO[64]{};
-    sspike_tune_(PROTO);
-    return PROTO[6];
-}();
-
-template<sp_d T> la_it BandMatSpike<T>::DPROTO = [] {
-    la_it PROTO[64]{};
-    dspike_tune_(PROTO);
-    return PROTO[6];
-}();
 
 template<sp_d T> int BandMatSpike<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     if(!this->factored) {
