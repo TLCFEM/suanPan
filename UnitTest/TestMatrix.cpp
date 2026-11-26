@@ -302,7 +302,7 @@ namespace {
         REQUIRE(Approx(A(N, N)) == 1.);
     }
 
-    // A positive definite matrix has a positive determinant.
+    // a positive definite matrix has a positive determinant
     template<sp_d T> void test_spike_sign_det(const Precision P) {
         constexpr uword N = 200, BAND = 10;
 
@@ -333,7 +333,7 @@ namespace {
         REQUIRE(SUANPAN_SUCCESS == A.solve(X, C));
         REQUIRE(-1 == A.sign_det());
 
-        // det(A) = 1 - 2 * 2 = -3 must come from the interface system.
+        // det(A) = 1 - 2 * 2 = -3 must come from the interface system
         A.zeros();
         for(uword I = 0; I < N; ++I) A.at(I, I) = T(1);
         A.at(N / 2 - 1, N / 2) = T(2);

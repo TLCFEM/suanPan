@@ -48,7 +48,7 @@ void spikerl_calc_size_partitions_(la_it*, la_it*, la_it*);
 }
 
 namespace spike_detail {
-    // Accumulate only the sign so overflow or underflow cannot invalidate it.
+    // accumulate only the sign so overflow or underflow cannot invalidate it
     template<sp_d T> struct det_sign {
         int sign = 1;
         bool zero = false;
@@ -64,7 +64,7 @@ namespace spike_detail {
         }
     };
 
-    // Convert the one-based Fortran partition offsets to zero-based starts.
+    // convert the one-based Fortran partition offsets to zero-based starts
     inline std::vector<la_it> partition_starts(const la_it* SPIKE, const la_it N) {
         la_it spm[64]{};
         std::copy_n(SPIKE, 64, spm);
@@ -77,7 +77,7 @@ namespace spike_detail {
         return ajmin;
     }
 
-    // Dense LU of the interface system.
+    // dense LU of the interface system
     template<sp_d T> det_sign<T> interface_sign(const T* M0, const la_it M) {
         det_sign<T> result;
 
@@ -109,8 +109,8 @@ namespace spike_detail {
         return result;
     }
 
-    // det(A) = prod_p det(A_pp) * det(R), with R the reduced interface system.
-    // Two-thread partitions keep part of their determinant outside WORK.
+    // det(A) = prod_p det(A_pp) * det(R), with R the reduced interface system
+    // two-thread partitions keep part of their determinant outside WORK
     template<sp_d T> int determinant_sign(const la_it* SPIKE, const la_it N, const la_it KL, const la_it KU, const T* A, const la_it LDA, const T* WORK) {
         if(nullptr == SPIKE || nullptr == A || N < 1 || KL < 0 || KU < 0 || LDA < KL + KU + 1) return 0;
 
@@ -125,15 +125,15 @@ namespace spike_detail {
 
         const auto ajmin = partition_starts(SPIKE, N);
 
-        // spike_gbtrf does not pivot, the factored diagonal is in band row ku.
+        // spike_gbtrf does not pivot, the factored diagonal is in band row ku
         for(la_it p = 0; p < nbpart; ++p) {
             const auto start = ajmin[p];
             const auto size = ajmin[p + 1] - start;
             for(la_it j = 0; j < size; ++j) total.mul(A[static_cast<size_t>(start + j) * LDA + KU]);
         }
 
-        // Rebuild the level zero interface from the saved spikes.
-        // rV/rW: (2*klu, klu, nblevel, nbpart), Fortran column major.
+        // rebuild the level zero interface from the saved spikes
+        // rV/rW: (2*klu, klu, nblevel, nbpart), Fortran column major
         if(nbpart > 1 && klu > 0) {
             const auto nblevel = SPIKE[20];
             const size_t plane = static_cast<size_t>(2) * klu * klu * nblevel;
