@@ -18,7 +18,6 @@
 #include "Interaction.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
 #include <Element/Element.h>
 #include <Solver/Integrator/Integrator.h>
 #include <Step/Step.h>

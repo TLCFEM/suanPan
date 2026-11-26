@@ -18,7 +18,6 @@
 #include "LeeNewmarkFull.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
 
 /**
  * \brief compute an approximation of the number of additional blocks

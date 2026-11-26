@@ -19,7 +19,6 @@
 // ReSharper disable IdentifierTypo
 #include "ElementParser.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Element/Element>
 #include <Toolbox/TokenRegistry.h>

@@ -19,7 +19,6 @@
 
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Toolbox/HDF5Wrapper.h>
 

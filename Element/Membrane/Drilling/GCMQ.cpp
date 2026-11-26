@@ -19,11 +19,9 @@
 
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
-#include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
 #include <Toolbox/tensor.h>
-#include <Toolbox/utility.h>
 
 mat GCMQ::form_transformation(const mat& jacobian) {
     mat trans_mat(3, 3);

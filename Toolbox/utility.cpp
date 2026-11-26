@@ -17,8 +17,6 @@
 
 #include "utility.h"
 
-#include <suanPan.h>
-
 unsigned long long suanpan::binomial(unsigned long long n, unsigned long long k) {
     auto c = 1llu;
 

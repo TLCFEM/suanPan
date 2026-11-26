@@ -18,7 +18,6 @@
 #include "argument.h"
 
 #include <Include/whereami/whereami.h>
-#include <Step/Bead.h>
 #include <Toolbox/async_print.h>
 #include <Toolbox/command.h>
 #include <Toolbox/revision.h>

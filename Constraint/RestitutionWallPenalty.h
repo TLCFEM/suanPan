@@ -31,8 +31,6 @@
 
 #include "RigidWallPenalty.h"
 
-#include <Toolbox/container.h>
-
 class Node;
 
 class RestitutionWallPenalty : public RigidWallPenalty {

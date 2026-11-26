@@ -18,7 +18,6 @@
 #include "LeeNewmarkIterative.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
 
 void LeeNewmarkIterative::init_worker(const unsigned n_dim, const unsigned n_multiplier) {
     const auto [l, u] = factory->get_bandwidth();

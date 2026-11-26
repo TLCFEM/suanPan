@@ -20,7 +20,6 @@
 #include <Domain/DomainBase.h>
 #include <Element/Plate/DKT3.h>
 #include <Material/Material.h>
-#include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
 #include <Toolbox/utility.h>

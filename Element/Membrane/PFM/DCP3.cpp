@@ -19,7 +19,6 @@
 
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
-#include <Recorder/OutputType.h>
 #include <Toolbox/utility.h>
 
 const uvec DCP3::u_dof{0, 1, 3, 4, 6, 7};

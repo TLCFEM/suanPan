@@ -2,7 +2,6 @@
 
 #include <Domain/MetaMat/Dense.Single/FullMat.hpp>
 #include <Toolbox/eigen_solver.h>
-#include <Toolbox/utility.h>
 
 TEST_CASE("Eigensolver", "[Utility.Eigen]") {
     constexpr auto N = 100;

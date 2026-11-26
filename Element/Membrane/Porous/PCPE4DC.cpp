@@ -19,11 +19,9 @@
 
 #include <Domain/DomainBase.h>
 #include <Material/Material2D/Material2D.h>
-#include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
 #include <Toolbox/tensor.h>
-#include <Toolbox/utility.h>
 
 const uvec PCPE4DC::s_dof{0, 1, 4, 5, 8, 9, 12, 13};
 const uvec PCPE4DC::f_dof{2, 3, 6, 7, 10, 11, 14, 15};

@@ -18,7 +18,6 @@
 #include "EB31OS.h"
 
 #include <Domain/DomainBase.h>
-#include <Recorder/OutputType.h>
 
 EB31OS::EB31OS(const unsigned T, uvec&& N, vec&& P, const unsigned O, const bool F)
     : SectionOSElement3D(T, b_node, b_dof, std::move(N), uvec{}, F)

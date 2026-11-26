@@ -28,13 +28,10 @@
 #include <Domain/ExternalModule.h>
 #include <Domain/Group/Group.h>
 #include <Domain/Group/GroupParser.h>
-#include <Domain/Node.h>
-#include <Element/Element.h>
 #include <Element/ElementParser.h>
 #include <Element/Modifier/Modifier.h>
 #include <Element/Utility/Orientation.h>
 #include <Element/Visualisation/vtkParser.h>
-#include <Load/Amplitude/Amplitude.h>
 #include <Load/Load.h>
 #include <Load/LoadParser.h>
 #include <Material/Material.h>
@@ -48,9 +45,7 @@
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Solver.h>
 #include <Solver/SolverParser.h>
-#include <Step/Bead.h>
 #include <Step/Frequency.h>
-#include <Step/Step.h>
 #include <Step/StepParser.h>
 #include <Toolbox/Expression.h>
 #include <Toolbox/ExpressionParser.h>

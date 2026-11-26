@@ -19,7 +19,6 @@
 
 #include <Domain/DomainBase.h>
 #include <Element/Utility/B3DL.h>
-#include <Recorder/OutputType.h>
 #include <Section/Section.h>
 
 NMB31::NMB31(const unsigned T, uvec&& N, const unsigned S, const unsigned O, const bool F)
