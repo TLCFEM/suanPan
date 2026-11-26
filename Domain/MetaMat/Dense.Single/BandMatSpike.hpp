@@ -48,8 +48,7 @@ void spikerl_calc_size_partitions_(la_it*, la_it*, la_it*);
 }
 
 namespace spike_detail {
-    // The determinant sign is accumulated independently of its magnitude, so
-    // it remains valid when the determinant would overflow or underflow.
+    // Accumulate only the sign so overflow or underflow cannot invalidate it.
     template<sp_d T> struct det_sign {
         int sign = 1;
         bool zero = false;
@@ -65,8 +64,7 @@ namespace spike_detail {
         }
     };
 
-    // Reuse the partition layout of the SPIKE dependency and convert the
-    // one-based Fortran offsets to zero-based positions.
+    // Convert the one-based Fortran partition offsets to zero-based starts.
     inline std::vector<la_it> partition_starts(const la_it* SPIKE, const la_it N) {
         la_it spm[64]{};
         std::copy_n(SPIKE, 64, spm);
@@ -79,7 +77,7 @@ namespace spike_detail {
         return ajmin;
     }
 
-    // Dense LU of the interface system, only its sign is required.
+    // Dense LU of the interface system.
     template<sp_d T> det_sign<T> interface_sign(const T* M0, const la_it M) {
         det_sign<T> result;
 
@@ -111,17 +109,8 @@ namespace spike_detail {
         return result;
     }
 
-    // Determinant sign of a matrix factorized by spike_gbtrf.
-    //
-    // For a single-level SPIKE factorization,
-    //   det(A) = prod_p det(A_pp) * det(R),
-    // where R is the block tridiagonal interface system rebuilt from the level
-    // one spikes saved in WORK. Each partition LU contributes the sign of the
-    // product of its diagonal entries.
-    //
-    // Two-thread partitions factor their two halves separately and keep the
-    // determinant of their internal interface outside WORK, thus the sign
-    // cannot be recovered and zero is reported instead of a wrong value.
+    // det(A) = prod_p det(A_pp) * det(R), with R the reduced interface system.
+    // Two-thread partitions keep part of their determinant outside WORK.
     template<sp_d T> int determinant_sign(const la_it* SPIKE, const la_it N, const la_it KL, const la_it KU, const T* A, const la_it LDA, const T* WORK) {
         if(nullptr == SPIKE || nullptr == A || N < 1 || KL < 0 || KU < 0 || LDA < KL + KU + 1) return 0;
 
@@ -134,18 +123,16 @@ namespace spike_detail {
 
         det_sign<T> total;
 
-        // The partition layout used during factorization.
         const auto ajmin = partition_starts(SPIKE, N);
 
-        // No pivoting is used by spike_gbtrf, the diagonal of each factored
-        // partition sits in band row ku.
+        // spike_gbtrf does not pivot, the factored diagonal is in band row ku.
         for(la_it p = 0; p < nbpart; ++p) {
             const auto start = ajmin[p];
             const auto size = ajmin[p + 1] - start;
             for(la_it j = 0; j < size; ++j) total.mul(A[static_cast<size_t>(start + j) * LDA + KU]);
         }
 
-        // Rebuild the level zero interface system from the saved spikes.
+        // Rebuild the level zero interface from the saved spikes.
         // rV/rW: (2*klu, klu, nblevel, nbpart), Fortran column major.
         if(nbpart > 1 && klu > 0) {
             const auto nblevel = SPIKE[20];

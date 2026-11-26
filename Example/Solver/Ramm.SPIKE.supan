@@ -68,6 +68,4 @@ peek node 11
 
 peek solver 1
 
-# save recorder 1
-
 exit

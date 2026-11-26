@@ -72,8 +72,6 @@ public:
     [[nodiscard]] int sign_det() const override {
         if(!this->factored) return 0;
 
-        // Both solvers expose the sign of the determinant computed from the
-        // stored factorization.
         if constexpr(std::is_same_v<T, float>) return nullptr == solver ? 0 : solver->det_sign();
         else return nullptr == mixer ? 0 : mixer->det_sign();
     }

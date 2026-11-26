@@ -302,8 +302,7 @@ namespace {
         REQUIRE(Approx(A(N, N)) == 1.);
     }
 
-    // A symmetric, strictly row diagonally dominant matrix has a positive
-    // determinant. Negating a single row flips its sign.
+    // A positive definite matrix has a positive determinant.
     template<sp_d T> void test_spike_sign_det(const Precision P) {
         constexpr uword N = 200, BAND = 10;
 
@@ -330,15 +329,11 @@ namespace {
         REQUIRE(SUANPAN_SUCCESS == A.solve(X, C));
         REQUIRE(1 == A.sign_det());
 
-        // negating a row flips the sign of the determinant, make sure the sign
-        // still tracks it after refactorization
         fill(true);
         REQUIRE(SUANPAN_SUCCESS == A.solve(X, C));
         REQUIRE(-1 == A.sign_det());
 
-        // A coupling of two across the partition boundary gives
-        // det(A) = 1 - 2 * 2 = -3, all partition blocks are identities, so the
-        // negative sign must come from the reduced interface system.
+        // det(A) = 1 - 2 * 2 = -3 must come from the interface system.
         A.zeros();
         for(uword I = 0; I < N; ++I) A.at(I, I) = T(1);
         A.at(N / 2 - 1, N / 2) = T(2);
