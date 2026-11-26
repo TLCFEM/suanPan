@@ -19,7 +19,6 @@
 
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 #include <Toolbox/HDF5Wrapper.h>
 #include <magic_enum/magic_enum.hpp>
 

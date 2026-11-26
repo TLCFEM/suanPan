@@ -18,7 +18,6 @@
 #include "RecorderParser.h"
 
 #include <Domain/ConditionalModifier.h>
-#include <Domain/DomainBase.h>
 #include <Recorder/Recorder>
 #include <Toolbox/TokenRegistry.h>
 

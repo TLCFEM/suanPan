@@ -22,13 +22,9 @@
 #include <Constraint/Interaction/Interaction.h>
 #include <Converger/Converger.h>
 #include <Database/Database.h>
-#include <Domain/Factory.hpp>
 #include <Domain/Group/Group.h>
-#include <Domain/Node.h>
-#include <Element/Element.h>
 #include <Element/Modifier/Modifier.h>
 #include <Element/Utility/Orientation.h>
-#include <Load/Amplitude/Amplitude.h>
 #include <Load/Load.h>
 #include <Material/Material.h>
 #include <Recorder/Recorder.h>
@@ -39,7 +35,6 @@
 #include <Toolbox/Expression.h>
 #include <Toolbox/sort_color.hpp>
 #include <Toolbox/sort_rcm.h>
-#include <numeric>
 #include <ranges>
 
 Domain::Domain(const unsigned T)

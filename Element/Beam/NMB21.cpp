@@ -19,7 +19,6 @@
 
 #include <Domain/DomainBase.h>
 #include <Element/Utility/B2DC.h>
-#include <Recorder/OutputType.h>
 #include <Section/Section.h>
 
 NMB21::NMB21(const unsigned T, uvec&& N, const unsigned S, const bool R)

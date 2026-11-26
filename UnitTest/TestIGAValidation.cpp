@@ -17,15 +17,10 @@
 
 #include "CatchHeader.h"
 
-#include <Element/Utility/IGA/BSpline.h>
-#include <Element/Utility/IGA/BSplineSurface.h>
-#include <Element/Utility/IGA/BSplineVolume.h>
-#include <Element/Utility/IGA/NURBS.h>
 #include <Element/Utility/IGA/NURBSSurface.h>
 #include <Element/Utility/IGA/NURBSVolume.h>
 #include <algorithm>
 #include <limits>
-#include <string>
 #include <utility>
 #include <vector>
 

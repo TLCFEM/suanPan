@@ -19,7 +19,6 @@
 
 #include <Constraint/Constraint.h>
 #include <Domain/Factory.hpp>
-#include <Domain/Node.h>
 #include <Element/Element.h>
 #include <Load/Load.h>
 #include <Recorder/Recorder.h>

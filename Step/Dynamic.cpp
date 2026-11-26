@@ -18,8 +18,6 @@
 #include "Dynamic.h"
 
 #include <Converger/AbsIncreDisp.h>
-#include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
 #include <Load/NodalDisplacement.h>
 #include <Solver/BFGS.h>
 #include <Solver/Integrator/Explicit/Tchamwa.h>

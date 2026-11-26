@@ -18,7 +18,6 @@
 #include "Section1D.h"
 
 #include <Domain/DomainBase.h>
-#include <Material/Material.h>
 
 Section1D::Section1D(const unsigned T, const unsigned MT, const double A)
     : Section(T, SectionType::D1, MT, A) {}

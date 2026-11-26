@@ -18,7 +18,6 @@
 #include "LeeNewmark.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
 
 uword LeeNewmark::get_total_size() const { return n_damping * n_block + n_block; }
 

@@ -19,7 +19,6 @@
 
 #include <Converger/AbsIncreDisp.h>
 #include <Domain/Domain.h>
-#include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Ramm.h>
 

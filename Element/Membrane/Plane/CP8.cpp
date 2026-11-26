@@ -22,7 +22,6 @@
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
 #include <Toolbox/tensor.h>
-#include <Toolbox/utility.h>
 
 CP8::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M, mat&& P)
     : coor(std::move(C))

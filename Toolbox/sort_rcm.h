@@ -41,7 +41,6 @@
 #define RCM_H
 
 #include <Domain/MetaMat/csc_form.hpp>
-#include <Domain/MetaMat/triplet_form.hpp>
 #include <Toolbox/container.h>
 
 uvec sort_rcm(const std::vector<uvec>&, const uvec&);

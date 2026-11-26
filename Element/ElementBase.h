@@ -29,7 +29,6 @@
 #define ELEMENTBASE_H
 
 #include <Domain/Node.h>
-#include <Domain/Tag.h>
 #include <Element/MappingDOF.h>
 #include <Element/Visualisation/vtkBase.h>
 #include <Recorder/OutputType.h>

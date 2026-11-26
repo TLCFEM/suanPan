@@ -31,7 +31,6 @@
 #define MATRIXMODIFIER_H
 
 #include <Element/Element.h>
-#include <suanPan.h>
 
 namespace suanpan {
     namespace mass {

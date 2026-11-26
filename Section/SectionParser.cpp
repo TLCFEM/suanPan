@@ -17,7 +17,6 @@
 
 #include "SectionParser.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Section/Section>
 #include <Toolbox/TokenRegistry.h>

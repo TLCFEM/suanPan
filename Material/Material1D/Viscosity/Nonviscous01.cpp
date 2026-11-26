@@ -18,7 +18,6 @@
 #include "Nonviscous01.h"
 
 #include <Domain/DomainBase.h>
-#include <Domain/Factory.hpp>
 #include <Recorder/OutputType.h>
 #include <Step/Step.h>
 

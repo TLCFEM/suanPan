@@ -32,7 +32,6 @@
 #include "Degradation.h"
 
 #include <Toolbox/Expression.h>
-#include <Toolbox/ResourceHolder.h>
 
 class CustomStressDegradation final : public StressDegradation {
     const unsigned positive_expression_tag, negative_expression_tag;

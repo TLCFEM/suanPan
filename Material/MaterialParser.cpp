@@ -20,7 +20,6 @@
 // ReSharper disable StringLiteralTypo
 #include "MaterialParser.h"
 
-#include <Domain/DomainBase.h>
 #include <Domain/ExternalModule.h>
 #include <Material/Material>
 #include <Toolbox/TokenRegistry.h>

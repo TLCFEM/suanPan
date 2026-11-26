@@ -17,8 +17,6 @@
 
 #include "Circle1D.h"
 
-#include <Material/Material.h>
-
 Circle1D::Circle1D(const unsigned T, const double B, const unsigned M)
     : Section1D(T, M, B * B * datum::pi)
     , radius(B) {}

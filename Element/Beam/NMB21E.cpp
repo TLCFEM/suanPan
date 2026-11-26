@@ -18,7 +18,6 @@
 #include "NMB21E.h"
 
 #include <Domain/DomainBase.h>
-#include <Element/Utility/Orientation.h>
 #include <Section/Section.h>
 
 NMB21E::NMB21E(const unsigned T, const unsigned W, uvec&& N, const unsigned S, const bool F)

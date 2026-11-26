@@ -28,7 +28,6 @@
 #ifndef MODIFIER_H
 #define MODIFIER_H
 
-#include <Domain/Tag.h>
 #include <Element/Element.h>
 
 class DomainBase;

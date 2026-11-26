@@ -20,7 +20,6 @@
 #include <Domain/DomainBase.h>
 #include <Element/Utility/IGA/NURBSVolume.h>
 #include <Material/Material3D/Material3D.h>
-#include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
 
 PatchCube::IntegrationPoint::IntegrationPoint(vec&& C, const double W, unique_ptr<Material>&& M)

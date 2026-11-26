@@ -17,7 +17,6 @@
 
 #include "SupportMotion.h"
 
-#include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
 #include <Step/Step.h>
 

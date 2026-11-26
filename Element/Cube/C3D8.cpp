@@ -19,7 +19,6 @@
 
 #include <Domain/DomainBase.h>
 #include <Material/Material3D/Material3D.h>
-#include <Recorder/OutputType.h>
 #include <Toolbox/IntegrationPlan.h>
 #include <Toolbox/shape.h>
 #include <Toolbox/tensor.h>
