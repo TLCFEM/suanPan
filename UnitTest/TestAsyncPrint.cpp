@@ -29,8 +29,19 @@
 
 #include <Toolbox/async_print.h>
 #include <sstream>
-#include <string>
 #include <suanPan.h>
+#include <thread>
+
+namespace {
+    struct counting_buf final : std::stringbuf {
+        int sync_count = 0;
+
+        int sync() override {
+            ++sync_count;
+            return std::stringbuf::sync();
+        }
+    };
+} // namespace
 
 TEST_CASE("Async Print Preserves Order", "[Utility.AsyncPrint]") {
     suanpan::disable_async_print();
@@ -60,10 +71,98 @@ TEST_CASE("Async Print Flush", "[Utility.AsyncPrint]") {
 
     suanpan::enable_async_print();
     suanpan::print_message("async\n", buffer);
-    suanpan::flush_print();
+    suanpan::flush_print(buffer);
     REQUIRE("sync\nasync\n" == buffer.str());
 
     suanpan::disable_async_print();
+}
+
+TEST_CASE("Async Print Flushes Stream", "[Utility.AsyncPrint]") {
+    suanpan::disable_async_print();
+
+    counting_buf buffer;
+    std::ostream stream(&buffer);
+
+    suanpan::print_message("[====]\r", stream);
+    suanpan::flush_print(stream);
+    REQUIRE(1 == buffer.sync_count);
+    REQUIRE("[====]\r" == buffer.str());
+
+    {
+        const suanpan::AsyncPrintGuard guard;
+        suanpan::print_message("async\r", stream);
+        suanpan::flush_print(stream);
+        REQUIRE(2 == buffer.sync_count);
+    }
+
+    REQUIRE("[====]\rasync\r" == buffer.str());
+}
+
+TEST_CASE("Nested Async Print Guards", "[Utility.AsyncPrint]") {
+    suanpan::disable_async_print();
+
+    counting_buf buffer;
+    std::ostream stream(&buffer);
+
+    {
+        const suanpan::AsyncPrintGuard outer;
+        {
+            const suanpan::AsyncPrintGuard inner;
+            suanpan::print_message("inner\n", stream);
+        }
+        REQUIRE(suanpan::is_async_print_enabled());
+        suanpan::print_message("outer\n", stream);
+    }
+
+    REQUIRE_FALSE(suanpan::is_async_print_enabled());
+    REQUIRE("inner\nouter\n" == buffer.str());
+}
+
+TEST_CASE("Nested Async Print Guard Drains Inner Scope", "[Utility.AsyncPrint]") {
+    suanpan::disable_async_print();
+
+    std::ostringstream stream;
+
+    {
+        const suanpan::AsyncPrintGuard outer;
+        {
+            const suanpan::AsyncPrintGuard inner;
+            suanpan::print_message("inner\n", stream);
+        }
+        REQUIRE("inner\n" == stream.str());
+    }
+}
+
+TEST_CASE("Async Print Disable With Concurrent Producers", "[Utility.AsyncPrint]") {
+    suanpan::disable_async_print();
+
+    counting_buf buffer;
+    std::ostream stream(&buffer);
+    constexpr auto producer_count = 4;
+    constexpr auto message_count = 100;
+
+    std::atomic go{false};
+    std::vector<std::thread> producers;
+
+    {
+        const suanpan::AsyncPrintGuard guard;
+        for(auto t = 0; t < producer_count; ++t)
+            producers.emplace_back([&, t] {
+                while(!go.load(std::memory_order_acquire)) {}
+                for(auto i = 0; i < message_count; ++i) suanpan::print_message(fmt::format("{:d}:{:d}\n", t, i), stream);
+            });
+
+        go.store(true, std::memory_order_release);
+        // Let the workers submit some messages asynchronously before the guard
+        // disables the mode and drains the queue.
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    for(auto& producer : producers) producer.join();
+
+    const auto output = buffer.str();
+    for(auto t = 0; t < producer_count; ++t)
+        for(auto i = 0; i < message_count; ++i) REQUIRE(std::string::npos != output.find(fmt::format("{:d}:{:d}\n", t, i)));
 }
 
 TEST_CASE("Async Print Via Logging Helpers", "[Utility.AsyncPrint]") {

@@ -1,7 +1,6 @@
 #include "CatchHeader.h"
 
 #include <Toolbox/thread_pool.hpp>
-#include <atomic>
 #include <numeric>
 
 TEST_CASE("Thread Pool Submit Values", "[Utility.ThreadPool]") {
@@ -113,10 +112,13 @@ TEST_CASE("Thread Pool Many Tasks", "[Utility.ThreadPool]") {
 TEST_CASE("Thread Pool Survives Throwing Task", "[Utility.ThreadPool]") {
     thread_pool pool(1);
 
+    const auto error_count = std::atomic_ref<unsigned>(SUANPAN_ERROR_COUNT).load();
+
     pool.push_task([] { throw std::runtime_error("boom"); });
     auto future = pool.submit([] { return 42; });
 
     pool.wait_for_tasks();
 
     REQUIRE(42 == future.get());
+    REQUIRE(error_count + 1 == std::atomic_ref<unsigned>(SUANPAN_ERROR_COUNT).load());
 }

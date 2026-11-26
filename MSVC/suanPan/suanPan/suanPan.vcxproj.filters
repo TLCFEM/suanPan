@@ -1540,6 +1540,9 @@
     <ClCompile Include="..\..\..\Recorder\ModalRecorder.cpp">
       <Filter>Recorder</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\UnitTest\TestAsyncPrint.cpp">
+      <Filter>UnitTest</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\UnitTest\TestCDPM2.cpp">
       <Filter>UnitTest</Filter>
     </ClCompile>

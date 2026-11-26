@@ -28,15 +28,35 @@
 #include "async_print.h"
 
 #include <Toolbox/thread_pool.hpp>
-#include <suanPan.h>
 
 namespace {
-    std::atomic async_enabled{false};
+    enum class print_mode : unsigned char { sync,
+                                            async,
+                                            switching };
 
-    // Only the synchronous (CLI) write path needs this lock: it writes on the
-    // calling thread, so concurrent callers have to be serialised. The async
-    // path is serialised by the print pool itself (single worker + FIFO queue).
-    std::mutex print_mutex;
+    // Guards the mode and serialises every stream write, including worker writes.
+    std::mutex mode_mutex;
+
+    std::condition_variable mode_cv;
+
+    // Serialises mode changes so only one drain/flip runs at a time.
+    std::mutex switch_mutex;
+
+    print_mode mode = print_mode::sync;
+
+    unsigned depth = 0;
+
+    // Restores the mode and wakes blocked producers, even if a stream throws.
+    struct restore_mode {
+        std::unique_lock<std::mutex>& lock;
+        print_mode next;
+
+        ~restore_mode() {
+            mode = next;
+            lock.unlock();
+            mode_cv.notify_all();
+        }
+    };
 
     thread_pool& get_print_pool() {
         static thread_pool pool(1);
@@ -46,28 +66,69 @@ namespace {
 
 namespace suanpan {
     void print_message(const std::string& message, std::ostream& stream) {
-        if(async_enabled.load(std::memory_order_relaxed)) get_print_pool().push_task([&stream, message] { stream << message; });
-        else {
-            const std::scoped_lock lock(print_mutex);
-            stream << message;
-        }
+        std::unique_lock lock(mode_mutex);
+        mode_cv.wait(lock, [] { return print_mode::switching != mode; });
+
+        if(print_mode::async == mode) get_print_pool().push_task([&stream, message] {
+            const std::scoped_lock write_lock(mode_mutex);
+            // A failing stream must not recurse into the logger.
+            try {
+                stream << message;
+            }
+            catch(...) {
+            }
+        });
+        else stream << message;
     }
 
     void enable_async_print() {
-        if(async_enabled.exchange(true)) return;
+        const std::scoped_lock switch_lock(switch_mutex);
+
         get_print_pool();
+
+        const std::scoped_lock lock(mode_mutex);
+        if(0 == depth++) mode = print_mode::async;
     }
 
     void disable_async_print() {
-        if(!async_enabled.exchange(false)) return;
+        const std::scoped_lock switch_lock(switch_mutex);
+
+        std::unique_lock lock(mode_mutex);
+        if(0 == depth) return;
+
+        --depth;
+        mode = print_mode::switching;
+        lock.unlock();
+
         get_print_pool().wait_for_tasks();
+
+        lock.lock();
+        const restore_mode restore{lock, 0 == depth ? print_mode::sync : print_mode::async};
     }
 
-    void flush_print() {
-        if(async_enabled.load(std::memory_order_relaxed)) get_print_pool().wait_for_tasks();
+    void flush_print(std::ostream& stream) {
+        const std::scoped_lock switch_lock(switch_mutex);
+
+        std::unique_lock lock(mode_mutex);
+        if(print_mode::sync == mode) {
+            stream.flush();
+            return;
+        }
+
+        mode = print_mode::switching;
+        lock.unlock();
+
+        get_print_pool().wait_for_tasks();
+
+        lock.lock();
+        const restore_mode restore{lock, 0 == depth ? print_mode::sync : print_mode::async};
+        stream.flush();
     }
 
-    bool is_async_print_enabled() { return async_enabled.load(std::memory_order_relaxed); }
+    bool is_async_print_enabled() {
+        const std::scoped_lock lock(mode_mutex);
+        return depth > 0;
+    }
 } // namespace suanpan
 
 //! @}

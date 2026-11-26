@@ -61,7 +61,6 @@
 #include <Toolbox/thread_pool.hpp>
 #include <ranges>
 #include <regex>
-#include <thread>
 
 using std::ifstream;
 using std::ofstream;
@@ -94,7 +93,7 @@ namespace {
                 progress.append(50 - length, '-');
                 progress.append("]\r");
                 suanpan::print_message(progress, SUANPAN_COUT);
-                suanpan::flush_print();
+                suanpan::flush_print(SUANPAN_COUT);
             });
             vec x = solve(A, b);
             x(randi<uvec>(1, distr_param(0, M - 1))).fill(I);
@@ -155,13 +154,13 @@ namespace {
         unique_ptr<std::stringbuf> buffer_tmp;
 
         const auto redirect = [&] {
-            suanpan::flush_print();
+            suanpan::flush_print(SUANPAN_COUT);
             buffer_backup = SUANPAN_COUT.rdbuf();
             buffer_tmp = std::make_unique<std::stringbuf>();
             SUANPAN_COUT.rdbuf(buffer_tmp.get());
         };
         const auto restore = [&] {
-            suanpan::flush_print();
+            suanpan::flush_print(SUANPAN_COUT);
             SUANPAN_COUT.rdbuf(buffer_backup);
             for(const auto I : buffer_tmp->str()) {
                 SUANPAN_COUT << I;
@@ -1565,12 +1564,14 @@ int process_command(const shared_ptr<Bead>& model, const std::string_view comman
 
     if(is_equal_any(command_id, "analyze", "analyse")) {
         const auto options = get_remaining(command);
-        if(SUANPAN_WARNING_COUNT > 0 && !if_contain(options, "ignore_warning") && !if_contain(options, "ignore-warning")) {
-            suanpan_warning("There are {} warnings, please fix them first or use `ignore-warning` to ignore them.\n", SUANPAN_WARNING_COUNT);
+        const auto warning_count = std::atomic_ref<unsigned>(SUANPAN_WARNING_COUNT).load(std::memory_order_relaxed);
+        if(warning_count > 0 && !if_contain(options, "ignore_warning") && !if_contain(options, "ignore-warning")) {
+            suanpan_warning("There are {} warnings, please fix them first or use `ignore-warning` to ignore them.\n", warning_count);
             return SUANPAN_SUCCESS;
         }
-        if(SUANPAN_ERROR_COUNT > 0 && !if_contain(options, "ignore_error") && !if_contain(options, "ignore-error")) {
-            suanpan_warning("There are {} errors, please fix them first or use `ignore-error` to ignore them.\n", SUANPAN_ERROR_COUNT);
+        const auto error_count = std::atomic_ref<unsigned>(SUANPAN_ERROR_COUNT).load(std::memory_order_relaxed);
+        if(error_count > 0 && !if_contain(options, "ignore_error") && !if_contain(options, "ignore-error")) {
+            suanpan_warning("There are {} errors, please fix them first or use `ignore-error` to ignore them.\n", error_count);
             return SUANPAN_SUCCESS;
         }
         const auto code = model->analyze();
