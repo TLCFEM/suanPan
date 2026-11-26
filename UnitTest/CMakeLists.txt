@@ -10,6 +10,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         TestExpression.cpp
         TestFeast.cpp
         TestFGMRES.cpp
+        TestHistory.cpp
         TestHomotopy.cpp
         TestIGAValidation.cpp
         TestIntegration.cpp
