@@ -59,11 +59,11 @@ protected:
 public:
     BandMatSpikeGPU(const uword in_size, const uword in_l, const uword in_u)
         : BandMatSpikeBase<T>(in_size, in_l, in_u)
-        , d_A(sizeof(T), static_cast<int>(this->n_elem)) { init_config(); }
+        , d_A(sizeof(T), static_cast<size_t>(this->n_elem)) { init_config(); }
 
     BandMatSpikeGPU(const BandMatSpikeGPU& other)
         : BandMatSpikeBase<T>(other)
-        , d_A(sizeof(T), static_cast<int>(this->n_elem)) { init_config(); }
+        , d_A(sizeof(T), static_cast<size_t>(this->n_elem)) { init_config(); }
 
     BandMatSpikeGPU(BandMatSpikeGPU&&) = delete;
     BandMatSpikeGPU& operator=(const BandMatSpikeGPU&) = delete;
@@ -103,7 +103,7 @@ template<sp_d T> int BandMatSpikeGPU<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
     }
 
     // sync copies transfer the whole buffer, so it must match the RHS exactly
-    if(d_B.size != static_cast<int>(B.n_elem)) d_B = cuda_ptr(sizeof(T), static_cast<int>(B.n_elem));
+    if(d_B.size != static_cast<size_t>(B.n_elem)) d_B = cuda_ptr(sizeof(T), static_cast<size_t>(B.n_elem));
 
     d_B.copy_from(B.memptr());
 

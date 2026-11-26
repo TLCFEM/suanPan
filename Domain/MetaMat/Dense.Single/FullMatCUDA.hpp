@@ -39,7 +39,7 @@ template<sp_d T> class FullMatCUDA final : public FullMat<T> {
     cusolverDnHandle_t handle = nullptr;
     cudaStream_t stream = nullptr;
 
-    cuda_ptr info{sizeof(int), 1}, d_ipiv{sizeof(int), static_cast<int>(this->n_rows)}, d_A{}, d_work{};
+    cuda_ptr info{sizeof(int), 1}, d_ipiv{sizeof(int), static_cast<size_t>(this->n_rows)}, d_A{}, d_work{};
 
     void init_config() {
         cusolverDnCreate(&handle);
@@ -48,14 +48,14 @@ template<sp_d T> class FullMatCUDA final : public FullMat<T> {
 
         int work_size = 0;
         if(std::is_same_v<T, float> || Precision::MIXED == this->setting.precision) {
-            d_A = cuda_ptr(sizeof(float), static_cast<int>(this->n_elem));
-            cusolverDnSgetrf_bufferSize(handle, static_cast<int>(this->n_rows), static_cast<int>(this->n_cols), d_A.get<float>(), d_A.size, &work_size);
-            d_work = cuda_ptr(sizeof(float), work_size);
+            d_A = cuda_ptr(sizeof(float), static_cast<size_t>(this->n_elem));
+            cusolverDnSgetrf_bufferSize(handle, static_cast<int>(this->n_rows), static_cast<int>(this->n_cols), d_A.get<float>(), static_cast<int>(d_A.size), &work_size);
+            d_work = cuda_ptr(sizeof(float), static_cast<size_t>(work_size));
         }
         else {
-            d_A = cuda_ptr(sizeof(double), static_cast<int>(this->n_elem));
-            cusolverDnDgetrf_bufferSize(handle, static_cast<int>(this->n_rows), static_cast<int>(this->n_cols), d_A.get<double>(), d_A.size, &work_size);
-            d_work = cuda_ptr(sizeof(double), work_size);
+            d_A = cuda_ptr(sizeof(double), static_cast<size_t>(this->n_elem));
+            cusolverDnDgetrf_bufferSize(handle, static_cast<int>(this->n_rows), static_cast<int>(this->n_cols), d_A.get<double>(), static_cast<int>(d_A.size), &work_size);
+            d_work = cuda_ptr(sizeof(double), static_cast<size_t>(work_size));
         }
 
         this->factored = false;
@@ -100,7 +100,7 @@ template<sp_d T> int FullMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
             cusolverDnSgetrf(handle, NROW, NCOL, d_A.get<float>(), NROW, d_work.get<float>(), d_ipiv.get(), info.get());
         }
 
-        const cuda_ptr d_x{sizeof(float), static_cast<int>(B.n_elem)};
+        const cuda_ptr d_x{sizeof(float), static_cast<size_t>(B.n_elem)};
         d_x.copy_from(B.memptr(), stream);
 
         cusolverDnSgetrs(handle, CUBLAS_OP_N, NROW, static_cast<int>(B.n_cols), d_A.get<float>(), NROW, d_ipiv.get(), d_x.get<float>(), NROW, info.get());
@@ -117,7 +117,7 @@ template<sp_d T> int FullMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
             cusolverDnSgetrf(handle, NROW, NCOL, d_A.get<float>(), NROW, d_work.get<float>(), d_ipiv.get(), info.get());
         }
 
-        const cuda_ptr d_x{sizeof(float), static_cast<int>(B.n_elem)};
+        const cuda_ptr d_x{sizeof(float), static_cast<size_t>(B.n_elem)};
 
         X = arma::zeros(B.n_rows, B.n_cols);
 
@@ -146,7 +146,7 @@ template<sp_d T> int FullMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) {
             cusolverDnDgetrf(handle, NROW, NCOL, d_A.get<double>(), NROW, d_work.get<double>(), d_ipiv.get(), info.get());
         }
 
-        const cuda_ptr d_x{sizeof(float), static_cast<int>(B.n_elem)};
+        const cuda_ptr d_x{sizeof(float), static_cast<size_t>(B.n_elem)};
         d_x.copy_from(B.memptr(), stream);
 
         cusolverDnDgetrs(handle, CUBLAS_OP_N, NROW, static_cast<int>(B.n_cols), d_A.get<double>(), NROW, d_ipiv.get(), d_x.get<double>(), NROW, info.get());

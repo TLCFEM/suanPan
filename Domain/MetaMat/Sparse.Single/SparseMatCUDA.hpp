@@ -54,7 +54,7 @@ template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
         cusparseCreateMatDescr(&descr);
         cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
         cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
-        d_row_ptr = cuda_ptr(sizeof(int), static_cast<int>(this->n_rows) + 1);
+        d_row_ptr = cuda_ptr(sizeof(int), static_cast<size_t>(this->n_rows) + 1);
         this->factored = false;
     }
 
@@ -65,8 +65,8 @@ template<sp_d T> class SparseMatCUDA final : public SparseMat<T> {
     }
 
     template<sp_d ET> void device_alloc(csr_form<ET, int>&& csr_mat) {
-        d_val_idx = cuda_ptr(sizeof(ET), csr_mat.n_elem);
-        d_col_idx = cuda_ptr(sizeof(int), csr_mat.n_elem);
+        d_val_idx = cuda_ptr(sizeof(ET), static_cast<size_t>(csr_mat.n_elem));
+        d_col_idx = cuda_ptr(sizeof(int), static_cast<size_t>(csr_mat.n_elem));
 
         d_val_idx.copy_from(csr_mat.val_mem(), stream);
         d_col_idx.copy_from(csr_mat.col_mem(), stream);
@@ -104,7 +104,7 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
 
     const size_t unit_size = single_precision ? sizeof(float) : sizeof(double);
 
-    const cuda_ptr d_b{unit_size, static_cast<int>(B.n_elem)}, d_x{unit_size, static_cast<int>(B.n_elem)};
+    const cuda_ptr d_b{unit_size, static_cast<size_t>(B.n_elem)}, d_x{unit_size, static_cast<size_t>(B.n_elem)};
 
     int singularity;
     Col<int> code(B.n_cols);
@@ -112,7 +112,7 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
     if constexpr(std::is_same_v<T, float>) {
         d_b.copy_from(B.memptr(), stream);
 
-        for(uword I{0}, J{0}; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpScsrlsvqr(handle, static_cast<int>(this->n_rows), d_val_idx.size, descr, d_val_idx.get<float>(), d_row_ptr.get(), d_col_idx.get(), d_b.get<float>(I), std::numeric_limits<float>::epsilon(), 3, d_x.get<float>(I), &singularity);
+        for(uword I{0}, J{0}; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpScsrlsvqr(handle, static_cast<int>(this->n_rows), static_cast<int>(d_val_idx.size), descr, d_val_idx.get<float>(), d_row_ptr.get(), d_col_idx.get(), d_b.get<float>(I), std::numeric_limits<float>::epsilon(), 3, d_x.get<float>(I), &singularity);
 
         if(0 == code.max()) {
             X.set_size(arma::size(B));
@@ -122,7 +122,7 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
     else if(Precision::FULL == this->setting.precision) {
         d_b.copy_from(B.memptr(), stream);
 
-        for(uword I{0}, J{0}; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpDcsrlsvqr(handle, static_cast<int>(this->n_rows), d_val_idx.size, descr, d_val_idx.get<double>(), d_row_ptr.get(), d_col_idx.get(), d_b.get<double>(I), std::numeric_limits<double>::epsilon(), 3, d_x.get<double>(I), &singularity);
+        for(uword I{0}, J{0}; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpDcsrlsvqr(handle, static_cast<int>(this->n_rows), static_cast<int>(d_val_idx.size), descr, d_val_idx.get<double>(), d_row_ptr.get(), d_col_idx.get(), d_b.get<double>(I), std::numeric_limits<double>::epsilon(), 3, d_x.get<double>(I), &singularity);
 
         if(0 == code.max()) {
             X.set_size(arma::size(B));
@@ -143,7 +143,7 @@ template<sp_d T> int SparseMatCUDA<T>::direct_solve(Mat<T>& X, const Mat<T>& B) 
             auto residual = conv_to<fmat>::from(full_residual / multiplier);
             d_b.copy_from(residual.memptr(), stream);
 
-            for(uword I{0}, J{0}; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpScsrlsvqr(handle, static_cast<int>(this->n_rows), d_val_idx.size, descr, d_val_idx.get<float>(), d_row_ptr.get(), d_col_idx.get(), d_b.get<float>(I), std::numeric_limits<float>::epsilon(), 3, d_x.get<float>(I), &singularity);
+            for(uword I{0}, J{0}; I < B.n_elem; I += B.n_rows, ++J) code[J] = cusolverSpScsrlsvqr(handle, static_cast<int>(this->n_rows), static_cast<int>(d_val_idx.size), descr, d_val_idx.get<float>(), d_row_ptr.get(), d_col_idx.get(), d_b.get<float>(I), std::numeric_limits<float>::epsilon(), 3, d_x.get<float>(I), &singularity);
             if(0 != code.max()) break;
 
             d_x.copy_to(residual.memptr(), stream);

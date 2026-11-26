@@ -38,9 +38,9 @@ class cuda_ptr {
 public:
     size_t unit{};
 
-    int size{};
+    size_t size{};
 
-    explicit cuda_ptr(const size_t in_unit = 0, const int in_size = 0)
+    explicit cuda_ptr(const size_t in_unit = 0, const size_t in_size = 0)
         : unit(in_unit)
         , size(in_size) {
         if(total_size() > 0) cudaMalloc(&ptr, total_size());
