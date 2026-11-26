@@ -131,6 +131,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <deque>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -1300,13 +1301,24 @@ inline bool history_save(const char *filename) {
 inline bool history_load(const char *filename) {
     std::ifstream f(filename, std::ios::binary);
     if (!f) return false;
+
+    /* history_add() erases from the front of a std::vector once the history
+     * is full. Loading a file that holds far more lines than the limit would
+     * shift every retained entry once per line, i.e. quadratic work and a
+     * noticeable startup delay. Keep the bounded window in a deque instead
+     * and publish it to the vector once at the end. */
+    std::deque<std::string> buffer(history.begin(), history.end());
     std::string line;
     while (std::getline(f, line)) {
         if (!line.empty() && line.back() == '\r') line.pop_back();
         /* Rebuild embedded newlines that were saved as CR. */
         std::replace(line.begin(), line.end(), '\r', '\n');
-        history_add(line.c_str());
+        if (0 == history_max_len) continue;
+        if (!buffer.empty() && buffer.back() == line) continue;
+        if (buffer.size() == history_max_len) buffer.pop_front();
+        buffer.emplace_back(std::move(line));
     }
+    history.assign(buffer.begin(), buffer.end());
     return true;
 }
 
