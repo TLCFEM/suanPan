@@ -40,7 +40,7 @@
 #include <gspike/spike.h>
 
 template<sp_d T> class BandMatSpikeGPU final : public BandMatSpikeBase<T> {
-    cuda_ptr d_A{}, d_B{};
+    cuda_ptr d_A, d_B{};
 
     std::unique_ptr<gspike::solver<float>> solver;
     std::unique_ptr<gspike::mixed_solver> mixer;
@@ -58,10 +58,12 @@ protected:
 
 public:
     BandMatSpikeGPU(const uword in_size, const uword in_l, const uword in_u)
-        : BandMatSpikeBase<T>(in_size, in_l, in_u) { init_config(); }
+        : BandMatSpikeBase<T>(in_size, in_l, in_u)
+        , d_A(sizeof(T), static_cast<int>(this->n_elem)) { init_config(); }
 
     BandMatSpikeGPU(const BandMatSpikeGPU& other)
-        : BandMatSpikeBase<T>(other) { init_config(); }
+        : BandMatSpikeBase<T>(other)
+        , d_A(sizeof(T), static_cast<int>(this->n_elem)) { init_config(); }
 
     BandMatSpikeGPU(BandMatSpikeGPU&&) = delete;
     BandMatSpikeGPU& operator=(const BandMatSpikeGPU&) = delete;
@@ -92,7 +94,6 @@ template<sp_d T> int BandMatSpikeGPU<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
         solver.reset();
         mixer.reset();
 
-        d_A = cuda_ptr(sizeof(T), static_cast<int>(this->n_elem));
         d_A.copy_from(this->memptr());
 
         if constexpr(std::is_same_v<T, float>) solver = std::make_unique<gspike::solver<float>>(N, KL, KU, d_A.get<float>(), LDAB);
