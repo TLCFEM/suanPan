@@ -6,22 +6,26 @@
 
 ## version 4.3.1
 
-1. add `ModalRecorder` for modal properties and `ModalForceRecorder` for nodal and elemental modal elastic forces [#395](https://github.com/TLCFEM/suanPan/pull/395) [#396](https://github.com/TLCFEM/suanPan/pull/396)
-2. merge distributed `HDF5` recorder outputs into a single file and remove per-rank files after successful combination [#397](https://github.com/TLCFEM/suanPan/pull/397)
-3. (**breaking**) pass the object tag as an additional argument to C++ external module creation functions, update module signatures accordingly
-4. improve convergence and robustness of `DafaliasManzari` and `SimpleSand` models with backtracking line search, tension handling and pressure regularization [#400](https://github.com/TLCFEM/suanPan/pull/400) [#401](https://github.com/TLCFEM/suanPan/pull/401) [#402](https://github.com/TLCFEM/suanPan/pull/402)
-5. fix non-deviatoric plastic correction in `YLD0418P` return mapping [#399](https://github.com/TLCFEM/suanPan/pull/399)
-6. regularize `DuncanSelig` moduli beyond failure to prevent local iteration oscillation
-7. fix body force matrix formulation in `SGCMQ` element
-8. stabilize return mapping by limiting the hardening increment in `CDPM2` and guarding the plastic multiplier in `NonlinearCamClay`
-9. refactor command parsers with token registries, factory functions and centralized tag extraction, with improved error handling [#406](https://github.com/TLCFEM/suanPan/pull/406) [#407](https://github.com/TLCFEM/suanPan/pull/407) [#409](https://github.com/TLCFEM/suanPan/pull/409) [#410](https://github.com/TLCFEM/suanPan/pull/410)
-10. use an RAII wrapper for `HDF5` handling and remove the `hdf5_hl` dependency [#398](https://github.com/TLCFEM/suanPan/pull/398)
-11. update `VTK` to version `9.7.2`
-12. add asynchronous printing support with a dedicated worker thread for ordered, non-blocking output in batch runs, with an `AsyncPrintGuard` RAII helper and improved `thread_pool` thread safety [#413](https://github.com/TLCFEM/suanPan/pull/413)
-13. refactor `DuncanSelig` local iteration for modularity and stability, seed the iteration with an elastic predictor and add coverage tests [#412](https://github.com/TLCFEM/suanPan/pull/412)
-14. update `Armadillo` to version `15.8.0`
-15. add adjusted steel section registries `US2DA`, `US3DA`, `US2DAC`, `US3DAC`, `EU2DA`, `EU3DA`, `NZ2DA` and `NZ3DA`, with dimensions optimized against tabulated `AISC`, `EN 10365` and NZ properties
-16. replace manual Euclidean norm computations with `std::hypot` for improved numerical robustness
+1. (**breaking**) pass the object tag as an additional argument to C++ external module creation functions and update module signatures accordingly
+2. add `ModalRecorder` for modal properties and `ModalForceRecorder` for nodal and elemental modal elastic forces [#395](https://github.com/TLCFEM/suanPan/pull/395) [#396](https://github.com/TLCFEM/suanPan/pull/396)
+3. merge distributed `HDF5` recorder outputs into a single file and remove per-rank files after successful combination [#397](https://github.com/TLCFEM/suanPan/pull/397)
+4. use an RAII wrapper for `HDF5` handling and remove the `hdf5_hl` dependency [#398](https://github.com/TLCFEM/suanPan/pull/398)
+5. improve convergence and robustness of `DafaliasManzari` and `SimpleSand` models with backtracking line search, tension handling and pressure regularization, with added coverage tests [#400](https://github.com/TLCFEM/suanPan/pull/400) [#401](https://github.com/TLCFEM/suanPan/pull/401) [#402](https://github.com/TLCFEM/suanPan/pull/402) [#403](https://github.com/TLCFEM/suanPan/pull/403) [#404](https://github.com/TLCFEM/suanPan/pull/404)
+6. fix non-deviatoric plastic correction in `YLD0418P` return mapping [#399](https://github.com/TLCFEM/suanPan/pull/399)
+7. refactor `DuncanSelig` local iteration for modularity and stability, regularize moduli beyond failure, seed the iteration with an elastic predictor, and fix the body force matrix formulation in `SGCMQ` [#412](https://github.com/TLCFEM/suanPan/pull/412)
+8. stabilize return mapping by limiting the hardening increment in `CDPM2`, guarding the plastic multiplier in `NonlinearCamClay`, and fixing the rank-deficient tension-cap tangent
+9. refactor command parsers with token registries, factory functions and centralized tag extraction, with improved error handling [#405](https://github.com/TLCFEM/suanPan/pull/405) [#406](https://github.com/TLCFEM/suanPan/pull/406) [#407](https://github.com/TLCFEM/suanPan/pull/407) [#409](https://github.com/TLCFEM/suanPan/pull/409) [#410](https://github.com/TLCFEM/suanPan/pull/410)
+10. redesign asynchronous printing, replacing the thread pool with a minimal implementation, and improve `thread_pool` thread safety [#413](https://github.com/TLCFEM/suanPan/pull/413)
+11. implement a GPU-based `SPIKE` solver and refactor banded storage, add determinant computation and sign support for `SPIKE` matrices, and make `SPIKE` auto-tuning thread-safe and deterministic [#416](https://github.com/TLCFEM/suanPan/pull/416) [#417](https://github.com/TLCFEM/suanPan/pull/417)
+12. add `FEAST` and `PFEAST` eigensolver interfaces with wrappers, plus wrappers for `ARPACK`, `FEAST` and `PARPACK` eigenvalue solvers [#414](https://github.com/TLCFEM/suanPan/pull/414)
+13. enhance the oneMKL `FGMRES` wrapper and integrate tests [#415](https://github.com/TLCFEM/suanPan/pull/415)
+14. add adjusted steel section registries `US2DA`, `US3DA`, `US2DAC`, `US3DAC`, `EU2DA`, `EU3DA`, `NZ2DA` and `NZ3DA`, with dimensions optimized against tabulated `AISC`, `EN 10365` and NZ properties, as well as `UB`, `UC` and `UBP` section registries
+15. update `Armadillo` to version `15.8.0`, `VTK` to `9.7.2` and `magic_enum` to `0.10.0`, add the `GSPIKE` dependency, and update the `CUDA` base image
+16. optimize CLI history loading and clean up the history test [#419](https://github.com/TLCFEM/suanPan/pull/419)
+17. minimize redundant includes via include tree analysis [#420](https://github.com/TLCFEM/suanPan/pull/420)
+18. apply `constexpr` best practices and rewrite the contribution guide [#421](https://github.com/TLCFEM/suanPan/pull/421)
+19. use `size_t` for `CUDA` pointer buffer sizes [#418](https://github.com/TLCFEM/suanPan/pull/418)
+20. miscellaneous maintenance: replace manual Euclidean norm computations with `std::hypot` for improved numerical robustness, limit container thread pools to visible CPU count, safeguard global variables, suppress Catch2 test output, improve the coverage runner script, refresh Sublime completions, icons and MSVC solution files, and update daily build configuration
 
 ## version 4.3
 
