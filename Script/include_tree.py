@@ -34,10 +34,9 @@ import re
 import subprocess
 import sys
 from collections import defaultdict
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from functools import lru_cache
 from pathlib import Path
-from typing import Iterable, Iterator
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -54,24 +53,111 @@ EXCLUDED_ANYWHERE = {"__pycache__"}
 # prune when another kept include provides them unconditionally.
 STL_HEADERS = frozenset(
     {
-        "algorithm", "any", "array", "atomic", "barrier", "bit", "bitset",
-        "cassert", "cctype", "cerrno", "cfenv", "cfloat", "charconv", "chrono",
-        "cinttypes", "climits", "clocale", "cmath", "codecvt", "compare",
-        "complex", "concepts", "condition_variable", "coroutine", "csetjmp",
-        "csignal", "cstdarg", "cstddef", "cstdint", "cstdio", "cstdlib",
-        "cstring", "ctime", "cuchar", "cwchar", "cwctype", "deque", "exception",
-        "execution", "expected", "filesystem", "flat_map", "flat_set", "format",
-        "forward_list", "fstream", "functional", "future", "generator",
-        "initializer_list", "iomanip", "ios", "iosfwd", "iostream", "istream",
-        "iterator", "latch", "limits", "list", "locale", "map", "mdspan",
-        "memory", "memory_resource", "mutex", "new", "numbers", "numeric",
-        "optional", "ostream", "print", "queue", "random", "ranges", "ratio",
-        "regex", "scoped_allocator", "semaphore", "set", "shared_mutex",
-        "source_location", "span", "sstream", "stack", "stdexcept", "stdfloat",
-        "stop_token", "streambuf", "string", "string_view", "strstream",
-        "syncstream", "system_error", "thread", "tuple", "type_traits",
-        "typeindex", "typeinfo", "unordered_map", "unordered_set", "utility",
-        "valarray", "variant", "vector", "version",
+        "algorithm",
+        "any",
+        "array",
+        "atomic",
+        "barrier",
+        "bit",
+        "bitset",
+        "cassert",
+        "cctype",
+        "cerrno",
+        "cfenv",
+        "cfloat",
+        "charconv",
+        "chrono",
+        "cinttypes",
+        "climits",
+        "clocale",
+        "cmath",
+        "codecvt",
+        "compare",
+        "complex",
+        "concepts",
+        "condition_variable",
+        "coroutine",
+        "csetjmp",
+        "csignal",
+        "cstdarg",
+        "cstddef",
+        "cstdint",
+        "cstdio",
+        "cstdlib",
+        "cstring",
+        "ctime",
+        "cuchar",
+        "cwchar",
+        "cwctype",
+        "deque",
+        "exception",
+        "execution",
+        "expected",
+        "filesystem",
+        "flat_map",
+        "flat_set",
+        "format",
+        "forward_list",
+        "fstream",
+        "functional",
+        "future",
+        "generator",
+        "initializer_list",
+        "iomanip",
+        "ios",
+        "iosfwd",
+        "iostream",
+        "istream",
+        "iterator",
+        "latch",
+        "limits",
+        "list",
+        "locale",
+        "map",
+        "mdspan",
+        "memory",
+        "memory_resource",
+        "mutex",
+        "new",
+        "numbers",
+        "numeric",
+        "optional",
+        "ostream",
+        "print",
+        "queue",
+        "random",
+        "ranges",
+        "ratio",
+        "regex",
+        "scoped_allocator",
+        "semaphore",
+        "set",
+        "shared_mutex",
+        "source_location",
+        "span",
+        "sstream",
+        "stack",
+        "stdexcept",
+        "stdfloat",
+        "stop_token",
+        "streambuf",
+        "string",
+        "string_view",
+        "strstream",
+        "syncstream",
+        "system_error",
+        "thread",
+        "tuple",
+        "type_traits",
+        "typeindex",
+        "typeinfo",
+        "unordered_map",
+        "unordered_set",
+        "utility",
+        "valarray",
+        "variant",
+        "vector",
+        "version",
     }
 )
 
@@ -150,9 +236,7 @@ def is_excluded(relative: Path) -> bool:
     if any(part in EXCLUDED_ANYWHERE for part in parts[:-1]):
         return True
     # Third party source trees such as Toolbox/superlu-src.
-    if any(part.endswith("-src") for part in parts[:-1]):
-        return True
-    return False
+    return bool(any(part.endswith("-src") for part in parts[:-1]))
 
 
 def collect_sources(root: Path = ROOT) -> list[Path]:
@@ -186,7 +270,7 @@ def _is_guard(lines: list[str], index: int, rest: str) -> bool:
         return False
     for line in lines[index + 1 :]:
         stripped = line.strip()
-        if not stripped or stripped.startswith("//") or stripped.startswith("/*") or stripped.startswith("*"):
+        if not stripped or stripped.startswith(("//", "/*", "*")):
             continue
         define = DEFINE_RE.match(line)
         return bool(define and define.group(1) == macro)
@@ -218,9 +302,8 @@ def parse_includes(path: Path) -> list[Include]:
             elif kind == "else":
                 if stack:
                     stack[-1] = ("else", "")
-            elif kind == "endif":
-                if stack:
-                    stack.pop()
+            elif kind == "endif" and stack:
+                stack.pop()
             index += 1
             continue
 
@@ -281,7 +364,6 @@ class IncludeGraph:
             if not self.is_project(self.resolve(include, path)):
                 yield include
 
-    @lru_cache(maxsize=None)
     def unconditional_closure(self, path: Path) -> frozenset[Path]:
         """Project headers reachable through unconditional includes only."""
         seen: set[Path] = set()
@@ -296,7 +378,6 @@ class IncludeGraph:
                     stack.append(child)
         return frozenset(seen)
 
-    @lru_cache(maxsize=None)
     def unconditional_external_names(self, path: Path) -> frozenset[str]:
         """External (system/third party) headers reachable without conditions."""
         names: set[str] = set()
@@ -348,7 +429,9 @@ class IncludeGraph:
                             "exact",
                             str(path.relative_to(ROOT)),
                             True,
-                            "repeated directive" if not condition else "repeated directive in the same branch",
+                            "repeated directive"
+                            if not condition
+                            else "repeated directive in the same branch",
                         )
                     )
 
@@ -367,7 +450,11 @@ class IncludeGraph:
                     provided = self.unconditional_closure(header)
                     for include in includes:
                         resolved = self.resolve(include, path)
-                        if resolved is None or resolved == header or resolved not in provided:
+                        if (
+                            resolved is None
+                            or resolved == header
+                            or resolved not in provided
+                        ):
                             continue
                         duplicates.append(
                             Duplicate(
@@ -404,7 +491,9 @@ class IncludeGraph:
                     continue
                 resolved = self.resolve(include, path)
                 is_project = self.is_project(resolved)
-                if not is_project and (path.suffix not in SOURCE_EXTENSIONS and not stl_in_headers):
+                if not is_project and (
+                    path.suffix not in SOURCE_EXTENSIONS and not stl_in_headers
+                ):
                     continue
                 if not is_project and include.name not in STL_HEADERS:
                     continue
@@ -444,9 +533,14 @@ class IncludeGraph:
         for duplicate in duplicates:
             key = (duplicate.path, duplicate.include.line)
             previous = unique.get(key)
-            if previous is None or priority.get(duplicate.kind, 99) < priority.get(previous.kind, 99):
+            if previous is None or priority.get(duplicate.kind, 99) < priority.get(
+                previous.kind, 99
+            ):
                 unique[key] = duplicate
-        return sorted(unique.values(), key=lambda item: (str(item.path), item.include.line, item.kind))
+        return sorted(
+            unique.values(),
+            key=lambda item: (str(item.path), item.include.line, item.kind),
+        )
 
     def modernize_c_headers(self) -> list[tuple[Path, Include, str]]:
         """Find standard C headers that should be replaced by C++ headers."""
@@ -468,15 +562,23 @@ class IncludeGraph:
                 branch = "└── " if last else "├── "
                 condition = ""
                 if include.condition:
-                    condition = "  [" + " && ".join(expr for _, expr in include.condition) + "]"
+                    condition = (
+                        "  [" + " && ".join(expr for _, expr in include.condition) + "]"
+                    )
                 child = self.resolve(include, current)
                 if self.is_project(child):
                     marker = " (already shown)" if child in ancestors else ""  # type: ignore[operator]
                     lines.append(f"{prefix}{branch}{include.name}{condition}{marker}")
                     if child not in ancestors:
-                        walk(child, prefix + ("    " if last else "│   "), ancestors | {child})  # type: ignore[operator]
+                        walk(
+                            child,
+                            prefix + ("    " if last else "│   "),
+                            ancestors | {child},
+                        )  # type: ignore[operator]
                 else:
-                    lines.append(f"{prefix}{branch}{include.name}{condition} [external]")
+                    lines.append(
+                        f"{prefix}{branch}{include.name}{condition} [external]"
+                    )
 
         lines.append(str(path.relative_to(ROOT)))
         walk(path, "", {path})
@@ -499,7 +601,7 @@ def _replace_include(path: Path, include: Include, replacement: str) -> None:
         return
     opening, closing = match.group(1), ">" if match.group(1) == "<" else '"'
     lines[include.start] = INCLUDE_RE.sub(
-        f'#include {opening}{replacement}{closing}',
+        f"#include {opening}{replacement}{closing}",
         line,
         count=1,
     )
@@ -523,18 +625,54 @@ def describe_duplicates(duplicates: Iterable[Duplicate], verbose: bool = False) 
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--root", type=Path, default=ROOT, help="repository root")
-    parser.add_argument("--tree", action="append", default=[], metavar="FILE", help="print the include tree of FILE")
-    parser.add_argument("--all-trees", action="store_true", help="print the include tree of every scanned file")
-    parser.add_argument("--report", action="store_true", help="report duplicated includes (default)")
-    parser.add_argument("--fix", action="store_true", help="remove safely duplicated includes")
-    parser.add_argument("--fix-stl", action="store_true", help="also remove duplicated standard headers from source files")
-    parser.add_argument("--stl-in-headers", action="store_true", help="allow --fix-stl to modify headers as well")
-    parser.add_argument("--modernize-c-headers", action="store_true", help="replace standard C headers with C++ headers")
-    parser.add_argument("--format", action="store_true", help="run Script/Format.sh after changing files")
-    parser.add_argument("--output", type=Path, help="write the report/trees to a file instead of stdout")
-    parser.add_argument("--verbose", action="store_true", help="show non-removable findings as well")
+    parser.add_argument(
+        "--tree",
+        action="append",
+        default=[],
+        metavar="FILE",
+        help="print the include tree of FILE",
+    )
+    parser.add_argument(
+        "--all-trees",
+        action="store_true",
+        help="print the include tree of every scanned file",
+    )
+    parser.add_argument(
+        "--report", action="store_true", help="report duplicated includes (default)"
+    )
+    parser.add_argument(
+        "--fix", action="store_true", help="remove safely duplicated includes"
+    )
+    parser.add_argument(
+        "--fix-stl",
+        action="store_true",
+        help="also remove duplicated standard headers from source files",
+    )
+    parser.add_argument(
+        "--stl-in-headers",
+        action="store_true",
+        help="allow --fix-stl to modify headers as well",
+    )
+    parser.add_argument(
+        "--modernize-c-headers",
+        action="store_true",
+        help="replace standard C headers with C++ headers",
+    )
+    parser.add_argument(
+        "--format",
+        action="store_true",
+        help="run Script/Format.sh after changing files",
+    )
+    parser.add_argument(
+        "--output", type=Path, help="write the report/trees to a file instead of stdout"
+    )
+    parser.add_argument(
+        "--verbose", action="store_true", help="show non-removable findings as well"
+    )
     args = parser.parse_args(argv)
 
     root = args.root.resolve()
@@ -545,7 +683,11 @@ def main(argv: list[str] | None = None) -> int:
     for requested in args.tree:
         candidate = (root / requested).resolve()
         if candidate not in graph.valid:
-            matches = [path for path in graph.files if path.name == requested or str(path).endswith(requested)]
+            matches = [
+                path
+                for path in graph.files
+                if path.name == requested or str(path).endswith(requested)
+            ]
             if len(matches) != 1:
                 parser.error(f"cannot identify tree target: {requested}")
             candidate = matches[0]
@@ -564,14 +706,22 @@ def main(argv: list[str] | None = None) -> int:
     c_headers = graph.modernize_c_headers()
     if c_headers:
         output.append("")
-        output.append(f"Standard C headers that can be replaced by C++ headers: {len(c_headers)}")
+        output.append(
+            f"Standard C headers that can be replaced by C++ headers: {len(c_headers)}"
+        )
         for path, include, replacement in c_headers:
-            output.append(f"  {path.relative_to(root)}:{include.line}: {include.name} -> {replacement}")
+            output.append(
+                f"  {path.relative_to(root)}:{include.line}: {include.name} -> {replacement}"
+            )
 
     def removable_items(items: list[Duplicate]) -> list[Duplicate]:
-        selected = [item for item in items if item.safe and (item.kind != "stl" or args.fix_stl)]
+        selected = [
+            item for item in items if item.safe and (item.kind != "stl" or args.fix_stl)
+        ]
         # The same directive may be reported by more than one rule.
-        return list({(item.path, item.include.line): item for item in selected}.values())
+        return list(
+            {(item.path, item.include.line): item for item in selected}.values()
+        )
 
     if args.fix:
         total_removed = 0
@@ -591,7 +741,9 @@ def main(argv: list[str] | None = None) -> int:
             passes += 1
             changed: set[Path] = set()
             # Remove from the bottom up so earlier line numbers stay valid.
-            for item in sorted(removable, key=lambda entry: (str(entry.path), -entry.include.line)):
+            for item in sorted(
+                removable, key=lambda entry: (str(entry.path), -entry.include.line)
+            ):
                 _remove_lines(item.path, item.include)
                 changed.add(item.path)
             for path, include, replacement in replacements:
@@ -600,7 +752,9 @@ def main(argv: list[str] | None = None) -> int:
             total_removed += len(removable)
             total_changed |= changed
             output.append("")
-            output.append(f"Pass {passes}: removed {len(removable)} duplicated include(s) from {len(changed)} file(s).")
+            output.append(
+                f"Pass {passes}: removed {len(removable)} duplicated include(s) from {len(changed)} file(s)."
+            )
             if not changed:
                 break
             graph = IncludeGraph(root)
@@ -608,10 +762,14 @@ def main(argv: list[str] | None = None) -> int:
             c_headers = graph.modernize_c_headers()
 
         output.append("")
-        output.append(f"Removed {total_removed} duplicated include(s) from {len(total_changed)} file(s) in {passes} pass(es).")
+        output.append(
+            f"Removed {total_removed} duplicated include(s) from {len(total_changed)} file(s) in {passes} pass(es)."
+        )
         if total_changed:
             output.append("")
-            output.extend(f"  {path.relative_to(root)}" for path in sorted(total_changed))
+            output.extend(
+                f"  {path.relative_to(root)}" for path in sorted(total_changed)
+            )
         if total_changed and args.format:
             formatter = Path(root) / "Script" / "Format.sh"
             subprocess.run([str(formatter)], cwd=root, check=True)
@@ -619,12 +777,16 @@ def main(argv: list[str] | None = None) -> int:
             output.append("Formatted with Script/Format.sh.")
         final_duplicates = graph.find_duplicates(stl_in_headers=args.stl_in_headers)
         output.append("")
-        output.append(f"Remaining removable includes after multipass: {len(removable_items(final_duplicates))}.")
+        output.append(
+            f"Remaining removable includes after multipass: {len(removable_items(final_duplicates))}."
+        )
     else:
         removable = removable_items(duplicates)
         if removable:
             output.append("")
-            output.append(f"Re-run with --fix to remove {len(removable)} safely duplicated include(s).")
+            output.append(
+                f"Re-run with --fix to remove {len(removable)} safely duplicated include(s)."
+            )
 
     report = "\n".join(output).rstrip() + "\n"
     if args.output:
