@@ -73,7 +73,8 @@ public:
         if(!this->factored) return 0;
 
         if constexpr(std::is_same_v<T, float>) return nullptr == solver ? 0 : solver->det_sign();
-        else return nullptr == mixer ? 0 : mixer->det_sign();
+
+        return nullptr == mixer ? 0 : mixer->det_sign();
     }
 };
 

@@ -32,10 +32,6 @@
 
 #include "BandMatSpikeBase.hpp"
 
-#include <algorithm>
-#include <cmath>
-#include <vector>
-
 extern "C" {
 void spikeinit_(la_it*, la_it*, la_it*);
 void dspike_tune_(la_it*);
@@ -150,12 +146,10 @@ namespace spike_detail {
                     r(I0 + a, I0 + a) = T(1);
                     r(I0 + klu + a, I0 + klu + a) = T(1);
                     for(la_it b = 0; b < klu; ++b) {
-                        r(I0 + a, I0 + klu + b) = v(klu + a, b, i); // Vp_i^bot
-                        r(I0 + klu + a, I0 + b) = w(a, b, i + 1);   // Vm_{i+1}^top
-                        if(i > 0)
-                            r(I0 + a, I0 - 2 * klu + b) = w(klu + a, b, i); // Vm_i^bot
-                        if(i + 1 < nbpart - 1)
-                            r(I0 + klu + a, I0 + 3 * klu + b) = v(a, b, i + 1); // Vp_{i+1}^top
+                        r(I0 + a, I0 + klu + b) = v(klu + a, b, i);                                // Vp_i^bot
+                        r(I0 + klu + a, I0 + b) = w(a, b, i + 1);                                  // Vm_{i+1}^top
+                        if(i > 0) r(I0 + a, I0 - 2 * klu + b) = w(klu + a, b, i);                  // Vm_i^bot
+                        if(i + 1 < nbpart - 1) r(I0 + klu + a, I0 + 3 * klu + b) = v(a, b, i + 1); // Vp_{i+1}^top
                     }
                 }
             }
@@ -217,8 +211,10 @@ public:
         const auto LDA = static_cast<la_it>(this->m_rows);
 
         if constexpr(std::is_same_v<T, float>) return spike_detail::determinant_sign(SPIKE, N, KL, KU, this->memptr(), LDA, WORK.memptr());
-        else if(Precision::FULL == this->setting.precision) return spike_detail::determinant_sign(SPIKE, N, KL, KU, this->memptr(), LDA, WORK.memptr());
-        else return spike_detail::determinant_sign(SPIKE, N, KL, KU, this->s_memory.memptr(), LDA, SWORK.memptr());
+
+        if(Precision::FULL == this->setting.precision) return spike_detail::determinant_sign(SPIKE, N, KL, KU, this->memptr(), LDA, WORK.memptr());
+
+        return spike_detail::determinant_sign(SPIKE, N, KL, KU, this->s_memory.memptr(), LDA, SWORK.memptr());
     }
 };
 
