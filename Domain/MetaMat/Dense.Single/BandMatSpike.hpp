@@ -35,14 +35,131 @@
 extern "C" {
 void spikeinit_(la_it*, la_it*, la_it*);
 void dspike_tune_(la_it*);
-void dspike_gbsv_(la_it*, la_it*, la_it*, la_it*, la_it*, double*, la_it*, double*, la_it*, la_it*);
 void dspike_gbtrf_(la_it*, la_it*, la_it*, la_it*, double*, la_it*, double*, la_it*);
 void dspike_gbtrs_(la_it*, const char*, la_it*, la_it*, la_it*, la_it*, double*, la_it*, double*, double*, la_it*);
 void sspike_tune_(la_it*);
-void sspike_gbsv_(la_it*, la_it*, la_it*, la_it*, la_it*, float*, la_it*, float*, la_it*, la_it*);
 void sspike_gbtrf_(la_it*, la_it*, la_it*, la_it*, float*, la_it*, float*, la_it*);
 void sspike_gbtrs_(la_it*, const char*, la_it*, la_it*, la_it*, la_it*, float*, la_it*, float*, float*, la_it*);
+void spikerl_calc_size_partitions_(la_it*, la_it*, la_it*);
 }
+
+namespace spike_detail {
+    // accumulate only the sign so overflow or underflow cannot invalidate it
+    template<sp_d T> struct det_sign {
+        int sign = 1;
+        bool zero = false;
+
+        void mul(const T V) {
+            if(V == T(0)) zero = true;
+            else if(V < T(0)) sign = -sign;
+        }
+
+        void mul(const det_sign& other) {
+            sign *= other.sign;
+            zero = zero || other.zero;
+        }
+    };
+
+    // convert the one-based Fortran partition offsets to zero-based starts
+    inline std::vector<la_it> partition_starts(const la_it* SPIKE, const la_it N) {
+        la_it spm[64]{};
+        std::copy_n(SPIKE, 64, spm);
+
+        la_it n = N;
+        std::vector<la_it> ajmin(static_cast<size_t>(spm[19]) + 1, 1);
+        spikerl_calc_size_partitions_(spm, ajmin.data(), &n);
+        for(auto& I : ajmin) --I;
+
+        return ajmin;
+    }
+
+    // dense LU of the interface system
+    template<sp_d T> det_sign<T> interface_sign(const T* M0, const la_it M) {
+        det_sign<T> result;
+
+        if(0 == M) return result;
+
+        std::vector<T> matrix(M0, M0 + static_cast<size_t>(M) * M);
+        const auto at = [&](const la_it I, const la_it J) -> T& { return matrix[static_cast<size_t>(J) * M + I]; };
+
+        for(la_it J = 0; J < M; ++J) {
+            la_it pivot = J;
+            for(la_it I = J + 1; I < M; ++I)
+                if(std::fabs(at(I, J)) > std::fabs(at(pivot, J))) pivot = I;
+            if(pivot != J) {
+                for(la_it K = 0; K < M; ++K) std::swap(at(J, K), at(pivot, K));
+                result.sign = -result.sign;
+            }
+            const T D = at(J, J);
+            if(D == T(0)) {
+                result.zero = true;
+                return result;
+            }
+            result.mul(D);
+            for(la_it I = J + 1; I < M; ++I) {
+                at(I, J) /= D;
+                for(la_it K = J + 1; K < M; ++K) at(I, K) -= at(I, J) * at(J, K);
+            }
+        }
+
+        return result;
+    }
+
+    // det(A) = prod_p det(A_pp) * det(R), with R the reduced interface system
+    // two-thread partitions keep part of their determinant outside WORK
+    template<sp_d T> int determinant_sign(const la_it* SPIKE, const la_it N, const la_it KL, const la_it KU, const T* A, const la_it LDA, const T* WORK) {
+        if(nullptr == SPIKE || nullptr == A || N < 1 || KL < 0 || KU < 0 || LDA < KL + KU + 1) return 0;
+
+        const auto klu = std::max(KL, KU);
+        const auto nbpart = SPIKE[19];
+
+        if(nbpart < 1 || nbpart > 63) return 0;
+        if(0 < SPIKE[22]) return 0;
+        if(nbpart > 1 && (klu < 1 || SPIKE[20] < 1 || nullptr == WORK)) return 0;
+
+        det_sign<T> total;
+
+        const auto ajmin = partition_starts(SPIKE, N);
+
+        // spike_gbtrf does not pivot, the factored diagonal is in band row ku
+        for(la_it p = 0; p < nbpart; ++p) {
+            const auto start = ajmin[p];
+            const auto size = ajmin[p + 1] - start;
+            for(la_it j = 0; j < size; ++j) total.mul(A[static_cast<size_t>(start + j) * LDA + KU]);
+        }
+
+        // rebuild the level zero interface from the saved spikes
+        // rV/rW: (2*klu, klu, nblevel, nbpart), Fortran column major
+        if(nbpart > 1 && klu > 0) {
+            const auto nblevel = SPIKE[20];
+            const size_t plane = static_cast<size_t>(2) * klu * klu * nblevel;
+            const size_t rw0 = plane * nbpart;
+            const la_it m = 2 * klu * (nbpart - 1);
+            std::vector<T> R(static_cast<size_t>(m) * m, T(0));
+            const auto r = [&](const la_it I, const la_it J) -> T& { return R[static_cast<size_t>(J) * m + I]; };
+            const auto v = [&](const la_it I, const la_it J, const la_it P) -> T { return WORK[static_cast<size_t>(P) * plane + static_cast<size_t>(J) * 2 * klu + I]; };
+            const auto w = [&](const la_it I, const la_it J, const la_it P) -> T { return WORK[rw0 + static_cast<size_t>(P) * plane + static_cast<size_t>(J) * 2 * klu + I]; };
+
+            for(la_it i = 0; i < nbpart - 1; ++i) {
+                const la_it I0 = 2 * klu * i;
+                for(la_it a = 0; a < klu; ++a) {
+                    r(I0 + a, I0 + a) = T(1);
+                    r(I0 + klu + a, I0 + klu + a) = T(1);
+                    for(la_it b = 0; b < klu; ++b) {
+                        r(I0 + a, I0 + klu + b) = v(klu + a, b, i);                                // Vp_i^bot
+                        r(I0 + klu + a, I0 + b) = w(a, b, i + 1);                                  // Vm_{i+1}^top
+                        if(i > 0) r(I0 + a, I0 - 2 * klu + b) = w(klu + a, b, i);                  // Vm_i^bot
+                        if(i + 1 < nbpart - 1) r(I0 + klu + a, I0 + 3 * klu + b) = v(a, b, i + 1); // Vp_{i+1}^top
+                    }
+                }
+            }
+
+            total.mul(interface_sign(R.data(), m));
+        }
+
+        return total.zero ? 0 : total.sign;
+    }
+} // namespace spike_detail
 
 template<sp_d T> class BandMatSpike final : public BandMatSpikeBase<T> {
     static constexpr auto TRAN = 'N';
@@ -84,6 +201,21 @@ public:
     BandMatSpike& operator=(BandMatSpike&&) = delete;
 
     unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<BandMatSpike>(*this); }
+
+    [[nodiscard]] int sign_det() const override {
+        if(!this->factored) return 0;
+
+        const auto N = static_cast<la_it>(this->n_rows);
+        const auto KL = static_cast<la_it>(this->l_band);
+        const auto KU = static_cast<la_it>(this->u_band);
+        const auto LDA = static_cast<la_it>(this->m_rows);
+
+        if constexpr(std::is_same_v<T, float>) return spike_detail::determinant_sign(SPIKE, N, KL, KU, this->memptr(), LDA, WORK.memptr());
+
+        if(Precision::FULL == this->setting.precision) return spike_detail::determinant_sign(SPIKE, N, KL, KU, this->memptr(), LDA, WORK.memptr());
+
+        return spike_detail::determinant_sign(SPIKE, N, KL, KU, this->s_memory.memptr(), LDA, SWORK.memptr());
+    }
 };
 
 template<sp_d T> la_it BandMatSpike<T>::SPROTO = [] {

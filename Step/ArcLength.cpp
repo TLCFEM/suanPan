@@ -53,7 +53,10 @@ int ArcLength::initialize() {
 
     configure_storage_scheme();
 
-    factory->set_solver_type(sparse_mat ? SolverType::SUPERLU : SolverType::LAPACK);
+    // both LAPACK and the banded SPIKE solvers report the determinant sign Ramm needs
+    if(sparse_mat) factory->set_solver_type(SolverType::SUPERLU);
+    else if(band_mat && (SolverType::SPIKE == system_solver || SolverType::CUDA == system_solver)) factory->set_solver_type(system_solver);
+    else factory->set_solver_type(SolverType::LAPACK);
 
     factory->set_analysis_type(AnalysisType::STATICS);
 

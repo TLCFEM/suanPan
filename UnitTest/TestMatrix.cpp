@@ -301,6 +301,46 @@ namespace {
         A.csr_condense();
         REQUIRE(Approx(A(N, N)) == 1.);
     }
+
+    // a positive definite matrix has a positive determinant
+    template<sp_d T> void test_spike_sign_det(const Precision P) {
+        constexpr uword N = 200, BAND = 10;
+
+        BandMatSpike<T> A(N, BAND, BAND);
+        A.get_solver_setting().precision = P;
+
+        const Col<T> C = ones<Col<T>>(N);
+        Col<T> X;
+
+        const auto fill = [&](const bool flip) {
+            A.zeros();
+            for(uword I = 0; I < N; ++I) A.at(I, I) = T(4);
+            for(uword I = 0; I < N; ++I)
+                for(uword J = I + 1; J <= I + BAND && J < N; ++J) {
+                    const auto V = T(.05) * static_cast<T>(1 + (I + J) % 3);
+                    A.at(I, J) = V;
+                    A.at(J, I) = V;
+                }
+            if(flip)
+                for(uword J = 0; J <= BAND; ++J) A.at(0, J) = -A(0, J);
+        };
+
+        fill(false);
+        REQUIRE(SUANPAN_SUCCESS == A.solve(X, C));
+        REQUIRE(1 == A.sign_det());
+
+        fill(true);
+        REQUIRE(SUANPAN_SUCCESS == A.solve(X, C));
+        REQUIRE(-1 == A.sign_det());
+
+        // det(A) = 1 - 2 * 2 = -3 must come from the interface system
+        A.zeros();
+        for(uword I = 0; I < N; ++I) A.at(I, I) = T(1);
+        A.at(N / 2 - 1, N / 2) = T(2);
+        A.at(N / 2, N / 2 - 1) = T(2);
+        REQUIRE(SUANPAN_SUCCESS == A.solve(X, C));
+        REQUIRE(-1 == A.sign_det());
+    }
 } // namespace
 
 TEST_CASE("Mixed Precision", "[Matrix.Benchmark]") {
@@ -352,7 +392,11 @@ TEST_CASE("BandMat", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new
 
 TEST_CASE("BandMatSpike", "[Matrix.Dense]") { test_dense_mat_setup<double>(create_new<BandMatSpike<double>>); }
 
-extern "C" void spikerl_calc_size_partitions_(la_it*, la_it*, la_it*);
+TEST_CASE("BandMatSpike Sign", "[Matrix.Dense]") {
+    test_spike_sign_det<double>(Precision::FULL);
+    test_spike_sign_det<double>(Precision::MIXED);
+    test_spike_sign_det<float>(Precision::FULL);
+}
 
 // The tuned SPIKE ratios must never shrink a partition below the bandwidth.
 // Otherwise SPIKE indexes outside its work arrays while factorizing.

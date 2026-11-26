@@ -68,6 +68,14 @@ public:
     BandMatSpikeGPU& operator=(BandMatSpikeGPU&&) = delete;
 
     unique_ptr<MetaMat<T>> unique_copy() override { return std::make_unique<BandMatSpikeGPU>(*this); }
+
+    [[nodiscard]] int sign_det() const override {
+        if(!this->factored) return 0;
+
+        if constexpr(std::is_same_v<T, float>) return nullptr == solver ? 0 : solver->det_sign();
+
+        return nullptr == mixer ? 0 : mixer->det_sign();
+    }
 };
 
 template<sp_d T> int BandMatSpikeGPU<T>::direct_solve(Mat<T>& X, Mat<T>&& B) {
