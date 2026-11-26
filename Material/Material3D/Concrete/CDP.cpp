@@ -18,7 +18,7 @@
 #include "CDP.h"
 
 pod6 CDP::compute_backbone(const double kappa, const double a_tc, const double cb_tc, const double f_tc) {
-    static constexpr auto SLOPE_BOUND = 1e2;
+    constexpr auto SLOPE_BOUND = 1e2;
 
     pod6 out;
 

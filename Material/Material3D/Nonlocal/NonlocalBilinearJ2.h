@@ -45,7 +45,7 @@ struct DataNonlocalBilinearJ2 {
 };
 
 class NonlocalBilinearJ2 final : protected DataNonlocalBilinearJ2, public NonlocalMaterial3D {
-    static const double two_third;
+    static constexpr double two_third = 2. / 3.;
     static const double root_two_third;
     static const mat unit_dev_tensor;
     static const uvec UD, DD;

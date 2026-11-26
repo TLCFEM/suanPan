@@ -42,7 +42,7 @@ class NonlinearOrthotropic : protected DataNonlinearOrthotropic, public Material
     static const double root_two_third;
     static constexpr unsigned max_iteration = 20u;
     static constexpr uword sa{0};
-    static const span sb;
+    static constexpr span sb{1, 6};
 
     mat proj_p, proj_q, elastic_p;
 

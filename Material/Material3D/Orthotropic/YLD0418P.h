@@ -56,7 +56,7 @@ class YLD0418P final : protected DataYLD0418P, public Material3D {
     static const double root_two_third;
     static constexpr unsigned max_iteration = 30u;
     static constexpr uword sa{0};
-    static const span sb, sc;
+    static constexpr span sb{1, 6}, sc{7, 12};
     static const mat unit_dev_tensor;
 
     const unsigned hardening_tag;

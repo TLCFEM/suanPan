@@ -35,7 +35,7 @@ std::tuple<double, double> DuncanSelig::compute_elastic(const double ps) const {
 std::tuple<double, double> DuncanSelig::compute_bulk(const double ps) const { return compute_modulus(ps, ref_bulk, m); }
 
 DuncanSelig::ds_tuple DuncanSelig::compute_principal_stress(const vec& t_stress) const {
-    static constexpr auto center_scale{-.5}; // this is correct as later the algorithm uses s3
+    constexpr auto center_scale{-.5}; // this is correct as later the algorithm uses s3
     const auto center = center_scale * (t_stress(0) + t_stress(1));
     const rowvec3 dcds{center_scale, center_scale, 0.};
 

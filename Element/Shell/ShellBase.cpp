@@ -119,7 +119,7 @@ vec ShellBase::transform_from_global_to_local(const vec& displacement) const {
 mat ShellBase::transform_from_local_to_global(mat&& stiffness) const { return std::move(transform_from_local_to_global(stiffness)); }
 
 mat ShellBase::transform_to_global_geometry(const mat& stiffness, const vec& resistance, const vec& displacement) const {
-    static const span a(0, 2), b(3, 5), c(6, 8);
+    static constexpr span a{0, 2}, b{3, 5}, c{6, 8};
     static const uvec d{0, 1, 2, 6, 7, 8, 12, 13, 14};
 
     const mat coor = get_coordinate(3).t();

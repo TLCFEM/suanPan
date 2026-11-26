@@ -72,9 +72,9 @@ ExternalModule::ExternalModule(std::string L)
         suanpan_error("Cannot load the library with the name \"{}\".\n", file_name);
 #else
 #ifdef SUANPAN_UNIX
-    static constexpr auto suffix = ".so";
+    constexpr auto suffix = ".so";
 #else
-    static constexpr auto suffix = ".dylib";
+    constexpr auto suffix = ".dylib";
 #endif
     auto file_name = "lib" + library_name + suffix;
     ext_library = dlopen(file_name.c_str(), RTLD_NOW);

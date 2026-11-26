@@ -21,8 +21,6 @@
 #include <Toolbox/tensor.h>
 
 const double YLD0418P::root_two_third = std::sqrt(2. / 3.);
-const span YLD0418P::sb{1, 6};
-const span YLD0418P::sc{7, 12};
 const mat YLD0418P::unit_dev_tensor = tensor::unit_deviatoric_tensor4v2();
 
 YLD0418P::yield_t YLD0418P::compute_yield_surface(const vec3& psa, const mat33& pva, const vec3& psb, const mat33& pvb) const {

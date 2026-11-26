@@ -19,8 +19,6 @@
 
 #include <Element/Element.h>
 
-const span B3DOSL::sa(0, 2), B3DOSL::sb(3, 5), B3DOSL::sc(7, 9), B3DOSL::sd(10, 12);
-
 Orientation::Type B3DOSL::type() const { return Type::B3DOS; }
 
 unique_ptr<Orientation> B3DOSL::unique_copy() { return std::make_unique<B3DOSL>(*this); }

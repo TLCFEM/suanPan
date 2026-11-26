@@ -20,9 +20,6 @@
 #include <Domain/Factory.hpp>
 
 const mat NodeLine::rotation{{0., -1.}, {1., 0.}};
-const span NodeLine::span_i(0, 1);
-const span NodeLine::span_j(2, 3);
-const span NodeLine::span_k(4, 5);
 
 NodeLine::NodeLine(const unsigned T, const unsigned A, uvec&& N)
     : Constraint(T, A, {Node::DOF::U1, Node::DOF::U2}, {}, 1) { target_node = std::move(N); }

@@ -29,10 +29,10 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-constexpr auto SUANPAN_MAJOR = 4;
-constexpr auto SUANPAN_MINOR = 3;
-constexpr auto SUANPAN_PATCH = 1;
-constexpr auto SUANPAN_CODE = "Deneb";
+inline constexpr auto SUANPAN_MAJOR = 4;
+inline constexpr auto SUANPAN_MINOR = 3;
+inline constexpr auto SUANPAN_PATCH = 1;
+inline constexpr auto SUANPAN_CODE = "Deneb";
 
 #ifndef SUANPAN_DATE
 #define SUANPAN_DATE __DATE__

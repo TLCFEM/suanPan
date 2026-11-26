@@ -59,7 +59,7 @@ class DafaliasManzari final : protected DataDafaliasManzari, public Material3D {
     const double gi = gr * shear_modulus * std::fabs(pc);
 
     static constexpr uword sa = 0, si = 0, sj = 1;
-    static const span sb, sk, sl, sm;
+    static constexpr span sb{1, 6}, sk{2, 7}, sl{8, 13}, sm{14, 19};
 
 public:
     DafaliasManzari(

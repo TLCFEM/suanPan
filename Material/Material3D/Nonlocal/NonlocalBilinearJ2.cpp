@@ -19,7 +19,6 @@
 
 #include <Toolbox/tensor.h>
 
-constexpr double NonlocalBilinearJ2::two_third = 2. / 3.;
 const double NonlocalBilinearJ2::root_two_third = std::sqrt(two_third);
 const mat NonlocalBilinearJ2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 const uvec NonlocalBilinearJ2::UD{0, 1, 2, 3, 4, 5};

@@ -44,7 +44,7 @@
 #include "B3DL.h"
 
 class B3DOSL final : public B3DL {
-    static const span sa, sb, sc, sd;
+    static constexpr span sa{0, 2}, sb{3, 5}, sc{7, 9}, sd{10, 12};
 
 public:
     using B3DL::B3DL;

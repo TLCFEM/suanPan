@@ -172,9 +172,9 @@ SUANPAN_EXPORT unsigned SUANPAN_WARNING_COUNT;
 SUANPAN_EXPORT unsigned SUANPAN_ERROR_COUNT;
 #endif
 
-constexpr auto SUANPAN_EXIT = 1;
-constexpr auto SUANPAN_SUCCESS = 0;
-constexpr auto SUANPAN_FAIL = -1;
+inline constexpr auto SUANPAN_EXIT = 1;
+inline constexpr auto SUANPAN_SUCCESS = 0;
+inline constexpr auto SUANPAN_FAIL = -1;
 
 // TWO IMPLEMENTATIONS
 #ifndef SUANPAN_WIN

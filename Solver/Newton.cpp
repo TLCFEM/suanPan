@@ -159,8 +159,8 @@ double AICN::amplification(const vec& x, const vec& r) {
     const auto hessian_norm = dot(x, r);
     if(hessian_norm <= 0.) return datum::neg_inf;
 
-    static constexpr auto ratio = .9;
-    static constexpr auto factor = 2. / ratio * (1. / ratio - 1.);
+    constexpr auto ratio = .9;
+    constexpr auto factor = 2. / ratio * (1. / ratio - 1.);
 
     return 2. / (std::sqrt(1. + 2. * std::max(l_est, factor / std::sqrt(inner_product = std::max(inner_product, hessian_norm))) * std::sqrt(hessian_norm)) + 1.);
 }

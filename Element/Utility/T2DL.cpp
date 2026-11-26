@@ -20,9 +20,6 @@
 #include <Element/Element.h>
 #include <Toolbox/tensor.h>
 
-const span T2DL::IS(0, 1);
-const span T2DL::JS(2, 3);
-
 unique_ptr<Orientation> T2DL::unique_copy() { return std::make_unique<T2DL>(*this); }
 
 void T2DL::update_transformation() {

@@ -42,7 +42,7 @@ class B31 final : public SectionElement3D {
 
     static constexpr unsigned b_node = 2, b_dof = 6, b_size = b_dof * b_node;
 
-    static const span b_span;
+    static constexpr span b_span{0, 2};
 
     const unsigned orientation_tag, int_pt_num;
 
