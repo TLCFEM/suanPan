@@ -21,10 +21,6 @@
 
 #include <Toolbox/tensor.h>
 
-const span DafaliasManzari::sb(1, 6);
-const span DafaliasManzari::sk(2, 7);
-const span DafaliasManzari::sl(8, 13);
-const span DafaliasManzari::sm(14, 19);
 const mat DafaliasManzari::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 DafaliasManzari::DafaliasManzari(const unsigned T, const double G0, const double NU, const double AC, const double LC, const double E0, const double XI, const double M, const double H0, const double H1, const double CH, const double NB, const double A, const double ND, const double ZM, const double CZ, const double PC, const double GR, const double R)

@@ -32,7 +32,7 @@
 #include <Element/Utility/Orientation.h>
 
 class T2DL : public Orientation {
-    static const span IS, JS;
+    static constexpr span IS{0, 1}, JS{2, 3};
 
 protected:
     void update_transformation() override;

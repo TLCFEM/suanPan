@@ -166,7 +166,7 @@ int eig_solve(cx_vec& eigval, cx_mat& eigvec, const mat_ptr& K, const mat_ptr& M
 
 int eig_solve(cx_vec& eigval, const std::shared_ptr<MetaMat<double>>& K, const unsigned num) {
     static auto BMAT{'I'};              // standard eigenvalue problem A*x=lambda*x
-    static constexpr auto WHICH = "SR"; // smallest real part
+    constexpr auto WHICH = "SR";  // smallest real part
 
     blas_int IDO{0}, INFO{0};
     auto N = static_cast<blas_int>(K->n_rows);

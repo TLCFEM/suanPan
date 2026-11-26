@@ -53,7 +53,7 @@ int NodeFacet::process(const shared_ptr<DomainBase>& D) {
 
     set_multiplier_size(1u);
 
-    static const span span_i(0, 2), span_j(3, 5), span_k(6, 8), span_s(9, 11);
+    static constexpr span span_i{0, 2}, span_j{3, 5}, span_k{6, 8}, span_s{9, 11};
 
     auxiliary_stiffness.zeros(D->get_factory()->get_size(), lagrangian_size);
     auxiliary_resistance = pen;

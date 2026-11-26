@@ -388,7 +388,7 @@ mat tensor::diff_triad(const vec3& x1, const vec3& x2, const vec3& x3) {
     const mat dn2dn3 = transform::skew_symm(-normalise(e1));
 
     mat triad(9, 9, fill::none);
-    static const span a(0, 2), b(3, 5), c(6, 8);
+    static constexpr span a{0, 2}, b{3, 5}, c{6, 8};
     triad(a, a) = dn1dx1;
     triad(a, b) = dn1dx2;
     triad(a, c).fill(0.);

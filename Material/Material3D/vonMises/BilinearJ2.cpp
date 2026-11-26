@@ -19,7 +19,6 @@
 
 #include <Toolbox/tensor.h>
 
-constexpr double BilinearJ2::two_third = 2. / 3.;
 const double BilinearJ2::root_two_third = sqrt(two_third);
 const mat BilinearJ2::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 

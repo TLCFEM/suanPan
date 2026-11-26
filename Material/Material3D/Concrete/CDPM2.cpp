@@ -419,9 +419,9 @@ int CDPM2::update_trial_status(const vec& t_strain) {
     const auto degenerate = trial_s <= datum::eps;
     const vec n = degenerate ? vec{2., -1., -1., 0., 0., 0.} / std::sqrt(6.) : vec(dev_stress / trial_s);
 
-    static constexpr double low_limit = -.95;
+    constexpr double low_limit = -.95;
     static const double low_slope = (2. * std::cos(std::acos(low_limit) / 3.) - 1.) / (low_limit + 1.);
-    static constexpr double high_limit = .95;
+    constexpr double high_limit = .95;
     static const double high_slope = (2. * std::cos(std::acos(high_limit) / 3.) - 2.) / (high_limit - 1.);
 
     double lode, dlode;

@@ -43,7 +43,7 @@ struct DataBilinearJ2 {
 };
 
 class BilinearJ2 final : protected DataBilinearJ2, public Material3D {
-    static const double two_third;
+    static constexpr double two_third = 2. / 3.;
     static const double root_two_third;
     static const mat unit_dev_tensor;
 

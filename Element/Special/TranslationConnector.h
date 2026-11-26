@@ -34,7 +34,7 @@
 #include <Element/Element.h>
 
 class TranslationConnector : public Element {
-    static const unsigned c_node = 3;
+    static constexpr unsigned c_node = 3;
 
     const unsigned c_dof;
 

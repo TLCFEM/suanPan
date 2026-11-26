@@ -22,8 +22,6 @@
 #include <Section/Section.h>
 #include <Toolbox/IntegrationPlan.h>
 
-const span F31::b_span(0, 2);
-
 F31::IntegrationPoint::IntegrationPoint(const double C, const double W, unique_ptr<Section>&& M)
     : coor(C)
     , weight(W)

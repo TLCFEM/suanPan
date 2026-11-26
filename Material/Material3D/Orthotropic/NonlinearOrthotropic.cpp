@@ -21,7 +21,6 @@
 #include <Toolbox/tensor.h>
 
 const double NonlinearOrthotropic::root_two_third = std::sqrt(2. / 3.);
-const span NonlinearOrthotropic::sb{1, 6};
 
 NonlinearOrthotropic::NonlinearOrthotropic(const unsigned T, const OrthotropicType TP, vec&& EE, vec&& VV, vec&& SS, const double R)
     : DataNonlinearOrthotropic{.modulus = std::move(EE), .ratio = std::move(VV), .yield_stress = std::move(SS)}

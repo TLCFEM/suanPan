@@ -46,7 +46,7 @@ class MooneyRivlin final : protected DataMooneyRivlin, public Material3D {
     static const vec weight;
     static const vec I1E;
     static const mat I2EE;
-    static const double one_three, two_three, four_three, five_three, eight_nine;
+    static constexpr double one_three = 1. / 3., two_three = 2. * one_three, four_three = 2. * two_three, five_three = 5. * one_three, eight_nine = two_three * four_three;
 
 public:
     MooneyRivlin(

@@ -28,11 +28,6 @@ const mat MooneyRivlin::I2EE = [] {
     TI2EE(3, 3) = TI2EE(4, 4) = TI2EE(5, 5) = -2.;
     return TI2EE;
 }();
-constexpr double MooneyRivlin::one_three = 1. / 3.;
-constexpr double MooneyRivlin::two_three = 2. * one_three;
-constexpr double MooneyRivlin::four_three = 2. * two_three;
-constexpr double MooneyRivlin::five_three = 5. * one_three;
-constexpr double MooneyRivlin::eight_nine = two_three * four_three;
 
 MooneyRivlin::MooneyRivlin(const unsigned T, const double KK, const double AA, const double AB, const double R)
     : DataMooneyRivlin{.K = fabs(KK), .A10 = fabs(AA), .A01 = fabs(AB)}

@@ -128,6 +128,27 @@ The project uses C++20. Prefer modern, explicit and safe C++:
 - Use the project logging macros (`suanpan_info`, `suanpan_debug`, `suanpan_warning`, `suanpan_error`, `suanpan_fatal`) instead of `std::cout` or `printf` in library code.
 - Use the project's approximate comparison helpers for floating-point comparisons where appropriate.
 
+### Constants and `constexpr`
+
+Use `constexpr` for values known at compile time, and reserve plain `const` for runtime values and per-object instance state. Which specifiers to add depends on the scope:
+
+| Scope | Preferred declaration |
+| --- | --- |
+| Static data member of a class or struct | `static constexpr`, initialised in the class; it is implicitly `inline` in C++20, so omit the out-of-line `.cpp` definition |
+| Shared namespace-scope constant in a header | `inline constexpr`, so every translation unit refers to one entity with one address |
+| Private namespace-scope constant in a `.cpp` file | plain `constexpr`; `static` is redundant because a namespace-scope `constexpr` already has internal linkage |
+| Small scalar local in a non-`constexpr` function | plain `constexpr` for numbers, booleans and enums |
+| Local array, lookup table or larger aggregate | `static constexpr`, so it is not materialised on the stack on every call |
+| Local in a `constexpr` or `consteval` function | plain `constexpr` only; `static constexpr` is ill-formed there |
+| `constexpr` reference | `inline constexpr` in a header, `constexpr` in a `.cpp` file, `static constexpr` in a class, always bound to an object with static storage duration |
+
+Additional rules:
+
+1. Use `constexpr` only when the type is a literal type and the initialiser is a constant expression. Armadillo `mat`, `vec` and `uvec`, as well as `TokenRegistry`, are not literal types; keep them as `static const` with an out-of-line definition (`inline static const` if they must be defined in a header).
+2. Standard library functions such as `std::sqrt` and `std::log` are not `constexpr` in C++20, so constants initialised with them must remain `const`.
+3. A non-`static` `const` data member such as `const double length = 0.;` is per-object instance state, often written through `access::rw`. Do not convert it into a `static constexpr` class member.
+4. When a literal-type class member becomes `static constexpr`, delete its old out-of-line definition rather than keeping both declarations.
+
 ### Headers and includes
 
 1. Keep the copyright and license header used by the file.

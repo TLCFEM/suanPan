@@ -35,7 +35,7 @@
 
 class NodeLine final : public Constraint {
     static const mat rotation;
-    static const span span_i, span_j, span_k;
+    static constexpr span span_i{0, 1}, span_j{2, 3}, span_k{4, 5};
 
     bool initial_right{true};
 

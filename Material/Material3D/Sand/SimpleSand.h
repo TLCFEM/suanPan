@@ -53,7 +53,7 @@ class SimpleSand final : protected DataSimpleSand, public Material3D {
     static const mat unit_dev_tensor;
 
     static constexpr uword sa = 0, sb = 1;
-    static const span sc, sd;
+    static constexpr span sc{2, 7}, sd{8, 13};
 
     const double shear = elastic_modulus / (2. + 2. * poissons_ratio); // shear modulus
     const double double_shear = 2. * shear;                            // double shear

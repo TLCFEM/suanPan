@@ -19,8 +19,6 @@
 
 #include <Toolbox/tensor.h>
 
-const span SimpleSand::sc(2, 7);
-const span SimpleSand::sd(8, 13);
 const mat SimpleSand::unit_dev_tensor = tensor::unit_deviatoric_tensor4();
 
 SimpleSand::SimpleSand(const unsigned T, const double E, const double V, const double M, const double A, const double H, const double AC, const double NB, const double ND, const double VC, const double PC, const double LC, const double V0, const double R)

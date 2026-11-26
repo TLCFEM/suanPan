@@ -28,7 +28,7 @@
 #ifndef REVISION_H
 #define REVISION_H
 
-constexpr auto SUANPAN_REVISION = "@GIT_COMMIT_HASH@";
+inline constexpr auto SUANPAN_REVISION = "@GIT_COMMIT_HASH@";
 
 #endif // REVISION_H
 //! @}

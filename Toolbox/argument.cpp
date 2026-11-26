@@ -145,7 +145,7 @@ namespace {
          *     |___/\__,_|_|   \__,_|_| |_|
          *
          */
-        static constexpr auto header = "+--------------------------------------------------------+\n";
+        constexpr auto header = "+--------------------------------------------------------+\n";
         suanpan_info(header);
         suanpan_info("|             ____             suanPan is an open source |\n");
         suanpan_info("|   ___ _   _|  _ \\ __ _ _ __     FEM framework (64-bit) |\n");
@@ -186,7 +186,7 @@ namespace {
     }
 
     bool catchtest_main(const int argc, char** argv) {
-        static constexpr auto empty_arg = "";
+        constexpr auto empty_arg = "";
         for(auto I = 1; I < argc; ++I)
             if(is_equal_any(argv[I], "-ct", "--catch2test")) {
                 for(auto J = 1; J <= I; ++J) argv[J] = const_cast<char*>(empty_arg);

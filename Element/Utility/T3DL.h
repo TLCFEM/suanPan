@@ -33,7 +33,7 @@
 
 class T3DL : public Orientation {
 protected:
-    static const span IS, JS;
+    static constexpr span IS{0, 2}, JS{3, 5};
 
     void update_transformation() override;
 

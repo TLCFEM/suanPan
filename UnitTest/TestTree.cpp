@@ -4,8 +4,8 @@
 #include <random>
 
 TEST_CASE("Quadtree Benchmark", "[Utility.Tree]") {
-    static constexpr auto size = 1000.;
-    static constexpr auto n = 30'000;
+    constexpr auto size = 1000.;
+    constexpr auto n = 30'000;
     std::mt19937 gen(42);
     std::uniform_real_distribution dis(-size, size);
 
