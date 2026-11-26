@@ -27,9 +27,9 @@
 
 #include "CatchHeader.h"
 
-#include <linenoise/linenoise.hpp>
 #include <chrono>
 #include <fstream>
+#include <linenoise/linenoise.hpp>
 #include <string>
 #include <suanPan.h>
 
