@@ -27,10 +27,7 @@
 
 #include "CatchHeader.h"
 
-#include <chrono>
-#include <fstream>
 #include <linenoise/linenoise.hpp>
-#include <string>
 #include <suanPan.h>
 
 TEST_CASE("Load History Keeps Recent Entries", "[Utility.History]") {
