@@ -74,8 +74,8 @@
     - [Docker](#docker)
     - [Other Platforms](#other-platforms)
   - [🛠 Automation \& Tooling](#-automation--tooling)
-      - [VS Code \[Recommended\]](#vs-code-recommended)
-      - [Sublime Text \[Deprecated\]](#sublime-text-deprecated)
+      - [VS Code](#vs-code)
+      - [Sublime Text](#sublime-text)
   - [📚 Dependencies](#-dependencies)
   - [🔨 How To Compile](#-how-to-compile)
   - [🎉 Happy Modelling](#-happy-modelling)
@@ -314,12 +314,12 @@ Advanced users can compile the program from source to enable GPU-based solvers, 
 
 ## 🛠 Automation & Tooling
 
-#### VS Code [Recommended]
+#### VS Code
 
 The VS Code extension is available [here](https://marketplace.visualstudio.com/items?itemName=tlc.suanpan).
 It provides syntax highlighting and autocompletion, and can run models using the specified executable or Docker container.
 
-#### Sublime Text [Deprecated]
+#### Sublime Text
 
 On Windows, a batch file named `AddAssociation.bat` is provided in the archive.
 It sets up file associations and prepares a suitable working environment (build system, autocompletion, highlighting) for [Sublime Text](https://www.sublimetext.com/).
