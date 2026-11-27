@@ -4,7 +4,7 @@
 
 1. Arc-length analysis is limited on both SMP and DMP, mainly due to the lack of determinant computation.
 
-## version 4.3.1
+## version 4.4
 
 1. (**breaking**) pass the object tag as an additional argument to C++ external module creation functions and update module signatures accordingly
 2. add `ModalRecorder` for modal properties and `ModalForceRecorder` for nodal and elemental modal elastic forces [#395](https://github.com/TLCFEM/suanPan/pull/395) [#396](https://github.com/TLCFEM/suanPan/pull/396)
