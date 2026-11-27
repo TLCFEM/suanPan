@@ -573,12 +573,15 @@ int Domain::update_current_status() const {
     });
 
     update_current_resistance();
-    if(analysis_type == AnalysisType::DYNAMICS) {
-        update_current_damping_force();
-        update_current_inertial_force();
-        // only for computing the very initial mass related energy
-        assemble_current_mass();
-    }
+    if(analysis_type == AnalysisType::DYNAMICS)
+        // these routines assemble independent vectors and matrices, and update distinct nodal quantities
+        // in distributed builds parallel_invoke is sequential so the collectives keep the same order
+        suanpan::parallel_invoke(
+            [&] { update_current_damping_force(); },
+            [&] { update_current_inertial_force(); },
+            // only for computing the very initial mass related energy
+            [&] { assemble_current_mass(); }
+        );
 
     factory->commit_energy();
 

@@ -18,6 +18,7 @@
 #include "LeeNewmarkFull.h"
 
 #include <Domain/DomainBase.h>
+#include <Toolbox/utility.h>
 
 /**
  * \brief compute an approximation of the number of additional blocks
@@ -91,14 +92,12 @@ void LeeNewmarkFull::update_residual() const {
     // residual = csr_form<double>(stiffness->triplet_mat) * trial_vel;
 
     // ! check in damping force
-    auto fa = std::async([&] { factory->modify_trial_damping_force() -= residual.head(n_block); });
-    auto fb = std::async([&] { factory->modify_incre_damping_force() -= residual.head(n_block); });
     // ! update left-hand side
-    auto fc = std::async([&] { factory->modify_sushi() -= residual.head(n_block); });
-
-    fa.get();
-    fb.get();
-    fc.get();
+    suanpan::parallel_invoke(
+        [&] { factory->modify_trial_damping_force() -= residual.head(n_block); },
+        [&] { factory->modify_incre_damping_force() -= residual.head(n_block); },
+        [&] { factory->modify_sushi() -= residual.head(n_block); }
+    );
 }
 
 void LeeNewmarkFull::assemble_mass(const uword row_shift, const uword col_shift, const double scalar) const { assemble(mass_graph, current_mass, row_shift, col_shift, scalar); }
@@ -384,12 +383,14 @@ int LeeNewmarkFull::process_constraint() {
 
         // const auto& t_mass = factory->get_mass()->triplet_mat;
 
+        mat_t geometry_matrix;
+
         // otherwise, directly make a copy
-        auto f_mass = std::async([&] {
+        auto assemble_mass = [&] {
             auto& t_mass = factory->get_mass()->triplet_mat;
             t_mass.csc_condense();
             access::rw(current_mass) = t_mass;
-        });
+        };
 
         // ! probably faster but unsafe
         // steal the already assembled mass matrix
@@ -398,8 +399,8 @@ int LeeNewmarkFull::process_constraint() {
         // t_mass = mat_t(n_block, n_block, current_mass.n_elem);
 
         // handle geometry matrix
-        auto f_geometry = std::async([&] {
-            if(!factory->is_nlgeom()) return mat_t();
+        auto assemble_geometry = [&] {
+            if(!factory->is_nlgeom()) return;
 
             auto& t_geometry = factory->get_geometry()->triplet_mat;
 
@@ -427,33 +428,34 @@ int LeeNewmarkFull::process_constraint() {
             // swap back
             std::swap(t_fox, t_geometry);
 
-            return t_fox;
-        });
+            geometry_matrix = std::move(t_fox);
+        };
 
         // handle stiffness matrix
-        // backup whatever
-        std::swap(access::rw(current_stiffness), t_stiff);
+        auto assemble_stiffness = [&] {
+            // backup whatever
+            std::swap(access::rw(current_stiffness), t_stiff);
 
-        // now t_stiffness is empty
-        t_stiff = mat_t(n_block, n_block, num_entry);
+            // now t_stiffness is empty
+            t_stiff = mat_t(n_block, n_block, num_entry);
 
-        switch(stiffness_type) {
-        case StiffnessType::TRIAL:
-            D->assemble_trial_stiffness();
-            break;
-        case StiffnessType::CURRENT:
-            D->assemble_current_stiffness();
-            break;
-        case StiffnessType::INITIAL:
-            D->assemble_initial_stiffness();
-            break;
-        }
+            switch(stiffness_type) {
+            case StiffnessType::TRIAL:
+                D->assemble_trial_stiffness();
+                break;
+            case StiffnessType::CURRENT:
+                D->assemble_current_stiffness();
+                break;
+            case StiffnessType::INITIAL:
+                D->assemble_initial_stiffness();
+                break;
+            }
+        };
+
+        suanpan::parallel_invoke(assemble_mass, assemble_geometry, assemble_stiffness);
 
         // account for geometry matrix
-        t_stiff += f_geometry.get();
-
-        // need to be performed before applying constraints
-        f_mass.get();
+        t_stiff += geometry_matrix;
 
         // now apply constraints
         if(SUANPAN_SUCCESS != LeeNewmarkBase::process_constraint()) return SUANPAN_FAIL;

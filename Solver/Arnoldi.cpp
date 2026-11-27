@@ -21,6 +21,7 @@
 #include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
 #include <Toolbox/eigen_solver.h>
+#include <Toolbox/utility.h>
 
 Arnoldi::Arnoldi(const unsigned T, const unsigned N, const char TP)
     : Solver(T)
@@ -48,8 +49,10 @@ int Arnoldi::analyze() {
     D->update<Statistics::UpdateStatus>(t_clock);
 
     t_clock.tic();
-    D->assemble_trial_mass();
-    D->assemble_trial_stiffness();
+    suanpan::parallel_invoke(
+        [&] { D->assemble_trial_mass(); },
+        [&] { D->assemble_trial_stiffness(); }
+    );
     D->update<Statistics::AssembleMatrix>(t_clock);
 
     t_clock.tic();

@@ -34,6 +34,7 @@
 #include <Domain/MetaMat/MetaMat>
 #include <Element/MappingDOF.h>
 #include <Toolbox/container.h>
+#include <Toolbox/utility.h>
 #include <future>
 
 enum class AnalysisType {
@@ -1028,19 +1029,14 @@ template<sp_d T> const Col<T>& Factory<T>::get_eigenvalue() const { return eigen
 template<sp_d T> const Mat<T>& Factory<T>::get_eigenvector() const { return eigenvector; }
 
 template<sp_d T> void Factory<T>::commit_energy() {
-    auto se = std::async([&] { if(!trial_resistance.empty() && !incre_displacement.empty()) strain_energy += .5 * dot(trial_resistance + current_resistance, incre_displacement); });
-    auto ke = std::async([&] { if(!trial_inertial_force.empty() && !trial_velocity.empty()) kinetic_energy = .5 * dot(global_mass * trial_velocity, trial_velocity); });
-    auto ve = std::async([&] { if(!trial_damping_force.empty() && !incre_displacement.empty()) viscous_energy += .5 * dot(trial_damping_force + current_damping_force, incre_displacement); });
-    auto ne = std::async([&] { if(!trial_nonviscous_force.empty() && !incre_displacement.empty()) nonviscous_energy += .5 * dot(trial_nonviscous_force + current_nonviscous_force, incre_displacement); });
-    auto ce = std::async([&] { if(!trial_displacement.empty() && !incre_resistance.empty()) complementary_energy += .5 * dot(trial_displacement + current_displacement, incre_resistance); });
-    auto mm = std::async([&] { if(!trial_inertial_force.empty() && !trial_velocity.empty()) momentum = global_mass * trial_velocity; });
-
-    se.get();
-    ke.get();
-    ve.get();
-    ne.get();
-    ce.get();
-    mm.get();
+    suanpan::parallel_invoke(
+        [&] { if(!trial_resistance.empty() && !incre_displacement.empty()) strain_energy += .5 * dot(trial_resistance + current_resistance, incre_displacement); },
+        [&] { if(!trial_inertial_force.empty() && !trial_velocity.empty()) kinetic_energy = .5 * dot(global_mass * trial_velocity, trial_velocity); },
+        [&] { if(!trial_damping_force.empty() && !incre_displacement.empty()) viscous_energy += .5 * dot(trial_damping_force + current_damping_force, incre_displacement); },
+        [&] { if(!trial_nonviscous_force.empty() && !incre_displacement.empty()) nonviscous_energy += .5 * dot(trial_nonviscous_force + current_nonviscous_force, incre_displacement); },
+        [&] { if(!trial_displacement.empty() && !incre_resistance.empty()) complementary_energy += .5 * dot(trial_displacement + current_displacement, incre_resistance); },
+        [&] { if(!trial_inertial_force.empty() && !trial_velocity.empty()) momentum = global_mass * trial_velocity; }
+    );
 }
 
 template<sp_d T> void Factory<T>::clear_energy() {

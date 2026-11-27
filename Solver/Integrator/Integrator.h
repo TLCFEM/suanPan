@@ -50,6 +50,9 @@ class Integrator : public UniqueTag {
     std::weak_ptr<DomainBase> database;
 
 protected:
+    // assemble the four independent resistance contributions concurrently
+    void assemble_resistance_vectors() const;
+
     virtual void update_parameter(double);
 
     [[nodiscard]] virtual int process_load_impl(bool);
