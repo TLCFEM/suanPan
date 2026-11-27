@@ -35,6 +35,9 @@ void NZStrongMotion::initialize(const shared_ptr<DomainBase>& D) {
 }
 
 double NZStrongMotion::get_amplitude(const double T) {
+    // the data file may fail to load, in which case the amplitude is disabled and the buffer is empty
+    if(magnitude.n_elem < 4u) return 0.;
+
     const auto step_time = T - start_time;
 
     const auto IDX = static_cast<uword>(step_time * 1E3 / magnitude(0));
@@ -47,5 +50,6 @@ double NZStrongMotion::get_amplitude(const double T) {
 }
 
 void NZStrongMotion::print() {
-    suanpan_info("NZStrongMotion {} with total duration of {:.2f} seconds and raw PGA of {:.4f} mm/s/s.\n", file_name, static_cast<double>(magnitude.n_elem - 2u) * magnitude(0) / 1E3, magnitude(1) / 1E3);
+    if(magnitude.n_elem < 2u) suanpan_info("NZStrongMotion {} is not loaded.\n", file_name);
+    else suanpan_info("NZStrongMotion {} with total duration of {:.2f} seconds and raw PGA of {:.4f} mm/s/s.\n", file_name, static_cast<double>(magnitude.n_elem - 2u) * magnitude(0) / 1E3, magnitude(1) / 1E3);
 }
