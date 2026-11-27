@@ -131,7 +131,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <deque>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -1236,23 +1235,35 @@ inline void beep() {
 
 /* ============================== History =================================== */
 
-/* Add a new entry to the history. Returns true if the line was added. */
-inline bool history_add(const char *line) {
+/* Drop the oldest entries so that at most 'len' remain. */
+inline void history_trim(size_t len) {
+    if (history.size() > len)
+        history.erase(history.begin(), history.end() - len);
+}
+
+/* Append an entry without enforcing the maximum length: the caller must
+ * history_trim() afterwards. The entry is taken by value because the source
+ * may point into the history itself. Returns true if it was appended. */
+inline bool history_push(std::string entry) {
     if (history_max_len == 0) return false;
 
     /* Don't add duplicated lines. */
-    if (!history.empty() && history.back() == line) return false;
+    if (!history.empty() && history.back() == entry) return false;
 
-    /* If we reached the max length, remove the older line. */
-    if (history.size() == history_max_len) history.erase(history.begin());
-    history.emplace_back(line);
+    history.push_back(std::move(entry));
+    return true;
+}
+
+/* Add a new entry to the history. Returns true if the line was added. */
+inline bool history_add(const char *line) {
+    if (!history_push(line)) return false;
+    history_trim(history_max_len);
     return true;
 }
 
 inline bool history_set_max_len(size_t len) {
     if (len < 1) return false;
-    if (history.size() > len)
-        history.erase(history.begin(), history.end() - len);
+    history_trim(len);
     history_max_len = len;
     return true;
 }
@@ -1301,24 +1312,17 @@ inline bool history_save(const char *filename) {
 inline bool history_load(const char *filename) {
     std::ifstream f(filename, std::ios::binary);
     if (!f) return false;
-
-    /* history_add() erases from the front of a std::vector once the history
-     * is full. Loading a file that holds far more lines than the limit would
-     * shift every retained entry once per line, i.e. quadratic work and a
-     * noticeable startup delay. Keep the bounded window in a deque instead
-     * and publish it to the vector once at the end. */
-    std::deque<std::string> buffer(history.begin(), history.end());
     std::string line;
     while (std::getline(f, line)) {
         if (!line.empty() && line.back() == '\r') line.pop_back();
         /* Rebuild embedded newlines that were saved as CR. */
         std::replace(line.begin(), line.end(), '\r', '\n');
-        if (0 == history_max_len) continue;
-        if (!buffer.empty() && buffer.back() == line) continue;
-        if (buffer.size() == history_max_len) buffer.pop_front();
-        buffer.emplace_back(std::move(line));
+        history_push(line.c_str());
+        /* Trimming shifts every retained entry, so do it in batches: once
+         * per line would cost O(lines * max length) on a long file. */
+        if (history.size() / 2 >= history_max_len) history_trim(history_max_len);
     }
-    history.assign(buffer.begin(), buffer.end());
+    history_trim(history_max_len);
     return true;
 }
 
