@@ -22,7 +22,6 @@
 #include <Solver/Integrator/Integrator.h>
 #include <Solver/Newton.h>
 #include <Toolbox/eigen_solver.h>
-#include <Toolbox/utility.h>
 
 Buckle::Buckle(const unsigned T)
     : Static(T, 1.) {}

@@ -19,7 +19,6 @@
 
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Toolbox/utility.h>
 
 LogicConverger::LogicConverger(const unsigned T, const unsigned TA, const unsigned TB)
     : Converger(T)

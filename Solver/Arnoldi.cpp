@@ -21,7 +21,6 @@
 #include <Domain/Factory.hpp>
 #include <Solver/Integrator/Integrator.h>
 #include <Toolbox/eigen_solver.h>
-#include <Toolbox/utility.h>
 
 Arnoldi::Arnoldi(const unsigned T, const unsigned N, const char TP)
     : Solver(T)

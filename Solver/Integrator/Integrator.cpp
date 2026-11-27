@@ -19,7 +19,6 @@
 
 #include <Domain/DomainBase.h>
 #include <Domain/Factory.hpp>
-#include <Toolbox/utility.h>
 
 int Integrator::process_load_impl(const bool full) {
     const auto D = database.lock();
