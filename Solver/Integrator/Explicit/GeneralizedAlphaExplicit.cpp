@@ -75,10 +75,7 @@ void GeneralizedAlphaExplicit::assemble_resistance() {
     const auto D = get_domain();
     auto& W = D->get_factory();
 
-    D->assemble_resistance();
-    D->assemble_damping_force();
-    D->assemble_nonviscous_force();
-    D->assemble_inertial_force();
+    assemble_resistance_vectors();
 
     W->set_sushi(W->get_trial_resistance() - AF * W->get_incre_resistance() + W->get_trial_damping_force() - AF * W->get_incre_damping_force() + W->get_trial_nonviscous_force() - AF * W->get_incre_nonviscous_force() + W->get_trial_inertial_force() - AM * W->get_incre_inertial_force());
 }

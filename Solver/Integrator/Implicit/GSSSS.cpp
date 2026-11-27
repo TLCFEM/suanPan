@@ -74,10 +74,7 @@ void GSSSS::assemble_resistance() {
     const auto D = get_domain();
     auto& W = D->get_factory();
 
-    D->assemble_resistance();
-    D->assemble_damping_force();
-    D->assemble_nonviscous_force();
-    D->assemble_inertial_force();
+    assemble_resistance_vectors();
 
     W->set_sushi(W->get_current_resistance() + W3G3 / L3 * W->get_incre_resistance() + W->get_current_damping_force() + W2G5 / L5 * W->get_incre_damping_force() + W->get_current_nonviscous_force() + W2G5 / L5 * W->get_incre_nonviscous_force() + W->get_current_inertial_force() + W1G6 * W->get_incre_inertial_force());
 }

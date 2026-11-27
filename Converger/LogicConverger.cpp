@@ -52,10 +52,13 @@ int LogicConverger::initialize() {
 unique_ptr<Converger> LogicConvergerAND::unique_copy() { return std::make_unique<LogicConvergerAND>(*this); }
 
 bool LogicConvergerAND::is_converged(const unsigned counter) {
-    auto result_a = std::async([&] { return converger_a->is_converged(counter); });
-    auto result_b = std::async([&] { return converger_b->is_converged(counter); });
+    bool result_a{}, result_b{};
+    suanpan::parallel_invoke(
+        [&] { result_a = converger_a->is_converged(counter); },
+        [&] { result_b = converger_b->is_converged(counter); }
+    );
 
-    const auto logic_result = result_a.get() && result_b.get();
+    const auto logic_result = result_a && result_b;
     set_conv_flag(logic_result);
     converger_a->set_conv_flag(logic_result);
     converger_b->set_conv_flag(logic_result);
@@ -66,10 +69,13 @@ bool LogicConvergerAND::is_converged(const unsigned counter) {
 unique_ptr<Converger> LogicConvergerOR::unique_copy() { return std::make_unique<LogicConvergerOR>(*this); }
 
 bool LogicConvergerOR::is_converged(const unsigned counter) {
-    auto result_a = std::async([&] { return converger_a->is_converged(counter); });
-    auto result_b = std::async([&] { return converger_b->is_converged(counter); });
+    bool result_a{}, result_b{};
+    suanpan::parallel_invoke(
+        [&] { result_a = converger_a->is_converged(counter); },
+        [&] { result_b = converger_b->is_converged(counter); }
+    );
 
-    const auto logic_result = result_a.get() || result_b.get();
+    const auto logic_result = result_a || result_b;
     set_conv_flag(logic_result);
     converger_a->set_conv_flag(logic_result);
     converger_b->set_conv_flag(logic_result);
@@ -80,10 +86,13 @@ bool LogicConvergerOR::is_converged(const unsigned counter) {
 unique_ptr<Converger> LogicConvergerXOR::unique_copy() { return std::make_unique<LogicConvergerXOR>(*this); }
 
 bool LogicConvergerXOR::is_converged(const unsigned counter) {
-    auto result_a = std::async([&] { return converger_a->is_converged(counter); });
-    auto result_b = std::async([&] { return converger_b->is_converged(counter); });
+    bool result_a{}, result_b{};
+    suanpan::parallel_invoke(
+        [&] { result_a = converger_a->is_converged(counter); },
+        [&] { result_b = converger_b->is_converged(counter); }
+    );
 
-    const auto logic_result = result_a.get() != result_b.get();
+    const auto logic_result = result_a != result_b;
     set_conv_flag(logic_result);
     converger_a->set_conv_flag(logic_result);
     converger_b->set_conv_flag(logic_result);

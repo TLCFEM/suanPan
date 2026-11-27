@@ -29,14 +29,38 @@
 #define UTILITY_H
 
 #include <concepts>
+#include <functional>
 #include <set>
 #include <suanPan.h>
 #ifdef __cpp_lib_execution
 #include <execution>
 #endif
+#ifdef SUANPAN_MT
+#include <oneapi/tbb/parallel_invoke.h>
+#endif
 
 namespace suanpan {
     template<typename T> constexpr const T& middle(const std::vector<T>& container) { return container[container.size() / 2]; }
+
+    /**
+     * @brief Invoke a number of callables, in parallel when multi-threading is enabled.
+     *
+     * This mirrors the interface of \p tbb::parallel_invoke. Without \p SUANPAN_MT the
+     * callables are invoked sequentially in pack order. All callables must be independent
+     * as they may run concurrently.
+     *
+     * In distributed builds the callables are always invoked sequentially. They may issue
+     * MPI collectives, which have to be called in the same order on every rank; concurrent
+     * calls from several threads cannot guarantee that order even with MPI_THREAD_MULTIPLE.
+     */
+    template<typename... F> void parallel_invoke(F&&... func) {
+        static_assert(sizeof...(F) >= 2, "parallel_invoke requires at least two callables");
+#if defined(SUANPAN_MT) && !defined(SUANPAN_DISTRIBUTED)
+        tbb::parallel_invoke(std::forward<F>(func)...);
+#else
+        (std::invoke(std::forward<F>(func)), ...);
+#endif
+    }
 
     template<sp_i IT, std::invocable<IT> F> void for_each(const IT start, const IT end, F&& FN) {
 #ifdef SUANPAN_MT

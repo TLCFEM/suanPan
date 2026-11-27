@@ -131,6 +131,19 @@ TEST_CASE("For Each", "[Utility.ForEach]") {
     for(auto I = 1u; I < 5u; ++I) REQUIRE(1 == w[I]);
 }
 
+TEST_CASE("Parallel Invoke", "[Utility.ParallelInvoke]") {
+    std::vector<int> values(4, 0);
+
+    suanpan::parallel_invoke(
+        [&] { values[0] = 1; },
+        [&] { values[1] = 2; },
+        [&] { values[2] = 3; },
+        [&] { values[3] = 4; }
+    );
+
+    for(auto I{0u}; I < values.size(); ++I) REQUIRE(static_cast<int>(I) + 1 == values[I]);
+}
+
 TEST_CASE("Hacker Const Cast", "[Utility.Hacker]") {
     auto value = 42;
     const auto& cref = value;

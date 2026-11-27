@@ -62,17 +62,16 @@ void LeeNewmark::initialize_stiffness(const shared_ptr<DomainBase>& D) {
     auto& t_stiff = factory->modify_stiffness();
     auto& t_geometry = factory->modify_geometry();
 
-    auto fa = std::async([&] {
+    auto assemble_stiffness = [&] {
         current_stiffness.swap(t_stiff);
         D->assemble_current_stiffness();
-    });
+    };
 
-    if(!factory->is_nlgeom()) fa.get();
+    if(!factory->is_nlgeom()) assemble_stiffness();
     else {
         current_geometry.swap(t_geometry);
-        D->assemble_current_geometry();
+        suanpan::parallel_invoke(assemble_stiffness, [&] { D->assemble_current_geometry(); });
         current_geometry.swap(t_geometry);
-        fa.get();
         t_stiff += current_geometry;
     }
 }
@@ -152,11 +151,7 @@ void LeeNewmark::assemble_resistance() {
     const auto D = get_domain();
     const auto& W = factory;
 
-    D->assemble_resistance();
-    D->assemble_inertial_force();
-    // consider independent viscous device
-    D->assemble_damping_force();
-    D->assemble_nonviscous_force();
+    assemble_resistance_vectors();
 
     if(nullptr != current_mass) {
         vec internal_velocity = CM * W->get_trial_velocity();

@@ -65,8 +65,10 @@ int FEAST::analyze() {
     D->update<Statistics::UpdateStatus>(t_clock);
 
     t_clock.tic();
-    D->assemble_trial_mass();
-    D->assemble_trial_stiffness();
+    suanpan::parallel_invoke(
+        [&] { D->assemble_trial_mass(); },
+        [&] { D->assemble_trial_stiffness(); }
+    );
     D->update<Statistics::AssembleMatrix>(t_clock);
 
     t_clock.tic();

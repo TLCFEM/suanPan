@@ -127,6 +127,17 @@ int Integrator::process_constraint_resistance() { return process_constraint_impl
 
 void Integrator::record() const { database.lock()->record(); }
 
+void Integrator::assemble_resistance_vectors() const {
+    const auto D = database.lock();
+
+    suanpan::parallel_invoke(
+        [&] { D->assemble_resistance(); },
+        [&] { D->assemble_damping_force(); },
+        [&] { D->assemble_nonviscous_force(); },
+        [&] { D->assemble_inertial_force(); }
+    );
+}
+
 void Integrator::assemble_resistance() {
     const auto D = database.lock();
     auto& W = D->get_factory();
@@ -140,8 +151,10 @@ void Integrator::assemble_resistance() {
  */
 void Integrator::assemble_matrix() {
     const auto D = database.lock();
-    D->assemble_trial_stiffness();
-    D->assemble_trial_geometry();
+    suanpan::parallel_invoke(
+        [&] { D->assemble_trial_stiffness(); },
+        [&] { D->assemble_trial_geometry(); }
+    );
 }
 
 /**
@@ -376,21 +389,20 @@ vec Integrator::from_total_acceleration(const double magnitude, const uvec& enco
 void ImplicitIntegrator::assemble_matrix() {
     const auto D = get_domain();
 
-    D->assemble_trial_stiffness();
-    D->assemble_trial_geometry();
-    D->assemble_trial_damping();
-    D->assemble_trial_nonviscous();
-    D->assemble_trial_mass();
+    suanpan::parallel_invoke(
+        [&] { D->assemble_trial_stiffness(); },
+        [&] { D->assemble_trial_geometry(); },
+        [&] { D->assemble_trial_damping(); },
+        [&] { D->assemble_trial_nonviscous(); },
+        [&] { D->assemble_trial_mass(); }
+    );
 }
 
 void ExplicitIntegrator::assemble_resistance() {
     const auto D = get_domain();
     auto& W = D->get_factory();
 
-    D->assemble_resistance();
-    D->assemble_damping_force();
-    D->assemble_nonviscous_force();
-    D->assemble_inertial_force();
+    assemble_resistance_vectors();
 
     W->set_sushi(W->get_trial_resistance() + W->get_trial_damping_force() + W->get_trial_nonviscous_force() + W->get_trial_inertial_force());
 }

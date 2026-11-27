@@ -70,8 +70,10 @@ int Buckle::analyze() {
     }
 
     // assemble stiffness and geometry as they may be modified in solver
-    D->assemble_trial_stiffness();
-    D->assemble_trial_geometry();
+    suanpan::parallel_invoke(
+        [&] { D->assemble_trial_stiffness(); },
+        [&] { D->assemble_trial_geometry(); }
+    );
 
     if(SUANPAN_SUCCESS != G->process_constraint()) return SUANPAN_FAIL;
 
