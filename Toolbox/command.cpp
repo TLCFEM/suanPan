@@ -54,11 +54,11 @@
 #include <Toolbox/resampling.h>
 #include <Toolbox/response_spectrum.h>
 #include <Toolbox/thread_pool.hpp>
+#include <linenoise/linenoise.hpp>
 #include <ranges>
 #include <regex>
 
 using std::ifstream;
-using std::ofstream;
 using std::vector;
 
 unsigned SUANPAN_WARNING_COUNT = 0;
@@ -2336,16 +2336,11 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
 
     ifstream input_file;
 
-    uintmax_t input_file_size{};
-
     for(const auto& file : file_list) {
         const auto file_path = fs::path(file);
         if(fs::is_directory(file_path)) continue;
         input_file.open(file_path);
-        if(input_file.is_open()) {
-            input_file_size = file_size(file_path);
-            break;
-        }
+        if(input_file.is_open()) break;
     }
 
     if(!input_file.is_open()) {
@@ -2358,26 +2353,15 @@ int process_file(const shared_ptr<Bead>& model, const char* file_name) {
         return SUANPAN_EXIT;
     }
 
-    const auto history_path = get_history_path();
-    ofstream output_file(history_path, !exists(history_path) || file_size(history_path) > 16777216 ? std::ios_base::out : (std::ios_base::app | std::ios_base::out));
-
-    const auto record_command = output_file.is_open() && input_file_size <= 102400;
-
-    if(record_command) output_file << "### start processing --> " << file_name << '\n';
-
     std::string all_line, command_line;
     while(getline(input_file, command_line)) {
         if(!normalise_command(all_line, command_line)) continue;
         // now process the command
-        if(record_command) output_file << all_line << '\n';
-        if(process_command(model, all_line) == SUANPAN_EXIT) {
-            if(record_command) output_file << "### finish processing --> " << file_name << '\n';
-            return SUANPAN_EXIT;
-        }
+        linenoise::AddHistory(all_line.c_str());
+        if(process_command(model, all_line) == SUANPAN_EXIT) return SUANPAN_EXIT;
         all_line.clear();
     }
 
-    if(record_command) output_file << "### finish processing --> " << file_name << '\n';
     return SUANPAN_SUCCESS;
 }
 

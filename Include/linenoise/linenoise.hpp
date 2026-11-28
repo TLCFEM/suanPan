@@ -131,11 +131,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <deque>
 #include <fstream>
 #include <functional>
 #include <iostream>
 #include <string>
-#include <utility>
 #include <vector>
 
 namespace linenoise {
@@ -792,111 +792,6 @@ inline constexpr size_t kPasteFoldContext = 8; /* Context chars kept around fold
 inline constexpr size_t kPasteMaxBytes = LINENOISE_MAX_LINE;
 inline constexpr int kMaxFolds = 16;
 
-/* Fixed-capacity FIFO backed by std::vector. The slots are allocated once;
- * adding to a full buffer overwrites the oldest slot in place and advances
- * the head index. This makes push_back() and trimming O(1) instead of the
- * O(max_len) shift performed by std::vector::erase(begin(), ...).
- *
- * Logical index 0 is always the oldest entry, size()-1 the newest. The
- * logical-order snapshot is cached and rebuilt lazily, so GetHistory() can
- * keep returning a const std::vector<std::string>& without putting a copy
- * on the AddHistory() hot path. */
-template <typename T> class ring_buffer {
-public:
-    explicit ring_buffer(size_t capacity = 0) { slots_.assign(capacity, T{}); }
-
-    size_t capacity() const { return slots_.size(); }
-    size_t size() const { return size_; }
-    bool empty() const { return 0 == size_; }
-
-    void clear() {
-        head_ = 0;
-        size_ = 0;
-        invalidate();
-    }
-
-    /* Allocate 'capacity' slots, discarding all entries. */
-    void reserve(size_t capacity) {
-        slots_.assign(capacity, T{});
-        head_ = 0;
-        size_ = 0;
-        invalidate();
-    }
-
-    /* Change capacity while keeping the newest min(old size, capacity)
-     * entries in logical order. Used by SetHistoryMaxLen(). */
-    void set_capacity(size_t capacity) {
-        if (capacity == slots_.size()) return;
-
-        std::vector<T> old;
-        old.reserve(size_);
-        for (size_t i = 0; i < size_; ++i) old.push_back((*this)[i]);
-
-        slots_.assign(capacity, T{});
-        head_ = 0;
-        size_ = 0;
-        const size_t keep = old.size() < capacity ? old.size() : capacity;
-        for (size_t i = old.size() - keep; i < old.size(); ++i) push_back(std::move(old[i]));
-        invalidate();
-    }
-
-    /* Append an entry, evicting the oldest when full. The value is taken by
-     * value so a pointer into this buffer can be passed as 'value': the copy
-     * is made before any slot is overwritten. */
-    bool push_back(T value) {
-        if (0 == capacity()) return false;
-        if (size_ == capacity()) {
-            slots_[head_] = std::move(value);
-            head_ = (head_ + 1) % capacity();
-        }
-        else {
-            slots_[(head_ + size_) % capacity()] = std::move(value);
-            ++size_;
-        }
-        invalidate();
-        return true;
-    }
-
-    void pop_back() {
-        if (!empty()) {
-            --size_;
-            invalidate();
-        }
-    }
-
-    T &operator[](size_t i) {
-        invalidate(); /* a non-const access may modify the entry */
-        return slots_[(head_ + i) % capacity()];
-    }
-    const T &operator[](size_t i) const { return slots_[(head_ + i) % capacity()]; }
-
-    T &back() {
-        invalidate();
-        return (*this)[size_ - 1];
-    }
-    const T &back() const { return (*this)[size_ - 1]; }
-
-    /* Logical-order view, rebuilt only when the buffer changed. */
-    const std::vector<T> &snapshot() const {
-        if (snapshot_dirty_) {
-            snapshot_.clear();
-            snapshot_.reserve(size_);
-            for (size_t i = 0; i < size_; ++i) snapshot_.push_back(slots_[(head_ + i) % capacity()]);
-            snapshot_dirty_ = false;
-        }
-        return snapshot_;
-    }
-
-private:
-    void invalidate() const { snapshot_dirty_ = true; }
-
-    std::vector<T> slots_;
-    size_t head_ = 0;
-    size_t size_ = 0;
-    mutable std::vector<T> snapshot_;
-    mutable bool snapshot_dirty_ = true;
-};
-
 /* A single tab-completion candidate. The bytes [start, end) of the edit
  * buffer are replaced with 'text', and the cursor lands right after the
  * inserted text. This lets a callback complete the word under the cursor
@@ -931,7 +826,9 @@ inline int raw_mode_ifd = STDIN_FILENO;
 inline int raw_mode_ofd = STDOUT_FILENO;
 inline bool atexit_registered = false;
 inline size_t history_max_len = kHistoryDefaultMaxLen;
-inline ring_buffer<std::string> history{kHistoryDefaultMaxLen};
+/* A deque keeps both ends cheap: trimming the oldest entries is O(1) per
+ * entry instead of the O(size) shift std::vector::erase() would perform. */
+inline std::deque<std::string> history;
 
 /* Multi-line composition (cpp-linenoise extension). ENTER submits the
  * line; the conventions below insert a newline into the buffer instead.
@@ -1341,24 +1238,27 @@ inline void beep() {
 
 /* ============================== History =================================== */
 
-/* Append an entry. The ring buffer evicts the oldest entry in place when it
- * is full, so no separate trim is needed. The entry is taken by value
- * because the source may point into the history itself. */
-inline bool history_push(std::string entry) {
+/* Add a new entry to the history. The source is copied first because it may
+ * point into the history itself. With a deque, discarding the oldest entry
+ * when the limit is reached is O(1). Returns true if the line was added. */
+inline bool history_add(const char *line) {
     if (history_max_len == 0) return false;
+
+    std::string entry{line};
 
     /* Don't add duplicated lines. */
     if (!history.empty() && history.back() == entry) return false;
 
-    return history.push_back(std::move(entry));
-}
+    history.push_back(std::move(entry));
 
-/* Add a new entry to the history. Returns true if the line was added. */
-inline bool history_add(const char *line) { return history_push(line); }
+    if (history.size() > history_max_len) history.pop_front();
+
+    return true;
+}
 
 inline bool history_set_max_len(size_t len) {
     if (len < 1) return false;
-    history.set_capacity(len);
+    while (history.size() > len) history.pop_front();
     history_max_len = len;
     return true;
 }
@@ -1369,11 +1269,10 @@ inline bool history_set_max_len(size_t len) {
  * descriptor avoids the symlink race of chmod() on the path. */
 inline bool history_save(const char *filename) {
     std::string data;
-    const auto &entries = history;
-    for (size_t i = 0; i < entries.size(); ++i) {
+    for (const auto &entry : history) {
         /* Keep the history file newline-separated: embedded newlines in an
          * entry are stored as CR and converted back by history_load(). */
-        std::string s = entries[i];
+        std::string s = entry;
         std::replace(s.begin(), s.end(), '\n', '\r');
         data += s;
         data += '\n';
@@ -1413,9 +1312,9 @@ inline bool history_load(const char *filename) {
         if (!line.empty() && line.back() == '\r') line.pop_back();
         /* Rebuild embedded newlines that were saved as CR. */
         std::replace(line.begin(), line.end(), '\r', '\n');
-        /* The ring buffer evicts the oldest entry in O(1), so no batching
-         * is needed even for a file much longer than the limit. */
-        history_push(line.c_str());
+        /* history_add() enforces the maximum length; with a deque, trimming
+         * is O(1), so memory stays bounded even for a long file. */
+        history_add(line.c_str());
     }
     return true;
 }
@@ -3077,9 +2976,7 @@ inline bool SaveHistory(const char *path) { return detail::history_save(path); }
 /* Load the history from the specified file. */
 inline bool LoadHistory(const char *path) { return detail::history_load(path); }
 
-/* Logical-order view of the history. The snapshot is cached, so repeated
- * calls (or calls after a no-op add) do not copy the buffer. */
-inline const std::vector<std::string> &GetHistory() { return detail::history.snapshot(); }
+inline const std::deque<std::string> &GetHistory() { return detail::history; }
 
 /* Clear the screen. */
 inline void ClearScreen() { detail::clear_screen(); }

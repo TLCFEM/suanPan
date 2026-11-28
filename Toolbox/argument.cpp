@@ -224,6 +224,12 @@ void argument_parser(const int argc, char** argv) {
     wall_clock T;
     T.tic();
 
+    const auto history_path = get_history_path();
+    const auto history_path_string = history_path.generic_string();
+
+    linenoise::SetHistoryMaxLen(4096);
+    linenoise::LoadHistory(history_path_string.c_str());
+
     if(argc > 1) {
         try {
             program.parse_args(argc, argv);
@@ -287,6 +293,8 @@ void argument_parser(const int argc, char** argv) {
         print_header();
         cli_mode(std::make_shared<Bead>());
     }
+
+    linenoise::SaveHistory(history_path_string.c_str());
 
     // ReSharper disable once CppIfCanBeReplacedByConstexprIf
     if(comm_rank == 0) suanpan_highlight("\nPlease feel free to share feedback, start discussions, or request new features on the GitHub repository.\n");
@@ -730,9 +738,6 @@ void cli_mode(const shared_ptr<Bead>& model) {
             else if(boundary < line.length()) suggest_types(line.substr(0, first_word_end), line, pos, completions);
         }
     );
-
-    linenoise::SetHistoryMaxLen(4096);
-    linenoise::LoadHistory(history_path.generic_string().c_str());
 
     std::string prompt{"suanPan ~<> "};
     if(SUANPAN_COLOR) prompt = fmt::format(fmt::emphasis::bold | fg(fmt::color::deep_sky_blue), "{}", prompt);
