@@ -275,7 +275,6 @@ namespace suanpan {
         template<typename T> decltype(auto) store_argument(T&& argument) {
             using value_t = std::remove_cvref_t<T>;
             if constexpr(std::is_same_v<value_t, std::string_view>) return std::string(argument);
-            else if constexpr(std::is_same_v<value_t, fmt::basic_string_view<char>>) return 0 == argument.size() ? std::string() : std::string(argument.data(), argument.size());
             else if constexpr(std::is_same_v<value_t, const char*> || std::is_same_v<value_t, char*>) return std::string(argument ? argument : "(null)");
             else return std::forward<T>(argument);
         }
@@ -308,36 +307,31 @@ namespace suanpan {
 
     template<typename... T> void debug(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_VERBOSE || !SUANPAN_PRINT) return;
-        if(SUANPAN_COLOR) print_message(SUANPAN_COUT, fg(fmt::color::sky_blue), pattern("DEBUG", file_name, format_str), line, args...);
-        else print_message(SUANPAN_COUT, pattern("DEBUG", file_name, format_str), line, args...);
+        print_message(SUANPAN_COUT, SUANPAN_COLOR ? fg(fmt::color::sky_blue) : fmt::text_style{}, pattern("DEBUG", file_name, format_str), line, args...);
     }
 
     template<typename... T> void warning(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         // ReSharper disable once CppExpressionWithoutSideEffects
         std::atomic_ref(SUANPAN_WARNING_COUNT).fetch_add(1, std::memory_order_relaxed);
         if(!SUANPAN_PRINT) return;
-        if(SUANPAN_COLOR) print_message(SUANPAN_CWRN, fg(fmt::color::gold), pattern("WARNING", file_name, format_str), line, args...);
-        else print_message(SUANPAN_CWRN, pattern("WARNING", file_name, format_str), line, args...);
+        print_message(SUANPAN_CWRN, SUANPAN_COLOR ? fg(fmt::color::gold) : fmt::text_style{}, pattern("WARNING", file_name, format_str), line, args...);
     }
 
     template<typename... T> void error(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         // ReSharper disable once CppExpressionWithoutSideEffects
         std::atomic_ref(SUANPAN_ERROR_COUNT).fetch_add(1, std::memory_order_relaxed);
         if(!SUANPAN_PRINT) return;
-        if(SUANPAN_COLOR) print_message(SUANPAN_CERR, fg(fmt::color::crimson), pattern("ERROR", file_name, format_str), line, args...);
-        else print_message(SUANPAN_CERR, pattern("ERROR", file_name, format_str), line, args...);
+        print_message(SUANPAN_CERR, SUANPAN_COLOR ? fg(fmt::color::crimson) : fmt::text_style{}, pattern("ERROR", file_name, format_str), line, args...);
     }
 
     template<typename... T> void fatal(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_PRINT) return;
-        if(SUANPAN_COLOR) print_message(SUANPAN_CFTL, fg(fmt::color::deep_pink), pattern("FATAL", file_name, format_str), line, args...);
-        else print_message(SUANPAN_CFTL, pattern("FATAL", file_name, format_str), line, args...);
+        print_message(SUANPAN_CFTL, SUANPAN_COLOR ? fg(fmt::color::deep_pink) : fmt::text_style{}, pattern("FATAL", file_name, format_str), line, args...);
     }
 
     template<typename... T> void info(const std::string_view format_sv, const T&... args) {
         if(!SUANPAN_PRINT) return;
-        if(SUANPAN_COLOR) print_message(SUANPAN_COUT, fg(fmt::color::spring_green), format_sv, args...);
-        else print_message(SUANPAN_COUT, format_sv, args...);
+        print_message(SUANPAN_COUT, SUANPAN_COLOR ? fg(fmt::color::spring_green) : fmt::text_style{}, format_sv, args...);
     }
 
     template<typename... T> std::string format(const std::string_view format_str, const T&... args) { return fmt::vformat(format_str, fmt::make_format_args(args...)); }
@@ -369,8 +363,7 @@ namespace suanpan {
 
     template<typename... T> void highlight(const std::string_view format_sv, const T&... args) {
         if(!SUANPAN_PRINT) return;
-        if(SUANPAN_COLOR) print_message(SUANPAN_COUT, fg(fmt::color::cyan), format_sv, args...);
-        else print_message(SUANPAN_COUT, format_sv, args...);
+        print_message(SUANPAN_COUT, SUANPAN_COLOR ? fg(fmt::color::cyan) : fmt::text_style{}, format_sv, args...);
     }
 } // namespace suanpan
 

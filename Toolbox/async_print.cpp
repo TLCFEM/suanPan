@@ -73,7 +73,12 @@ namespace suanpan {
             std::unique_lock lock(mode_mutex);
             mode_cv.wait(lock, [] { return print_mode::switching != mode; });
 
-            if(print_mode::async == mode) get_print_pool().push_task([&stream, formatter = std::move(formatter)] {
+            if(print_mode::sync == mode) {
+                stream << formatter();
+                return;
+            }
+
+            get_print_pool().push_task([&stream, formatter = std::move(formatter)] {
                 // Formatting happens on the worker thread as well, so the
                 // producer only pays for copying the arguments.
                 std::string message;
@@ -92,7 +97,6 @@ namespace suanpan {
                 catch(...) {
                 }
             });
-            else stream << formatter();
         }
     } // namespace detail
 
