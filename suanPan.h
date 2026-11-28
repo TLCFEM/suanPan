@@ -289,14 +289,16 @@ namespace suanpan {
     }
 
     template<typename... T> void warning(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
-        std::atomic_ref<unsigned>(SUANPAN_WARNING_COUNT).fetch_add(1, std::memory_order_relaxed);
+        // ReSharper disable once CppExpressionWithoutSideEffects
+        std::atomic_ref(SUANPAN_WARNING_COUNT).fetch_add(1, std::memory_order_relaxed);
         if(!SUANPAN_PRINT) return;
         if(SUANPAN_COLOR) print_message(fmt::vformat(fg(fmt::color::gold), pattern("WARNING", file_name, format_str), fmt::make_format_args(line, args...)), SUANPAN_CWRN);
         else print_message(fmt::vformat(pattern("WARNING", file_name, format_str), fmt::make_format_args(line, args...)), SUANPAN_CWRN);
     }
 
     template<typename... T> void error(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
-        std::atomic_ref<unsigned>(SUANPAN_ERROR_COUNT).fetch_add(1, std::memory_order_relaxed);
+        // ReSharper disable once CppExpressionWithoutSideEffects
+        std::atomic_ref(SUANPAN_ERROR_COUNT).fetch_add(1, std::memory_order_relaxed);
         if(!SUANPAN_PRINT) return;
         if(SUANPAN_COLOR) print_message(fmt::vformat(fg(fmt::color::crimson), pattern("ERROR", file_name, format_str), fmt::make_format_args(line, args...)), SUANPAN_CERR);
         else print_message(fmt::vformat(pattern("ERROR", file_name, format_str), fmt::make_format_args(line, args...)), SUANPAN_CERR);
