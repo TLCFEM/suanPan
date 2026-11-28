@@ -18,6 +18,9 @@
  * @file async_print.cpp
  * @brief Implementation of asynchronous screen printing.
  *
+ * Messages are queued as formatter jobs rather than pre-formatted strings, so
+ * the worker thread performs both formatting and writing.
+ *
  * @author tlc
  * @date 23/11/2026
  * @version 0.1.0
@@ -65,21 +68,33 @@ namespace {
 } // namespace
 
 namespace suanpan {
-    void print_message(const std::string& message, std::ostream& stream) {
-        std::unique_lock lock(mode_mutex);
-        mode_cv.wait(lock, [] { return print_mode::switching != mode; });
+    namespace detail {
+        void enqueue_print(std::ostream& stream, std::function<std::string()> formatter) {
+            std::unique_lock lock(mode_mutex);
+            mode_cv.wait(lock, [] { return print_mode::switching != mode; });
 
-        if(print_mode::async == mode) get_print_pool().push_task([&stream, message] {
-            const std::scoped_lock write_lock(mode_mutex);
-            // A failing stream must not recurse into the logger.
-            try {
-                stream << message;
-            }
-            catch(...) {
-            }
-        });
-        else stream << message;
-    }
+            if(print_mode::async == mode) get_print_pool().push_task([&stream, formatter = std::move(formatter)] {
+                // Formatting happens on the worker thread as well, so the
+                // producer only pays for copying the arguments.
+                std::string message;
+                try {
+                    message = formatter();
+                }
+                catch(...) {
+                    return;
+                }
+
+                const std::scoped_lock write_lock(mode_mutex);
+                // A failing stream must not recurse into the logger.
+                try {
+                    stream << message;
+                }
+                catch(...) {
+                }
+            });
+            else stream << formatter();
+        }
+    } // namespace detail
 
     void enable_async_print() {
         const std::scoped_lock switch_lock(switch_mutex);

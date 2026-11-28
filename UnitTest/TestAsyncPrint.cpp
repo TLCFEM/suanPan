@@ -41,7 +41,36 @@ namespace {
             return std::stringbuf::sync();
         }
     };
+
+    std::thread::id main_thread_id;
+    std::atomic<bool> formatted_on_worker{false};
+
+    struct thread_probe {};
 } // namespace
+
+template<> struct fmt::formatter<thread_probe> : fmt::formatter<std::string_view> {
+    auto format(const thread_probe&, fmt::format_context& ctx) const {
+        formatted_on_worker.store(std::this_thread::get_id() != main_thread_id, std::memory_order_relaxed);
+        return fmt::formatter<std::string_view>::format("probe", ctx);
+    }
+};
+
+TEST_CASE("Async Print Formats On Worker", "[Utility.AsyncPrint]") {
+    suanpan::disable_async_print();
+
+    main_thread_id = std::this_thread::get_id();
+    formatted_on_worker.store(false, std::memory_order_relaxed);
+
+    std::ostringstream stream;
+
+    {
+        const suanpan::AsyncPrintGuard guard;
+        suanpan::print_message(stream, "{}", thread_probe{});
+    }
+
+    REQUIRE(formatted_on_worker.load(std::memory_order_relaxed));
+    REQUIRE("probe" == stream.str());
+}
 
 TEST_CASE("Async Print Preserves Order", "[Utility.AsyncPrint]") {
     suanpan::disable_async_print();
@@ -51,7 +80,7 @@ TEST_CASE("Async Print Preserves Order", "[Utility.AsyncPrint]") {
     {
         const suanpan::AsyncPrintGuard guard;
         REQUIRE(suanpan::is_async_print_enabled());
-        for(int i = 0; i < 1000; ++i) suanpan::print_message(fmt::format("{:04d}\n", i), buffer);
+        for(int i = 0; i < 1000; ++i) suanpan::print_message(buffer, "{:04d}\n", i);
     }
 
     REQUIRE_FALSE(suanpan::is_async_print_enabled());
@@ -66,11 +95,11 @@ TEST_CASE("Async Print Flush", "[Utility.AsyncPrint]") {
 
     std::ostringstream buffer;
 
-    suanpan::print_message("sync\n", buffer);
+    suanpan::print_message(buffer, "sync\n");
     REQUIRE("sync\n" == buffer.str());
 
     suanpan::enable_async_print();
-    suanpan::print_message("async\n", buffer);
+    suanpan::print_message(buffer, "async\n");
     suanpan::flush_print(buffer);
     REQUIRE("sync\nasync\n" == buffer.str());
 
@@ -83,14 +112,14 @@ TEST_CASE("Async Print Flushes Stream", "[Utility.AsyncPrint]") {
     counting_buf buffer;
     std::ostream stream(&buffer);
 
-    suanpan::print_message("[====]\r", stream);
+    suanpan::print_message(stream, "[====]\r");
     suanpan::flush_print(stream);
     REQUIRE(1 == buffer.sync_count);
     REQUIRE("[====]\r" == buffer.str());
 
     {
         const suanpan::AsyncPrintGuard guard;
-        suanpan::print_message("async\r", stream);
+        suanpan::print_message(stream, "async\r");
         suanpan::flush_print(stream);
         REQUIRE(2 == buffer.sync_count);
     }
@@ -108,10 +137,10 @@ TEST_CASE("Nested Async Print Guards", "[Utility.AsyncPrint]") {
         const suanpan::AsyncPrintGuard outer;
         {
             const suanpan::AsyncPrintGuard inner;
-            suanpan::print_message("inner\n", stream);
+            suanpan::print_message(stream, "inner\n");
         }
         REQUIRE(suanpan::is_async_print_enabled());
-        suanpan::print_message("outer\n", stream);
+        suanpan::print_message(stream, "outer\n");
     }
 
     REQUIRE_FALSE(suanpan::is_async_print_enabled());
@@ -127,7 +156,7 @@ TEST_CASE("Nested Async Print Guard Drains Inner Scope", "[Utility.AsyncPrint]")
         const suanpan::AsyncPrintGuard outer;
         {
             const suanpan::AsyncPrintGuard inner;
-            suanpan::print_message("inner\n", stream);
+            suanpan::print_message(stream, "inner\n");
         }
         REQUIRE("inner\n" == stream.str());
     }
@@ -149,7 +178,7 @@ TEST_CASE("Async Print Disable With Concurrent Producers", "[Utility.AsyncPrint]
         for(auto t = 0; t < producer_count; ++t)
             producers.emplace_back([&, t] {
                 while(!go.load(std::memory_order_acquire)) {}
-                for(auto i = 0; i < message_count; ++i) suanpan::print_message(fmt::format("{:d}:{:d}\n", t, i), stream);
+                for(auto i = 0; i < message_count; ++i) suanpan::print_message(stream, "{:d}:{:d}\n", t, i);
             });
 
         go.store(true, std::memory_order_release);

@@ -19,9 +19,10 @@
  * @brief Asynchronous screen printing support.
  *
  * Printing is synchronous by default, which is required in CLI mode. While
- * asynchronous printing is enabled, a single worker thread writes the queued
- * messages. Enabling, disabling and flushing pause producers and drain the
- * queue before the mode changes, so a write can never overlap a mode change.
+ * asynchronous printing is enabled, a single worker thread formats and writes
+ * the queued messages. Enabling, disabling and flushing pause producers and
+ * drain the queue before the mode changes, so a write can never overlap a mode
+ * change.
  *
  * @author tlc
  * @date 23/11/2026
