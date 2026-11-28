@@ -65,7 +65,7 @@ TEST_CASE("Async Print Formats On Worker", "[Utility.AsyncPrint]") {
 
     {
         const suanpan::AsyncPrintGuard guard;
-        suanpan::print_message(stream, "{}", thread_probe{});
+        suanpan::print_message(stream, fmt::text_style{}, "{}", thread_probe{});
     }
 
     REQUIRE(formatted_on_worker.load(std::memory_order_relaxed));
@@ -80,7 +80,7 @@ TEST_CASE("Async Print Preserves Order", "[Utility.AsyncPrint]") {
     {
         const suanpan::AsyncPrintGuard guard;
         REQUIRE(suanpan::is_async_print_enabled());
-        for(int i = 0; i < 1000; ++i) suanpan::print_message(buffer, "{:04d}\n", i);
+        for(int i = 0; i < 1000; ++i) suanpan::print_message(buffer, fmt::text_style{}, "{:04d}\n", i);
     }
 
     REQUIRE_FALSE(suanpan::is_async_print_enabled());
@@ -95,11 +95,11 @@ TEST_CASE("Async Print Flush", "[Utility.AsyncPrint]") {
 
     std::ostringstream buffer;
 
-    suanpan::print_message(buffer, "sync\n");
+    suanpan::print_message(buffer, fmt::text_style{}, "sync\n");
     REQUIRE("sync\n" == buffer.str());
 
     suanpan::enable_async_print();
-    suanpan::print_message(buffer, "async\n");
+    suanpan::print_message(buffer, fmt::text_style{}, "async\n");
     suanpan::flush_print(buffer);
     REQUIRE("sync\nasync\n" == buffer.str());
 
@@ -112,14 +112,14 @@ TEST_CASE("Async Print Flushes Stream", "[Utility.AsyncPrint]") {
     counting_buf buffer;
     std::ostream stream(&buffer);
 
-    suanpan::print_message(stream, "[====]\r");
+    suanpan::print_message(stream, fmt::text_style{}, "[====]\r");
     suanpan::flush_print(stream);
     REQUIRE(1 == buffer.sync_count);
     REQUIRE("[====]\r" == buffer.str());
 
     {
         const suanpan::AsyncPrintGuard guard;
-        suanpan::print_message(stream, "async\r");
+        suanpan::print_message(stream, fmt::text_style{}, "async\r");
         suanpan::flush_print(stream);
         REQUIRE(2 == buffer.sync_count);
     }
@@ -137,10 +137,10 @@ TEST_CASE("Nested Async Print Guards", "[Utility.AsyncPrint]") {
         const suanpan::AsyncPrintGuard outer;
         {
             const suanpan::AsyncPrintGuard inner;
-            suanpan::print_message(stream, "inner\n");
+            suanpan::print_message(stream, fmt::text_style{}, "inner\n");
         }
         REQUIRE(suanpan::is_async_print_enabled());
-        suanpan::print_message(stream, "outer\n");
+        suanpan::print_message(stream, fmt::text_style{}, "outer\n");
     }
 
     REQUIRE_FALSE(suanpan::is_async_print_enabled());
@@ -156,7 +156,7 @@ TEST_CASE("Nested Async Print Guard Drains Inner Scope", "[Utility.AsyncPrint]")
         const suanpan::AsyncPrintGuard outer;
         {
             const suanpan::AsyncPrintGuard inner;
-            suanpan::print_message(stream, "inner\n");
+            suanpan::print_message(stream, fmt::text_style{}, "inner\n");
         }
         REQUIRE("inner\n" == stream.str());
     }
@@ -178,7 +178,7 @@ TEST_CASE("Async Print Disable With Concurrent Producers", "[Utility.AsyncPrint]
         for(auto t = 0; t < producer_count; ++t)
             producers.emplace_back([&, t] {
                 while(!go.load(std::memory_order_acquire)) {}
-                for(auto i = 0; i < message_count; ++i) suanpan::print_message(stream, "{:d}:{:d}\n", t, i);
+                for(auto i = 0; i < message_count; ++i) suanpan::print_message(stream, fmt::text_style{}, "{:d}:{:d}\n", t, i);
             });
 
         go.store(true, std::memory_order_release);

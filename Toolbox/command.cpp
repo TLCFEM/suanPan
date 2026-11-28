@@ -87,7 +87,7 @@ namespace {
                 progress.append(length, '=');
                 progress.append(50 - length, '-');
                 progress.append("]\r");
-                suanpan::print_message(SUANPAN_COUT, "{}", progress);
+                suanpan::print_message(SUANPAN_COUT, fmt::text_style{}, "{}", progress);
                 suanpan::flush_print(SUANPAN_COUT);
             });
             vec x = solve(A, b);

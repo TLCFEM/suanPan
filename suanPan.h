@@ -278,18 +278,14 @@ namespace suanpan {
             else if constexpr(std::is_same_v<value_t, const char*> || std::is_same_v<value_t, char*>) return std::string(argument ? argument : "(null)");
             else return std::forward<T>(argument);
         }
-
-        // The formatting job is executed by the printing thread, so neither
-        // formatting nor writing blocks the caller.
-        template<typename... T> void print_message(std::ostream& stream, const fmt::text_style& style, const std::string_view format_str, T&&... args) {
-            detail::enqueue_print(stream, [&stream, style, format_str = std::string(format_str), ... args = detail::store_argument(std::forward<T>(args))]() mutable {
-                return fmt::vformat(style, format_str, fmt::make_format_args(args...));
-            });
-        }
     } // namespace detail
 
-    template<typename... T> void print_message(std::ostream& stream, const std::string_view format_str, T&&... args) {
-        detail::print_message(stream, fmt::text_style{}, format_str, std::forward<T>(args)...);
+    // The formatting job is executed by the printing thread, so neither
+    // formatting nor writing blocks the caller.
+    template<typename... T> void print_message(std::ostream& stream, const fmt::text_style& style, const std::string_view format_str, T&&... args) {
+        detail::enqueue_print(stream, [&stream, style, format_str = std::string(format_str), ... args = detail::store_argument(std::forward<T>(args))]() mutable {
+            return fmt::vformat(style, format_str, fmt::make_format_args(args...));
+        });
     }
 
     inline std::string pattern(const std::string_view header, const std::string_view file_path, const std::string_view format) {
@@ -307,31 +303,31 @@ namespace suanpan {
 
     template<typename... T> void debug(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_VERBOSE || !SUANPAN_PRINT) return;
-        detail::print_message(SUANPAN_COUT, SUANPAN_COLOR ? fg(fmt::color::sky_blue) : fmt::text_style{}, pattern("DEBUG", file_name, format_str), line, args...);
+        print_message(SUANPAN_COUT, SUANPAN_COLOR ? fg(fmt::color::sky_blue) : fmt::text_style{}, pattern("DEBUG", file_name, format_str), line, args...);
     }
 
     template<typename... T> void warning(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         // ReSharper disable once CppExpressionWithoutSideEffects
         std::atomic_ref(SUANPAN_WARNING_COUNT).fetch_add(1, std::memory_order_relaxed);
         if(!SUANPAN_PRINT) return;
-        detail::print_message(SUANPAN_CWRN, SUANPAN_COLOR ? fg(fmt::color::gold) : fmt::text_style{}, pattern("WARNING", file_name, format_str), line, args...);
+        print_message(SUANPAN_CWRN, SUANPAN_COLOR ? fg(fmt::color::gold) : fmt::text_style{}, pattern("WARNING", file_name, format_str), line, args...);
     }
 
     template<typename... T> void error(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         // ReSharper disable once CppExpressionWithoutSideEffects
         std::atomic_ref(SUANPAN_ERROR_COUNT).fetch_add(1, std::memory_order_relaxed);
         if(!SUANPAN_PRINT) return;
-        detail::print_message(SUANPAN_CERR, SUANPAN_COLOR ? fg(fmt::color::crimson) : fmt::text_style{}, pattern("ERROR", file_name, format_str), line, args...);
+        print_message(SUANPAN_CERR, SUANPAN_COLOR ? fg(fmt::color::crimson) : fmt::text_style{}, pattern("ERROR", file_name, format_str), line, args...);
     }
 
     template<typename... T> void fatal(const std::string_view file_name, const int line, const std::string_view format_str, const T&... args) {
         if(!SUANPAN_PRINT) return;
-        detail::print_message(SUANPAN_CFTL, SUANPAN_COLOR ? fg(fmt::color::deep_pink) : fmt::text_style{}, pattern("FATAL", file_name, format_str), line, args...);
+        print_message(SUANPAN_CFTL, SUANPAN_COLOR ? fg(fmt::color::deep_pink) : fmt::text_style{}, pattern("FATAL", file_name, format_str), line, args...);
     }
 
     template<typename... T> void info(const std::string_view format_sv, const T&... args) {
         if(!SUANPAN_PRINT) return;
-        detail::print_message(SUANPAN_COUT, SUANPAN_COLOR ? fg(fmt::color::spring_green) : fmt::text_style{}, format_sv, args...);
+        print_message(SUANPAN_COUT, SUANPAN_COLOR ? fg(fmt::color::spring_green) : fmt::text_style{}, format_sv, args...);
     }
 
     template<typename... T> std::string format(const std::string_view format_str, const T&... args) { return fmt::vformat(format_str, fmt::make_format_args(args...)); }
@@ -363,7 +359,7 @@ namespace suanpan {
 
     template<typename... T> void highlight(const std::string_view format_sv, const T&... args) {
         if(!SUANPAN_PRINT) return;
-        detail::print_message(SUANPAN_COUT, SUANPAN_COLOR ? fg(fmt::color::cyan) : fmt::text_style{}, format_sv, args...);
+        print_message(SUANPAN_COUT, SUANPAN_COLOR ? fg(fmt::color::cyan) : fmt::text_style{}, format_sv, args...);
     }
 } // namespace suanpan
 
